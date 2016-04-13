@@ -1,8 +1,15 @@
 $ cat .gitignore
+<<<<<<< HEAD
+=======
+build/*
+>>>>>>> 8e97860aecf3d1c41608f9a79562438633ca547c
 nbproject/*
 dist/*
 Entrega1/*
 nbbuild.xml
 test/*
 libs/*
+<<<<<<< HEAD
 /build/
+=======
+>>>>>>> 8e97860aecf3d1c41608f9a79562438633ca547c

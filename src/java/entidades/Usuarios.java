@@ -137,6 +137,7 @@ public class Usuarios implements Serializable {
         this.uActivo = uActivo;
     }
 
+
     public String getCodigoPerfil() {
         return codigoPerfil;
     }
@@ -229,5 +230,4 @@ public class Usuarios implements Serializable {
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
-
 }
