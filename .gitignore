@@ -1,1 +1,8 @@
-/nbproject/private/
+$ cat .gitignore
+build/*
+nbproject/*
+dist/*
+Entrega1/*
+nbbuild.xml
+test/*
+libs/*/

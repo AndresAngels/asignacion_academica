@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:messages id="messages" showDetail="true"/>
+        <p:panel id="panel">
+            <h:panelGrid columns="3" cellpadding="10">  
+                <p:outputLabel for="login" value="Login"/>
+                <p:inputText id="login" 
+                             value="#{usuarioController.selected.ULogin}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="login" />
+                <p:outputLabel for="nombre" value="Nombres"/>
+                <p:inputText id="nombre" 
+                             value="#{usuarioController.selected.UNombre}" required="true">
+                    <f:validator validatorId="letras"/>
+                </p:inputText>
+                <p:message for="nombre" />
+                <p:outputLabel for="apellido" value="Apellidos"/>
+                <p:inputText id="apellido" 
+                             value="#{usuarioController.selected.UApellido}" required="true">
+                    <f:validator validatorId="letras"/>
+                </p:inputText>
+                <p:message for="apellido" />
+                <p:outputLabel for="email" value="E-mail"/>
+                <p:inputText id="email" 
+                             value="#{usuarioController.selected.UEmail}" required="true">
+                    <f:validator validatorId="email"/>
+                </p:inputText>
+                <p:message for="email" />
+                <p:outputLabel for="perfil" value="Perfil"/>
+                <p:inputText id="perfil" 
+                             value="#{usuarioController.selected.codigoPerfil}" required="false">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="perfil" />
+            </h:panelGrid>
+            <c:choose>
+                <c:when test="#{usuarioController.selected.ULogin==null}">
+                    <p:commandButton value="Grabar Sistema de Riesgo" 
+                                     actionListener="#{usuarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
+                </c:when>
+                <c:otherwise>
+                    <p:commandButton value="Actualizar Sistema de Riesgo" 
+                                     actionListener="#{usuarioController.update}" 
+                                     process="panel" update=":tabview" onclick="funcion1();" 
+                                     onsuccess="tabla.clearFilters();"/>
+                    <p:commandButton value="Cancelar Actualizacion" 
+                                     actionListener="#{indexLoader.limpiarCruds()}" 
+                                     process="@this" update=":tabview" onclick="funcion1();" 
+                                     onsuccess="tabla.clearFilters();"/>
+                </c:otherwise>
+            </c:choose>
+            <p:remoteCommand name="funcion" process="@this" 
+                             onstart="tabla.clearFilters();" 
+                             actionListener="#{usuarioController.mantenerIndex}"/>
+            <p:remoteCommand name="funcion1" process="@this" onstart="tabla.clearFilters();"/>
+        </p:panel>
+    </cc:implementation>
+</html>

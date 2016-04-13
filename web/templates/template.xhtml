@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ezcomp="http://java.sun.com/jsf/composite/ezcomp"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=/asignacion_docente/index.xhtml"/>
+                <title>
+                    <c:choose>
+                        <c:when test="#{usuarioController.usuario.ULogin!=null}">
+                            <ui:insert name="title">
+                                Plantilla
+                            </ui:insert>
+                        </c:when>
+                        <c:otherwise>
+                            Bienvenido a SAD
+                        </c:otherwise>
+                    </c:choose>
+                </title>
+                <h:outputStylesheet name="textos.css" library="css" />
+                <h:outputStylesheet name="jsfcrud.css" library="css" />
+                <h:outputStylesheet name="bordes.css" library="css" />
+                <ui:insert name="onload">
+                    <script language="JavaScript" type="text/JavaScript">
+                        function bodyLoaded(){
+                        }
+                    </script>
+                </ui:insert>
+                <script language="JavaScript" type="text/JavaScript">
+                    function getScreenSize(){
+                    var screenWidth = screen.width;
+                    var screenHeight = screen.height;
+                    document.getElementById("tabview:form:width").value = screenWidth;
+                    document.getElementById("tabview:form:height").value = screenHeight;
+                    }
+                </script>
+            </f:facet>
+        </h:head>
+        <h:body onload="bodyLoaded();">
+            <c:choose>
+                <c:when test="#{usuarioController.usuario.ULogin!=null}">
+                    <p:growl showDetail="true"/>
+                    <p:layout fullPage="true">
+                        <p:layoutUnit position="north" size="156">
+                            <p:layout>
+                                <p:layoutUnit position="center">
+                                    <p:graphicImage name="/img/Header.png"/>
+                                </p:layoutUnit>
+                                <p:layoutUnit position="east" minSize="200">
+                                    <h:form id="formsesion">
+                                        <ezcomp:sesion/>
+                                    </h:form>
+                                </p:layoutUnit>
+                                <p:layoutUnit position="south" size="46">
+                                    <h:form id="formmigas">
+                                        <p:breadCrumb>  
+                                            <p:menuitem styleClass="migas" value="Inicio" url="/index.xhtml" />
+                                            <ui:insert name="migas">
+                                            </ui:insert>
+                                        </p:breadCrumb>
+                                    </h:form>
+                                </p:layoutUnit>
+                            </p:layout>
+                        </p:layoutUnit>
+                        <p:layoutUnit position="west" size="190" header="Menu" collapsible="true">
+                            <h:form id="formmenu">
+                                <p:panelMenu model="#{menu.model}" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px;" />
+                            </h:form>
+                        </p:layoutUnit>
+                        <p:layoutUnit position="center">
+                            <h:inputHidden id="hidden" value="#{indexLoader.limpiarCruds()}"/>
+                            <ui:insert name="content">
+                            </ui:insert>
+                        </p:layoutUnit>
+                    </p:layout>
+                </c:when>
+                <c:otherwise>
+                    <h:form id="formlogin">
+                        <ezcomp:login/>
+                    </h:form>
+                </c:otherwise>
+            </c:choose>
+            <p:ajaxStatus onstart="statusDialog.show();" oncomplete="statusDialog.hide();"/>  
+            <p:dialog modal="true" widgetVar="statusDialog" header="Procesando... por favor espere" draggable="false" resizable="false" closable="false">  
+                <p:graphicImage name="/img/loading.gif"/>
+            </p:dialog>
+        </h:body>
+    </f:view>
+</html>

@@ -1,0 +1,42 @@
+.sesion{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 12px;
+}
+.migas{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+.textoMenu {
+    font-family: Arial, Helvetica, sans-serif; 
+    font-size: 12px;
+}
+.footer{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 14px;
+}
+
+.contenido{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.titulos{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.semititulos{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+th{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}

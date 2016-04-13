@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:messages id="messages" showDetail="true"/>
+        <p:panel id="panel">
+            <h:panelGrid columns="3" cellpadding="10">  
+                <p:outputLabel for="plan" value="Plan"/>
+                <p:inputText id="plan" 
+                             value="#{horarioController.selected.idPlan}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="plan" />
+                <p:outputLabel for="cohorte" value="Cohorte"/>
+                <p:inputText id="cohorte" 
+                             value="#{horarioController.selected.cohorte}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="cohorte" />
+                <p:outputLabel for="grupo" value="Grupo"/>
+                <p:inputText id="grupo" 
+                             value="#{horarioController.selected.grupo}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="grupo" />
+                <p:outputLabel for="asignatura" value="Asignatura"/>
+                <p:inputText id="asignatura" 
+                             value="#{horarioController.selected.codAsignatura}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="asignatura" />
+                <p:outputLabel for="franja" value="Franja"/>
+                <p:inputText id="franja" 
+                             value="#{horarioController.selected.franja}" required="true">
+                    <f:validator validatorId="letras"/>
+                </p:inputText>
+                <p:message for="franja" />
+                <p:outputLabel for="docente" value="Docente"/>
+                <p:inputText id="docente" 
+                             value="#{horarioController.selected.ULogin}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="docente" />
+                <p:outputLabel for="intensidad" value="Intensidad"/>
+                <p:inputText id="intensidad" 
+                             value="#{horarioController.selected.intensidad}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="intensidad" />
+                <p:outputLabel for="salon" value="salon"/>
+                <p:inputText id="salon" 
+                             value="#{horarioController.selected.salon}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="salon" />
+                <p:outputLabel for="dia" value="Dia"/>
+                <p:inputText id="dia" 
+                             value="#{horarioController.selected.dia}" required="true">
+                    <f:validator validatorId="numeros"/>
+                </p:inputText>
+                <p:message for="dia" />
+                <p:outputLabel for="entrada" value="Hora de Entrada"/>
+                <p:inputText id="grupo" 
+                             value="#{horarioController.selected.HEntrada}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="entrada" />
+                <p:outputLabel for="salida" value="Hora de Salida"/>
+                <p:inputText id="salida" 
+                             value="#{horarioController.selected.HSalida}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="salida" />
+                <p:outputLabel for="anio" value="Año"/>
+                <p:inputText id="anio" 
+                             value="#{horarioController.selected.anio}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="anio" />
+                <p:outputLabel for="periodo" value="periodo"/>
+                <p:inputText id="periodo" 
+                             value="#{horarioController.selected.periodo}" required="true">
+                    <f:validator validatorId="letrasnumeros"/>
+                </p:inputText>
+                <p:message for="periodo" />
+            </h:panelGrid>
+            <c:choose>
+                <c:when test="#{asignaturaController.selected.codAsignatura==null}">
+                    <p:commandButton value="Grabar Sistema de Riesgo" 
+                                     actionListener="#{usuarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
+                </c:when>
+                <c:otherwise>
+                    <p:commandButton value="Actualizar Sistema de Riesgo" 
+                                     actionListener="#{usuarioController.update}" 
+                                     process="panel" update=":tabview" onclick="funcion1();" 
+                                     onsuccess="tabla.clearFilters();"/>
+                    <p:commandButton value="Cancelar Actualizacion" 
+                                     actionListener="#{indexLoader.limpiarCruds()}" 
+                                     process="@this" update=":tabview" onclick="funcion1();" 
+                                     onsuccess="tabla.clearFilters();"/>
+                </c:otherwise>
+            </c:choose>
+            <p:remoteCommand name="funcion" process="@this" 
+                             onstart="tabla.clearFilters();" 
+                             actionListener="#{horarioController.mantenerIndex}"/>
+            <p:remoteCommand name="funcion1" process="@this" onstart="tabla.clearFilters();"/>
+        </p:panel>
+    </cc:implementation>
+</html>
