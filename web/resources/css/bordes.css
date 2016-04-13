@@ -1,0 +1,8 @@
+.ui-datagrid-no-border>.ui-datagrid-content {
+    border: none;
+}
+
+.noBorders tr, .noBorders td {
+    background: none !important;
+    border: none !important;
+}

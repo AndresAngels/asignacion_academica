@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <body>
+
+        <ui:composition template="./template.xhtml">
+
+            <ui:define name="title">
+                <ui:insert name="title">
+                </ui:insert>
+            </ui:define>
+
+            <ui:define name="migas">
+                <ui:insert name="migas">
+                </ui:insert>
+            </ui:define>
+
+            <ui:define name="onload">
+                <script language="JavaScript" type="text/JavaScript">
+                    function bodyLoaded(){
+                    tabla.clearFilters();
+                    tabla.clearFilters();
+                    }
+                </script>
+            </ui:define>
+
+            <ui:define name="content">
+                <p:tabView id="tabview">
+                    <p:tab title="Registros">
+                        <p:growl id="noty" sticky="false" showDetail="true" /> 
+                        <p:accordionPanel id="acordeon" multiple="true" styleClass="contenido">
+                            <p:tab id="uno" title="#{acordeon.tituloTabla}">
+                                <h:form>
+                                    <ui:insert name="tabla">
+                                    </ui:insert>
+                                </h:form>
+                            </p:tab>  
+                            <p:tab id="dos" title="#{acordeon.tituloFormulario}">
+                                <h:form id="form">
+                                    <ui:insert id="formulario" name="formulario">
+                                    </ui:insert>
+                                </h:form>
+                            </p:tab>  
+                        </p:accordionPanel>
+                    </p:tab>
+                </p:tabView>
+            </ui:define>
+
+        </ui:composition>
+    </body>
+</html>

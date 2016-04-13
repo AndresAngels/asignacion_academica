@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="controller" required="true"/>
+        <cc:attribute name="datos" required="true"/>
+        <cc:attribute name="listaFiltro" required="true" />
+        <cc:attribute name="campoPrimario" required="true" />
+        <cc:attribute name="titulo" required="true" />
+        <cc:attribute name="exporter" required="true" />
+    </cc:interface>
+
+    <!-- IMPLEMENTATION --><!-- filteredValue="cc.attrs.controller.mapaRiegos" -->
+    <cc:implementation>
+        <p:dataTable id="tablaActivar"  value="#{cc.attrs.datos}" var="item" widgetVar="tabla"
+                     paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} " rowsPerPageTemplate="5,10,15" 
+                     paginatorPosition="bottom"
+                     rowKey="#{item.cc.attrs.campoPrimario}"   
+                     filterEvent="enter" filteredValue="#{cc.attrs.listaFiltro}" emptyMessage="No se Encontraton Registros">
+            <f:facet name="header">  
+                #{cc.attrs.titulo}
+                <p:commandButton value="Limpiar Filtros" onclick="tabla.clearFilters();" onsuccess="tabla.clearFilters();"/>
+            </f:facet> 
+            <p:columns value="#{cc.attrs.controller.columns}" var="column" columnIndexVar="colIndex"   
+                       sortBy="#{item[column.property]}" filterBy="#{item[column.property]}" filterMatchMode="contains">
+                <f:facet name="header">  
+                    <p:outputLabel value="#{column.header}"/>
+                </f:facet>  
+
+                <p:outputLabel value="#{item[column.property]}"/>
+            </p:columns>
+            <p:column headerText="Acciones" style="width:6%" exportable="false">  
+                <p:commandButton global="true" id="BActivar" process="@this" icon="ui-icon-pencil" title="Reactivar" onclick="diaActivar.show()">
+                    <f:setPropertyActionListener value="#{item}" target="#{cc.attrs.controller.primaryKey}"  />  
+                </p:commandButton>
+            </p:column> 
+        </p:dataTable>
+        <p:confirmDialog id="ActivarDialog" message="¿Desea Activar el Registro Seleccionado?"  
+                         header="Confirmar Acción" closable="false" severity="alert" widgetVar="diaActivar" appendTo="@(body)">
+
+            <p:commandButton id="confirm1" update=":tabview" value="Si" onstart="tabla.clearFilters();" oncomplete="tabla.clearFilters();" onsuccess="diaActivar.hide();"  icon="ui-icon-check" actionListener="#{cc.attrs.controller.activar}"  process="@this"/>
+            <p:commandButton id="decline1" value="No" onclick="diaActivar.hide();" type="button" icon="ui-icon-cancel"/>   
+
+        </p:confirmDialog>
+    </cc:implementation>
+</html>

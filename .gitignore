@@ -1,0 +1,8 @@
+$ cat .gitignore
+nbproject/*
+dist/*
+Entrega1/*
+nbbuild.xml
+test/*
+libs/*
+/build/

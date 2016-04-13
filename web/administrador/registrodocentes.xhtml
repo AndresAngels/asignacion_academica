@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <body>
+
+        <ui:composition template="./../templates/crud.xhtml">
+
+            <ui:define name="title">
+                Registro de Usuarios:SAD
+            </ui:define>
+
+            <ui:define name="migas">
+                <p:menuitem styleClass="migas" value="Registro de Informacion" url="#"/>
+                <p:menuitem styleClass="migas" value="Registro de Usuarios" url="#"/>
+            </ui:define>
+
+            <ui:define name="tabla">
+                <ezcomp:datatable id="tablaMapa" controller="#{usuarioController}" 
+                                  datos="#{usuarioController.consultaTabla}" 
+                                  campoPrimario="nombre" 
+                                  listaFiltro="#{usuarioController.filtro}" 
+                                  titulo="Sistemas de Riesgo" exporter="0"/>
+            </ui:define>
+
+            <ui:define name="formulario">
+                <ezcomp:formulariodocentes/>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
