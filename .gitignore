@@ -5,4 +5,4 @@ dist/*
 Entrega1/*
 nbbuild.xml
 test/*
-libs/*/
+libs/*
