@@ -6,4 +6,4 @@ Entrega1/*
 nbbuild.xml
 test/*
 libs/*
-/nbproject/private/
+nbproject/*
