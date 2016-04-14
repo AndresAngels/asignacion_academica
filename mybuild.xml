@@ -16,8 +16,12 @@
     <target name="prepare" depends="clean" description="Crea los directorios de trabajo y copia los archivos estaticos al directorio de trabajo">
         <mkdir dir="${dist.home}"/>
         <mkdir dir="${work.home}/WEB-INF/classes"/>
+		<mkdir dir="${work.home}/WEB-INF/lib"/>
         <copy todir="${work.home}">
             <fileset dir="${web.home}"/>
+        </copy>
+		<copy todir="${work.home}/WEB-INF/lib">
+            <fileset dir="/lib"/>
         </copy>
     </target>
     
