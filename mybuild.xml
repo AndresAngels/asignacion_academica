@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="asignacion_academica" default="all" basedir=".">
     
-    <property name="app.name"		value="asignacion_academica"/>
-    <property name="app.version"	value="0.1-dev"/>
     <property name="work.home"		value="${basedir}/work"/>
     <property name="dist.home"		value="${basedir}/dist"/>
     <property name="src.home"		value="${basedir}/src"/>
@@ -44,7 +42,7 @@
 
     <target name="dist" depends="compile"
         description="Crea un archivo WAR para desplegar">
-        <jar jarfile="${dist.home}/${app.name).war"
+        <jar jarfile="${dist.home}/asignacion_academica.war"
         basedir="${work.home}"/>
     </target>
     
