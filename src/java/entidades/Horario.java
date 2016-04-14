@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -89,6 +90,12 @@ public class Horario implements Serializable {
     @JoinColumn(name = "u_login", referencedColumnName = "u_login")
     @ManyToOne(optional = false)
     private Usuarios uLogin;
+    @Transient
+    private String plan;
+    @Transient
+    private String asignatura;
+    @Transient
+    private String docente;
 
     public Horario() {
     }
@@ -264,6 +271,51 @@ public class Horario implements Serializable {
     @Override
     public String toString() {
         return "entidades.Horario[ idHorario=" + idHorario + " ]";
+    }
+
+    /**
+     * @return the plan
+     */
+    public String getPlan() {
+        plan = "" + idPlan;
+        return plan;
+    }
+
+    /**
+     * @param plan the plan to set
+     */
+    public void setPlan(String plan) {
+        this.plan = plan;
+    }
+
+    /**
+     * @return the asignatura
+     */
+    public String getAsignatura() {
+        asignatura = codasignatura.getNombre();
+        return asignatura;
+    }
+
+    /**
+     * @param asignatura the asignatura to set
+     */
+    public void setAsignatura(String asignatura) {
+        this.asignatura = asignatura;
+    }
+
+    /**
+     * @return the docente
+     */
+    public String getDocente() {
+        docente = uLogin.getNombreLogin();
+        return docente;
+    }
+
+    /**
+     * @param docente the docente to set
+     */
+    public void setDocente(String docente) {
+        this.docente = docente;
     }
 
 }

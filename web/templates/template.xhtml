@@ -12,7 +12,7 @@
         <h:head>
             <f:facet name="first">
                 <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
-                <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=/asignacion_docente/index.xhtml"/>
+                <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=/SAR2/index.xhtml"/>
                 <title>
                     <c:choose>
                         <c:when test="#{usuarioController.usuario.ULogin!=null}">
@@ -76,9 +76,14 @@
                             </h:form>
                         </p:layoutUnit>
                         <p:layoutUnit position="center">
-                            <h:inputHidden id="hidden" value="#{indexLoader.limpiarCruds()}"/>
+                            <h:inputHidden id="hidden" value="#{indexLoader.indexLoader()}"/>
                             <ui:insert name="content">
                             </ui:insert>
+                        </p:layoutUnit>
+                        <p:layoutUnit position="south" size="85" header="Infomación" collapsible="true" styleClass="footer">
+                            <p:layoutUnit position="east" size="79">
+                                <p:graphicImage name="/img/univalle4.png"/>
+                            </p:layoutUnit>
                         </p:layoutUnit>
                     </p:layout>
                 </c:when>

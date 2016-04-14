@@ -6,34 +6,34 @@
     <property name="src.home"		value="${basedir}/src"/>
     <property name="web.home"		value="${basedir}/web"/>
 	
-	<path id="compile.classpath">
-		<fileset dir="${src.home}/java/lib">
-			<include name="*.jar"/>
-		</fileset>
-		<pathelement location="${src.home}/java/lib"/>
-	</path>
+    <path id="compile.classpath">
+        <fileset dir="${src.home}/java/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${src.home}/java/lib"/>
+    </path>
     
     <target name="clean" description="Elimina la informacion antigua de generaciones pasadas">
-    	<delete dir="${work.home}"/>
-    	<delete dir="${dist.home}"/>
+        <delete dir="${work.home}"/>
+        <delete dir="${dist.home}"/>
     </target>
     
     <target name="prepare" depends="clean" description="Crea los directorios de trabajo y copia los archivos estaticos al directorio de trabajo">
         <mkdir dir="${dist.home}"/>
         <mkdir dir="${work.home}/WEB-INF/classes"/>
-		<mkdir dir="${work.home}/WEB-INF/lib"/>
+        <mkdir dir="${work.home}/WEB-INF/lib"/>
         <copy todir="${work.home}">
             <fileset dir="${web.home}"/>
         </copy>
-		<copy todir="${work.home}/WEB-INF/lib">
+        <copy todir="${work.home}/WEB-INF/lib">
             <fileset dir="${src.home}/java/lib"/>
         </copy>
     </target>
     
     <target name="compile" depends="prepare" description="Compila el codigo java y lo copia dentro de WEB-INF/classes">
         <javac srcdir="${src.home}"
-            destdir="${work.home}/WEB-INF/classes">
-			<classpath refid="compile.classpath"/>
+               destdir="${work.home}/WEB-INF/classes">
+            <classpath refid="compile.classpath"/>
         </javac>
         <copy todir="${work.home}/WEB-INF/classes">
             <fileset dir="${src.home}" excludes="**/*.java"/>
@@ -41,9 +41,9 @@
     </target>
 
     <target name="dist" depends="compile"
-        description="Crea un archivo WAR para desplegar">
+            description="Crea un archivo WAR para desplegar">
         <jar jarfile="${dist.home}/asignacion_academica.war"
-        basedir="${work.home}"/>
+             basedir="${work.home}"/>
     </target>
     
     <target name="all" depends="clean,prepare,compile,dist" description="Limpia el directorio, luego compila y genera el WAR"/>

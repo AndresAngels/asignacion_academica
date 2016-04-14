@@ -41,19 +41,21 @@
                 </p:inputText>
                 <p:message for="email" />
                 <p:outputLabel for="perfil" value="Perfil"/>
-                <p:inputText id="perfil" 
-                             value="#{usuarioController.selected.codigoPerfil}" required="false">
-                    <f:validator validatorId="numeros"/>
-                </p:inputText>
+                <p:selectOneMenu id="perfil"
+                                 value="#{perfilesController.selected}"
+                                 required="true">
+                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
+                    <f:selectItems value="#{perfilesController.consultaPerfiles}" var="perfiles" itemLabel="#{perfiles.descripcionPerfil}" itemValue="#{perfiles}"/>
+                </p:selectOneMenu>
                 <p:message for="perfil" />
             </h:panelGrid>
             <c:choose>
                 <c:when test="#{usuarioController.selected.ULogin==null}">
-                    <p:commandButton value="Grabar Sistema de Riesgo" 
+                    <p:commandButton value="Grabar Usuario" 
                                      actionListener="#{usuarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
-                    <p:commandButton value="Actualizar Sistema de Riesgo" 
+                    <p:commandButton value="Actualizar Usuario" 
                                      actionListener="#{usuarioController.update}" 
                                      process="panel" update=":tabview" onclick="funcion1();" 
                                      onsuccess="tabla.clearFilters();"/>

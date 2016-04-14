@@ -1,6 +1,7 @@
 package controladores;
 
 import controladores.util.JsfUtil;
+import entidades.Perfiles;
 import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,18 +18,22 @@ import javax.persistence.Query;
 import modelos.UsuariosJpaController;
 import vista.Index;
 
-@ManagedBean
+@ManagedBean(name = "usuarioController")
 @SessionScoped
 public class UsuarioController implements Serializable {
 
+    @ManagedProperty("#{perfilesController}")
+    private PerfilesController perfilesController;
     @ManagedProperty("#{index}")
     private Index index;
     private Usuarios primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private UsuariosJpaController jpaController = null;
     private List<Usuarios> consultaTabla;
     private List<Usuarios> filtro;
+    private List<Perfiles> perfiles;
     private Usuarios usuario;
     private Usuarios selected;
+    private boolean reactivar = false;
 
     public UsuarioController() {
         usuario = new Usuarios();
@@ -50,6 +55,7 @@ public class UsuarioController implements Serializable {
     public void insertar(ActionEvent ae) {
         selected.setUPassword(selected.getULogin());
         selected.setUActivo((short) 1);
+        selected.setCodigoPerfil(getPerfilesController().getSelected());
         create();
         getIndex().setIndex(0);
     }
@@ -191,6 +197,34 @@ public class UsuarioController implements Serializable {
      */
     public void setFiltro(List<Usuarios> filtro) {
         this.filtro = filtro;
+    }
+
+    /**
+     * @return the reactivar
+     */
+    public boolean isReactivar() {
+        return reactivar;
+    }
+
+    /**
+     * @param reactivar the reactivar to set
+     */
+    public void setReactivar(boolean reactivar) {
+        this.reactivar = reactivar;
+    }
+
+    /**
+     * @return the perfilesController
+     */
+    public PerfilesController getPerfilesController() {
+        return perfilesController;
+    }
+
+    /**
+     * @param perfilesController the perfilesController to set
+     */
+    public void setPerfilesController(PerfilesController perfilesController) {
+        this.perfilesController = perfilesController;
     }
 
     //Implementando Tabla Dinamica

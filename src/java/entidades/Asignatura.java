@@ -11,6 +11,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -41,6 +42,10 @@ public class Asignatura implements Serializable {
     private int estado;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "codasignatura")
     private List<Horario> horarioList;
+    @Transient
+    private String codigo;
+    @Transient
+    private String nombre;
 
     public Asignatura() {
     }
@@ -113,4 +118,33 @@ public class Asignatura implements Serializable {
         return "entidades.Asignatura[ codasignatura=" + codasignatura + " ]";
     }
 
+    /**
+     * @return the codigo
+     */
+    public String getCodigo() {
+        codigo = codasignatura;
+        return codigo;
+    }
+
+    /**
+     * @param codigo the codigo to set
+     */
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    /**
+     * @return the nombre
+     */
+    public String getNombre() {
+        nombre = nombreAsignatura;
+        return nombre;
+    }
+
+    /**
+     * @param nombre the nombre to set
+     */
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 }

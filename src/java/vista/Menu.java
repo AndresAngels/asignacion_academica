@@ -27,7 +27,7 @@ public class Menu implements Serializable {
         // Formularios de ingreso
         DefaultSubMenu submenu = new DefaultSubMenu("Registro de Informacion");
         item.setValue("Registrar Usuarios");
-        item.setUrl("/administrador/registrodocentes.xhtml");
+        item.setUrl("/administrador/registrousuarios.xhtml");
         submenu.addElement(item);
 
         item = new DefaultMenuItem();

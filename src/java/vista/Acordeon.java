@@ -27,7 +27,7 @@ public class Acordeon implements Serializable {
 
     public void llenar() {
         String value = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-        if (value.equals("/adminitrador/registrardocentes.xhtml")) {
+        if (value.equals("/administrador/registrousuarios.xhtml")) {
             tituloTabla = "Consultar Usuarios";
             if (getUsuarioController().getSelected().getULogin() == null) {
                 tituloFormulario = "Grabar Usuario";

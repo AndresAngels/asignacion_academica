@@ -39,6 +39,13 @@ public class IndexLoader implements Serializable {
     public IndexLoader() {
     }
 
+    public void indexLoader() {
+        getUsuarioController().setSelected(new Usuarios());
+        getAsignaturaController().setSelected(new Asignatura());
+        getHorarioController().setSelected(new Horario());
+        getUsuarioController().setReactivar(false);
+        getIndex().setIndex(0);
+    }
     public void limpiarCruds() {
         getUsuarioController().setSelected(new Usuarios());
         getAsignaturaController().setSelected(new Asignatura());
