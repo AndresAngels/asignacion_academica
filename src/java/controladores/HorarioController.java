@@ -40,7 +40,7 @@ public class HorarioController implements Serializable {
     public List<Horario> getConsultaTabla() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.estado:=ESTADO ORDER BY h.uLogin");
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.estado=:ESTADO ORDER BY h.uLogin.uLogin");
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {

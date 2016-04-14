@@ -34,31 +34,19 @@
                     <f:validator validatorId="numeros"/>
                 </p:inputText>
                 <p:message for="grupo" />
-                <p:outputLabel for="asignatura" value="Asignatura"/>
-                <p:inputText id="asignatura" 
-                             value="#{horarioController.selected.codAsignatura}" required="true">
-                    <f:validator validatorId="numeros"/>
-                </p:inputText>
-                <p:message for="asignatura" />
                 <p:outputLabel for="franja" value="Franja"/>
                 <p:inputText id="franja" 
                              value="#{horarioController.selected.franja}" required="true">
                     <f:validator validatorId="letras"/>
                 </p:inputText>
                 <p:message for="franja" />
-                <p:outputLabel for="docente" value="Docente"/>
-                <p:inputText id="docente" 
-                             value="#{horarioController.selected.ULogin}" required="true">
-                    <f:validator validatorId="numeros"/>
-                </p:inputText>
-                <p:message for="docente" />
                 <p:outputLabel for="intensidad" value="Intensidad"/>
                 <p:inputText id="intensidad" 
                              value="#{horarioController.selected.intensidad}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
                 </p:inputText>
                 <p:message for="intensidad" />
-                <p:outputLabel for="salon" value="salon"/>
+                <p:outputLabel for="salon" value="Salon"/>
                 <p:inputText id="salon" 
                              value="#{horarioController.selected.salon}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
@@ -71,7 +59,7 @@
                 </p:inputText>
                 <p:message for="dia" />
                 <p:outputLabel for="entrada" value="Hora de Entrada"/>
-                <p:inputText id="grupo" 
+                <p:inputText id="entrada" 
                              value="#{horarioController.selected.HEntrada}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
                 </p:inputText>
@@ -88,7 +76,7 @@
                     <f:validator validatorId="letrasnumeros"/>
                 </p:inputText>
                 <p:message for="anio" />
-                <p:outputLabel for="periodo" value="periodo"/>
+                <p:outputLabel for="periodo" value="Periodo"/>
                 <p:inputText id="periodo" 
                              value="#{horarioController.selected.periodo}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
@@ -96,13 +84,13 @@
                 <p:message for="periodo" />
             </h:panelGrid>
             <c:choose>
-                <c:when test="#{asignaturaController.selected.codAsignatura==null}">
+                <c:when test="#{horarioController.selected.idHorario==null}">
                     <p:commandButton value="Grabar Sistema de Riesgo" 
-                                     actionListener="#{usuarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
+                                     actionListener="#{horarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
                     <p:commandButton value="Actualizar Sistema de Riesgo" 
-                                     actionListener="#{usuarioController.update}" 
+                                     actionListener="#{horarioController.update}" 
                                      process="panel" update=":tabview" onclick="funcion1();" 
                                      onsuccess="tabla.clearFilters();"/>
                     <p:commandButton value="Cancelar Actualizacion" 

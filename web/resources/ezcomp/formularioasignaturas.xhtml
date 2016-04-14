@@ -18,7 +18,7 @@
             <h:panelGrid columns="3" cellpadding="10">  
                 <p:outputLabel for="codigo" value="Codigo"/>
                 <p:inputText id="codigo" 
-                             value="#{asignaturaController.selected.codAsignatura}" required="true">
+                             value="#{asignaturaController.selected.codasignatura}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
                 </p:inputText>
                 <p:message for="codigo" />
@@ -30,13 +30,13 @@
                 <p:message for="nombre" />
             </h:panelGrid>
             <c:choose>
-                <c:when test="#{usuarioController.selected.ULogin==null}">
+                <c:when test="#{asignaturaController.selected.codasignatura==null}">
                     <p:commandButton value="Grabar Sistema de Riesgo" 
-                                     actionListener="#{usuarioController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
+                                     actionListener="#{asignaturaController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
                     <p:commandButton value="Actualizar Sistema de Riesgo" 
-                                     actionListener="#{usuarioController.update}" 
+                                     actionListener="#{asignaturaController.update}" 
                                      process="panel" update=":tabview" onclick="funcion1();" 
                                      onsuccess="tabla.clearFilters();"/>
                     <p:commandButton value="Cancelar Actualizacion" 
