@@ -26,9 +26,7 @@
     </target>
     
     <target name="compile" depends="prepare" description="Compila el codigo java y lo copia dentro de WEB-INF/classes">
-        <javac srcdir="${src.home}"
-            destdir="${work.home}/WEB-INF/classes">
-        </javac>
+        <webproject2:javac destdir="${work.home}/WEB-INF/classes" gensrcdir="${src.home}"/>
         <copy todir="${work.home}/WEB-INF/classes">
             <fileset dir="${src.home}" excludes="**/*.java"/>
         </copy>
