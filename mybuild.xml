@@ -7,6 +7,13 @@
     <property name="dist.home"		value="${basedir}/dist"/>
     <property name="src.home"		value="${basedir}/src"/>
     <property name="web.home"		value="${basedir}/web"/>
+	
+	<path id="compile.classpath">
+		<fileset dir="${src.home}/java/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement location="${src.home}/java/lib"/>
+	</path>
     
     <target name="clean" description="Elimina la informacion antigua de generaciones pasadas">
     	<delete dir="${work.home}"/>
@@ -26,7 +33,10 @@
     </target>
     
     <target name="compile" depends="prepare" description="Compila el codigo java y lo copia dentro de WEB-INF/classes">
-        <webproject2:javac destdir="${work.home}/WEB-INF/classes" gensrcdir="${src.home}"/>
+        <javac srcdir="${src.home}"
+            destdir="${work.home}/WEB-INF/classes">
+			<classpath refid="compile.classpath"/>
+        </javac>
         <copy todir="${work.home}/WEB-INF/classes">
             <fileset dir="${src.home}" excludes="**/*.java"/>
         </copy>
