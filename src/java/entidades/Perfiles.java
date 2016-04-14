@@ -1,23 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entidades;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author AndresAngel
+ * @author Aaron
  */
 @Entity
 @Table(name = "perfiles")
@@ -35,6 +34,8 @@ public class Perfiles implements Serializable {
     private String codigoPerfil;
     @Column(name = "descripcion_perfil")
     private String descripcionPerfil;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "codigoPerfil")
+    private List<Usuarios> usuariosList;
 
     public Perfiles() {
     }
@@ -57,6 +58,15 @@ public class Perfiles implements Serializable {
 
     public void setDescripcionPerfil(String descripcionPerfil) {
         this.descripcionPerfil = descripcionPerfil;
+    }
+
+    @XmlTransient
+    public List<Usuarios> getUsuariosList() {
+        return usuariosList;
+    }
+
+    public void setUsuariosList(List<Usuarios> usuariosList) {
+        this.usuariosList = usuariosList;
     }
 
     @Override

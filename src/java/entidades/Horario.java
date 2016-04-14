@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entidades;
 
 import java.io.Serializable;
@@ -12,15 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author AndresAngel
+ * @author Aaron
  */
 @Entity
 @Table(name = "horario")
@@ -28,12 +24,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Horario.findAll", query = "SELECT h FROM Horario h"),
     @NamedQuery(name = "Horario.findByIdHorario", query = "SELECT h FROM Horario h WHERE h.idHorario = :idHorario"),
-    @NamedQuery(name = "Horario.findByIdPlan", query = "SELECT h FROM Horario h WHERE h.idPlan = :idPlan"),
     @NamedQuery(name = "Horario.findByCohorte", query = "SELECT h FROM Horario h WHERE h.cohorte = :cohorte"),
     @NamedQuery(name = "Horario.findByGrupo", query = "SELECT h FROM Horario h WHERE h.grupo = :grupo"),
-    @NamedQuery(name = "Horario.findByCodAsignatura", query = "SELECT h FROM Horario h WHERE h.codAsignatura = :codAsignatura"),
     @NamedQuery(name = "Horario.findByFranja", query = "SELECT h FROM Horario h WHERE h.franja = :franja"),
-    @NamedQuery(name = "Horario.findByULogin", query = "SELECT h FROM Horario h WHERE h.uLogin = :uLogin"),
+    @NamedQuery(name = "Horario.findByNombreAsignatura", query = "SELECT h FROM Horario h WHERE h.nombreAsignatura = :nombreAsignatura"),
     @NamedQuery(name = "Horario.findByIntensidad", query = "SELECT h FROM Horario h WHERE h.intensidad = :intensidad"),
     @NamedQuery(name = "Horario.findBySalon", query = "SELECT h FROM Horario h WHERE h.salon = :salon"),
     @NamedQuery(name = "Horario.findByDia", query = "SELECT h FROM Horario h WHERE h.dia = :dia"),
@@ -51,23 +45,17 @@ public class Horario implements Serializable {
     @Column(name = "id_horario")
     private Integer idHorario;
     @Basic(optional = false)
-    @Column(name = "id_plan")
-    private int idPlan;
-    @Basic(optional = false)
     @Column(name = "cohorte")
     private int cohorte;
     @Basic(optional = false)
     @Column(name = "grupo")
     private int grupo;
     @Basic(optional = false)
-    @Column(name = "cod_asignatura")
-    private String codAsignatura;
-    @Basic(optional = false)
     @Column(name = "franja")
     private String franja;
     @Basic(optional = false)
-    @Column(name = "u_login")
-    private String uLogin;
+    @Column(name = "nombre_asignatura")
+    private String nombreAsignatura;
     @Basic(optional = false)
     @Column(name = "intensidad")
     private String intensidad;
@@ -92,12 +80,15 @@ public class Horario implements Serializable {
     @Basic(optional = false)
     @Column(name = "estado")
     private int estado;
-    @Transient
-    private String plan;
-    @Transient
-    private String asignatura;
-    @Transient
-    private String docente;
+    @JoinColumn(name = "codasignatura", referencedColumnName = "codasignatura")
+    @ManyToOne(optional = false)
+    private Asignatura codasignatura;
+    @JoinColumn(name = "id_plan", referencedColumnName = "id_plan")
+    @ManyToOne(optional = false)
+    private Plan idPlan;
+    @JoinColumn(name = "u_login", referencedColumnName = "u_login")
+    @ManyToOne(optional = false)
+    private Usuarios uLogin;
 
     public Horario() {
     }
@@ -106,14 +97,12 @@ public class Horario implements Serializable {
         this.idHorario = idHorario;
     }
 
-    public Horario(Integer idHorario, int idPlan, int cohorte, int grupo, String codAsignatura, String franja, String uLogin, String intensidad, String salon, String dia, String hEntrada, String hSalida, String anio, String periodo, int estado) {
+    public Horario(Integer idHorario, int cohorte, int grupo, String franja, String nombreAsignatura, String intensidad, String salon, String dia, String hEntrada, String hSalida, String anio, String periodo, int estado) {
         this.idHorario = idHorario;
-        this.idPlan = idPlan;
         this.cohorte = cohorte;
         this.grupo = grupo;
-        this.codAsignatura = codAsignatura;
         this.franja = franja;
-        this.uLogin = uLogin;
+        this.nombreAsignatura = nombreAsignatura;
         this.intensidad = intensidad;
         this.salon = salon;
         this.dia = dia;
@@ -132,14 +121,6 @@ public class Horario implements Serializable {
         this.idHorario = idHorario;
     }
 
-    public int getIdPlan() {
-        return idPlan;
-    }
-
-    public void setIdPlan(int idPlan) {
-        this.idPlan = idPlan;
-    }
-
     public int getCohorte() {
         return cohorte;
     }
@@ -156,14 +137,6 @@ public class Horario implements Serializable {
         this.grupo = grupo;
     }
 
-    public String getCodAsignatura() {
-        return codAsignatura;
-    }
-
-    public void setCodAsignatura(String codAsignatura) {
-        this.codAsignatura = codAsignatura;
-    }
-
     public String getFranja() {
         return franja;
     }
@@ -172,12 +145,12 @@ public class Horario implements Serializable {
         this.franja = franja;
     }
 
-    public String getULogin() {
-        return uLogin;
+    public String getNombreAsignatura() {
+        return nombreAsignatura;
     }
 
-    public void setULogin(String uLogin) {
-        this.uLogin = uLogin;
+    public void setNombreAsignatura(String nombreAsignatura) {
+        this.nombreAsignatura = nombreAsignatura;
     }
 
     public String getIntensidad() {
@@ -244,6 +217,30 @@ public class Horario implements Serializable {
         this.estado = estado;
     }
 
+    public Asignatura getCodasignatura() {
+        return codasignatura;
+    }
+
+    public void setCodasignatura(Asignatura codasignatura) {
+        this.codasignatura = codasignatura;
+    }
+
+    public Plan getIdPlan() {
+        return idPlan;
+    }
+
+    public void setIdPlan(Plan idPlan) {
+        this.idPlan = idPlan;
+    }
+
+    public Usuarios getULogin() {
+        return uLogin;
+    }
+
+    public void setULogin(Usuarios uLogin) {
+        this.uLogin = uLogin;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -267,51 +264,6 @@ public class Horario implements Serializable {
     @Override
     public String toString() {
         return "entidades.Horario[ idHorario=" + idHorario + " ]";
-    }
-
-    /**
-     * @return the plan
-     */
-    public String getPlan() {
-        plan = "" + idPlan;
-        return plan;
-    }
-
-    /**
-     * @param plan the plan to set
-     */
-    public void setPlan(String plan) {
-        this.plan = plan;
-    }
-
-    /**
-     * @return the asignatura
-     */
-    public String getAsignatura() {
-        asignatura = codAsignatura;
-        return asignatura;
-    }
-
-    /**
-     * @param asignatura the asignatura to set
-     */
-    public void setAsignatura(String asignatura) {
-        this.asignatura = asignatura;
-    }
-
-    /**
-     * @return the docente
-     */
-    public String getDocente() {
-        docente = uLogin;
-        return docente;
-    }
-
-    /**
-     * @param docente the docente to set
-     */
-    public void setDocente(String docente) {
-        this.docente = docente;
     }
 
 }

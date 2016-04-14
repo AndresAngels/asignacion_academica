@@ -9,8 +9,8 @@
     <property name="web.home"		value="${basedir}/web"/>
     
     <target name="clean" description="Elimina la informacion antigua de generaciones pasadas">
-    	<delete dir="${work.home}"/>
-    	<delete dir="${dist.home}"/>
+        <delete dir="${work.home}"/>
+        <delete dir="${dist.home}"/>
     </target>
     
     <target name="prepare" depends="clean" description="Crea los directorios de trabajo y copia los archivos estaticos al directorio de trabajo">
@@ -23,7 +23,7 @@
     
     <target name="compile" depends="prepare" description="Compila el codigo java y lo copia dentro de WEB-INF/classes">
         <javac srcdir="${src.home}"
-            destdir="${work.home}/WEB-INF/classes">
+               destdir="${work.home}/WEB-INF/classes">
         </javac>
         <copy todir="${work.home}/WEB-INF/classes">
             <fileset dir="${src.home}" excludes="**/*.java"/>
@@ -31,9 +31,9 @@
     </target>
 
     <target name="dist" depends="compile"
-        description="Crea un archivo WAR para desplegar">
+            description="Crea un archivo WAR para desplegar">
         <Jar jarfile="${dist.home}/${app.name).war"
-        basedir="${work.home}"/>
+             basedir="${work.home}"/>
     </target>
     
     <target name="all" depends="clean,prepare,compile,dist" description="Limpia el directorio, luego compila y genera el WAR"/>

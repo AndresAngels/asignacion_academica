@@ -1,19 +1,24 @@
 package entidades;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author AndresAngel
+ * @author Aaron
  */
 @Entity
 @Table(name = "usuarios")
@@ -27,7 +32,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Usuarios.findByUApellido", query = "SELECT u FROM Usuarios u WHERE u.uApellido = :uApellido"),
     @NamedQuery(name = "Usuarios.findByUEmail", query = "SELECT u FROM Usuarios u WHERE u.uEmail = :uEmail"),
     @NamedQuery(name = "Usuarios.findByUActivo", query = "SELECT u FROM Usuarios u WHERE u.uActivo = :uActivo"),
-    @NamedQuery(name = "Usuarios.findByCodigoPerfil", query = "SELECT u FROM Usuarios u WHERE u.codigoPerfil = :codigoPerfil")})
+    @NamedQuery(name = "Usuarios.findByDivCodigo", query = "SELECT u FROM Usuarios u WHERE u.divCodigo = :divCodigo"),
+    @NamedQuery(name = "Usuarios.findByDepa", query = "SELECT u FROM Usuarios u WHERE u.depa = :depa"),
+    @NamedQuery(name = "Usuarios.findByCodigousuario", query = "SELECT u FROM Usuarios u WHERE u.codigousuario = :codigousuario"),
+    @NamedQuery(name = "Usuarios.findByExtension", query = "SELECT u FROM Usuarios u WHERE u.extension = :extension")})
 public class Usuarios implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,17 +60,20 @@ public class Usuarios implements Serializable {
     @Basic(optional = false)
     @Column(name = "u_activo")
     private short uActivo;
+    @Column(name = "div_codigo")
+    private Short divCodigo;
+    @Column(name = "depa")
+    private Integer depa;
     @Basic(optional = false)
-    @Column(name = "codigo_perfil")
-    private String codigoPerfil;
-    @Transient
-    private String nombreLogin;
-    @Transient
-    private String login;
-    @Transient
-    private String nombre;
-    @Transient
-    private String apellido;
+    @Column(name = "codigousuario")
+    private int codigousuario;
+    @Column(name = "extension")
+    private String extension;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "uLogin")
+    private List<Horario> horarioList;
+    @JoinColumn(name = "codigo_perfil", referencedColumnName = "codigo_perfil")
+    @ManyToOne(optional = false)
+    private Perfiles codigoPerfil;
 
     public Usuarios() {
     }
@@ -71,14 +82,14 @@ public class Usuarios implements Serializable {
         this.uLogin = uLogin;
     }
 
-    public Usuarios(String uLogin, int uId, String uPassword, String uNombre, String uEmail, short uActivo, String codigoPerfil) {
+    public Usuarios(String uLogin, int uId, String uPassword, String uNombre, String uEmail, short uActivo, int codigousuario) {
         this.uLogin = uLogin;
         this.uId = uId;
         this.uPassword = uPassword;
         this.uNombre = uNombre;
         this.uEmail = uEmail;
         this.uActivo = uActivo;
-        this.codigoPerfil = codigoPerfil;
+        this.codigousuario = codigousuario;
     }
 
     public int getUId() {
@@ -137,12 +148,52 @@ public class Usuarios implements Serializable {
         this.uActivo = uActivo;
     }
 
+    public Short getDivCodigo() {
+        return divCodigo;
+    }
 
-    public String getCodigoPerfil() {
+    public void setDivCodigo(Short divCodigo) {
+        this.divCodigo = divCodigo;
+    }
+
+    public Integer getDepa() {
+        return depa;
+    }
+
+    public void setDepa(Integer depa) {
+        this.depa = depa;
+    }
+
+    public int getCodigousuario() {
+        return codigousuario;
+    }
+
+    public void setCodigousuario(int codigousuario) {
+        this.codigousuario = codigousuario;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    @XmlTransient
+    public List<Horario> getHorarioList() {
+        return horarioList;
+    }
+
+    public void setHorarioList(List<Horario> horarioList) {
+        this.horarioList = horarioList;
+    }
+
+    public Perfiles getCodigoPerfil() {
         return codigoPerfil;
     }
 
-    public void setCodigoPerfil(String codigoPerfil) {
+    public void setCodigoPerfil(Perfiles codigoPerfil) {
         this.codigoPerfil = codigoPerfil;
     }
 
@@ -171,63 +222,4 @@ public class Usuarios implements Serializable {
         return "entidades.Usuarios[ uLogin=" + uLogin + " ]";
     }
 
-    /**
-     * @return the nombreLogin
-     */
-    public String getNombreLogin() {
-        nombreLogin = uNombre + " " + uApellido;
-        return nombreLogin;
-    }
-
-    /**
-     * @param nombreLogin the nombreLogin to set
-     */
-    public void setNombreLogin(String nombreLogin) {
-        this.nombreLogin = nombreLogin;
-    }
-
-    /**
-     * @return the login
-     */
-    public String getLogin() {
-        login = uLogin;
-        return login;
-    }
-
-    /**
-     * @param login the login to set
-     */
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    /**
-     * @return the nombre
-     */
-    public String getNombre() {
-        nombre = uNombre;
-        return nombre;
-    }
-
-    /**
-     * @param nombre the nombre to set
-     */
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    /**
-     * @return the apellido
-     */
-    public String getApellido() {
-        apellido = uApellido;
-        return apellido;
-    }
-
-    /**
-     * @param apellido the apellido to set
-     */
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
 }
