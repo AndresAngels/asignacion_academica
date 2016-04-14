@@ -44,7 +44,7 @@
 
     <target name="dist" depends="compile"
         description="Crea un archivo WAR para desplegar">
-        <Jar jarfile="${dist.home}/${app.name).war"
+        <jar jarfile="${dist.home}/${app.name).war"
         basedir="${work.home}"/>
     </target>
     
