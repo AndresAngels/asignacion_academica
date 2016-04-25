@@ -16,7 +16,7 @@
 		<fileset dir="opt/apache-tomcat-8.0.32/bin">
             <include name="*.jar"/>
         </fileset>
-        <pathelement location="${src.home}/java/lib"/>
+        <pathelement location="${src.home}/lib"/>
 		<pathelement location="opt/apache-tomcat-8.0.32/lib"/>
 		<pathelement location="opt/apache-tomcat-8.0.32/bin"/>
     </path>
@@ -34,7 +34,13 @@
             <fileset dir="${web.home}"/>
         </copy>
         <copy todir="${work.home}/WEB-INF/lib">
-            <fileset dir="${src.home}/java/lib"/>
+            <fileset dir="${src.home}/lib"/>
+        </copy>
+		<copy todir="${work.home}/WEB-INF/lib">
+            <fileset dir="opt/apache-tomcat-8.0.32/lib"/>
+        </copy>
+		<copy todir="${work.home}/WEB-INF/lib">
+            <fileset dir="opt/apache-tomcat-8.0.32/bin"/>
         </copy>
     </target>
     
