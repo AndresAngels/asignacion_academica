@@ -16,9 +16,9 @@
 		<fileset dir="opt/apache-tomcat-8.0.32/bin">
             <include name="*.jar"/>
         </fileset>
-        <pathelement location="${src.home}/lib"/>
-		<pathelement location="opt/apache-tomcat-8.0.32/lib"/>
-		<pathelement location="opt/apache-tomcat-8.0.32/bin"/>
+        <pathelement location="${basedir}/lib"/>
+	<pathelement location="opt/apache-tomcat-8.0.32/lib"/>
+	<pathelement location="opt/apache-tomcat-8.0.32/bin"/>
     </path>
     
     <target name="clean" description="Elimina la informacion antigua de generaciones pasadas">
@@ -34,7 +34,7 @@
             <fileset dir="${web.home}"/>
         </copy>
         <copy todir="${work.home}/WEB-INF/lib">
-            <fileset dir="${src.home}/lib"/>
+            <fileset dir="${basedir}/lib"/>
         </copy>
 		<copy todir="${work.home}/WEB-INF/lib">
             <fileset dir="opt/apache-tomcat-8.0.32/lib"/>
