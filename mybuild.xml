@@ -10,10 +10,10 @@
         <fileset dir="${basedir}/lib">
             <include name="*.jar"/>
         </fileset>
-		<fileset dir="opt/apache-tomcat-8.0.32/lib">
+		<fileset dir="/opt/apache-tomcat-8.0.32/lib">
             <include name="*.jar"/>
         </fileset>
-		<fileset dir="opt/apache-tomcat-8.0.32/bin">
+		<fileset dir="/opt/apache-tomcat-8.0.32/bin">
             <include name="*.jar"/>
         </fileset>
         <pathelement location="${basedir}/lib"/>
