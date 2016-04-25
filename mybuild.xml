@@ -7,10 +7,18 @@
     <property name="web.home"		value="${basedir}/web"/>
 	
     <path id="compile.classpath">
-        <fileset dir="${src.home}/java/lib">
+        <fileset dir="${basedir}/lib">
+            <include name="*.jar"/>
+        </fileset>
+		<fileset dir="opt/apache-tomcat-8.0.32/lib">
+            <include name="*.jar"/>
+        </fileset>
+		<fileset dir="opt/apache-tomcat-8.0.32/bin">
             <include name="*.jar"/>
         </fileset>
         <pathelement location="${src.home}/java/lib"/>
+		<pathelement location="opt/apache-tomcat-8.0.32/lib"/>
+		<pathelement location="opt/apache-tomcat-8.0.32/bin"/>
     </path>
     
     <target name="clean" description="Elimina la informacion antigua de generaciones pasadas">
