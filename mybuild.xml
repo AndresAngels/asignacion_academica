@@ -30,8 +30,12 @@
         <mkdir dir="${dist.home}"/>
         <mkdir dir="${work.home}/WEB-INF/classes"/>
         <mkdir dir="${work.home}/WEB-INF/lib"/>
+        <mkdir dir="${work.home}/WEB-INF/classes/META-INF"/>
         <copy todir="${work.home}">
             <fileset dir="${web.home}"/>
+        </copy>
+        <copy todir="${work.home}/WEB-INF/classes/META-INF">
+            <fileset dir="${src.home}/conf"/>
         </copy>
         <copy todir="${work.home}/WEB-INF/lib">
             <fileset dir="${basedir}/lib"/>
