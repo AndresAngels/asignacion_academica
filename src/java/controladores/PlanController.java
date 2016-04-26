@@ -5,6 +5,7 @@
  */
 package controladores;
 
+import entidades.Plan;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -20,7 +21,8 @@ import modelos.PlanJpaController;
 public class PlanController implements Serializable {
 
     private PlanJpaController jpaController;
-    
+    Plan selected;
+
     /**
      * Creates a new instance of PlanController
      */
@@ -42,6 +44,20 @@ public class PlanController implements Serializable {
      */
     public void setJpaController(PlanJpaController jpaController) {
         this.jpaController = jpaController;
+    }
+
+    /**
+     * @return the selected
+     */
+    public Plan getSelected() {
+        if (selected == null) {
+            selected = new Plan();
+        }
+        return selected;
+    }
+
+    public void setSelected(Plan selected) {
+        this.selected = selected;
     }
 
 }

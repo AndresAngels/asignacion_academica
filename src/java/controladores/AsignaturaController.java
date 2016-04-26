@@ -33,7 +33,7 @@ public class AsignaturaController implements Serializable {
     private Asignatura selected;
 
     public AsignaturaController() {
-        setColumnTemplate("Codigo Nombre");
+        setColumnTemplate("codigo nombre");
         createDynamicColumns();
     }
 

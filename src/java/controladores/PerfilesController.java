@@ -15,7 +15,7 @@ import modelos.PerfilesJpaController;
 @ManagedBean(name = "perfilesController")
 @SessionScoped
 public class PerfilesController {
-    
+
     private Perfiles selected;
 
     private PerfilesJpaController jpaController;

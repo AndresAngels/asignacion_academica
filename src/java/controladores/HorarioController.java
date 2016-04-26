@@ -26,6 +26,10 @@ public class HorarioController implements Serializable {
     private Sesion sesion;
     @ManagedProperty("#{index}")
     private Index index;
+    @ManagedProperty("#{usuariosController}")
+    private UsuarioController usuarioController;
+    @ManagedProperty("#{planController}")
+    private PlanController planController;
     private Horario primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private HorarioJpaController jpaController = null;
     private List<Horario> consultaTabla;
@@ -35,6 +39,28 @@ public class HorarioController implements Serializable {
     public HorarioController() {
         setColumnTemplate("plan cohorte grupo asignatura docente");
         createDynamicColumns();
+    }
+
+    public List<Horario> getConsultaHorarioPrograma() {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan:PLAN");
+            query.setParameter("PLAN", getPlanController().selected);
+            consultaTabla = query.getResultList();
+        } catch (NullPointerException npe) {
+        }
+        return consultaTabla;
+    }
+
+    public List<Horario> getConsultaAsignaturaDocente() {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.uLogin=:DOCENTE");
+            query.setParameter("DOCENTE", getUsuarioController().getSelected());
+            consultaTabla = query.getResultList();
+        } catch (NullPointerException npe) {
+        }
+        return consultaTabla;
     }
 
     public List<Horario> getConsultaTabla() {
@@ -159,6 +185,9 @@ public class HorarioController implements Serializable {
      * @return the selected
      */
     public Horario getSelected() {
+        if (selected == null) {
+            selected = new Horario();
+        }
         return selected;
     }
 
@@ -195,6 +224,22 @@ public class HorarioController implements Serializable {
      */
     public void setFiltro(List<Horario> filtro) {
         this.filtro = filtro;
+    }
+
+    public UsuarioController getUsuarioController() {
+        return usuarioController;
+    }
+
+    public void setUsuarioController(UsuarioController usuarioController) {
+        this.usuarioController = usuarioController;
+    }
+
+    public PlanController getPlanController() {
+        return planController;
+    }
+
+    public void setPlanController(PlanController planController) {
+        this.planController = planController;
     }
 
     //Implementando Tabla Dinamica
