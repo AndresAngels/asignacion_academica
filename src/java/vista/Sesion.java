@@ -57,7 +57,7 @@ public class Sesion implements Serializable {
 
     public SesionJpaController getJpaController() {
         if (jpaController == null) {
-            jpaController = new SesionJpaController(Persistence.createEntityManagerFactory("asignacion_academicaﬁ"));
+            jpaController = new SesionJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
         }
         return jpaController;
     }
