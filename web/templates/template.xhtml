@@ -49,7 +49,7 @@
                 <c:when test="#{usuarioController.usuario.ULogin!=null}">
                     <p:growl showDetail="true"/>
                     <p:layout fullPage="true">
-                        <p:layoutUnit position="north" size="156">
+                        <p:layoutUnit position="north" size="90">
                             <p:layout>
                                 <p:layoutUnit position="center">
                                     <p:graphicImage name="/img/Header.png"/>
@@ -57,15 +57,6 @@
                                 <p:layoutUnit position="east" minSize="200">
                                     <h:form id="formsesion">
                                         <ezcomp:sesion/>
-                                    </h:form>
-                                </p:layoutUnit>
-                                <p:layoutUnit position="south" size="46">
-                                    <h:form id="formmigas">
-                                        <p:breadCrumb>  
-                                            <p:menuitem styleClass="migas" value="Inicio" url="/index.xhtml" />
-                                            <ui:insert name="migas">
-                                            </ui:insert>
-                                        </p:breadCrumb>
                                     </h:form>
                                 </p:layoutUnit>
                             </p:layout>
@@ -80,11 +71,6 @@
                             <ui:insert name="content">
                             </ui:insert>
                         </p:layoutUnit>
-                        <p:layoutUnit position="south" size="85" header="Infomación" collapsible="true" styleClass="footer">
-                            <p:layoutUnit position="east" size="79">
-                                <p:graphicImage name="/img/univalle4.png"/>
-                            </p:layoutUnit>
-                        </p:layoutUnit>
                     </p:layout>
                 </c:when>
                 <c:otherwise>
@@ -94,7 +80,7 @@
                 </c:otherwise>
             </c:choose>
             <p:ajaxStatus onstart="statusDialog.show();" oncomplete="statusDialog.hide();"/>  
-            <p:dialog modal="true" widgetVar="statusDialog" header="Procesando... por favor espere" draggable="false" resizable="false" closable="false">  
+            <p:dialog modal="true" widgetVar="statusDialog" header="Procesando..." draggable="false" resizable="false" closable="false">  
                 <p:graphicImage name="/img/loading.gif"/>
             </p:dialog>
         </h:body>

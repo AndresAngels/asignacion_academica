@@ -46,7 +46,7 @@
                             <p:commandButton global="true" id="BModificar"  icon="ui-icon-pencil" title="Modificar" process="tabla" action="#{cc.attrs.controller.prepararEdicion()}" update=":tabview">
                                 <f:setPropertyActionListener value="#{item}" target="#{cc.attrs.controller.primaryKey}"  />  
                             </p:commandButton>
-                            <p:commandButton global="true" id="Beliminar" process="@this" icon="icon-trash" title="Eliminar" onclick="diaEliminar.show();">  
+                            <p:commandButton global="true" id="Beliminar" process="@this" icon="ui-icon-trash" title="Eliminar" onclick="diaEliminar.show();">  
                                 <f:setPropertyActionListener value="#{item}" target="#{cc.attrs.controller.primaryKey}"  />
                             </p:commandButton> 
                         </h:panelGrid>

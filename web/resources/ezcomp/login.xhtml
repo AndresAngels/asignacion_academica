@@ -19,8 +19,6 @@
             </p:layoutUnit>
             <p:layoutUnit position="center">
                 <p:layout>
-                    <p:layoutUnit position="west" size="30%" header="Novedades" collapsible="true">
-                    </p:layoutUnit>
                     <p:layoutUnit position="center">
                         <p:panel id="panel" header="Iniciar Sesion" style="position: fixed; left: 50%; margin-left: -143px;">
                             <h:panelGrid columns="3">
@@ -31,19 +29,17 @@
                                 <p:password id="passLogin" value="#{usuarioController.usuario.UPassword}" required="true"/>
                                 <p:message for="passLogin"/>
                             </h:panelGrid>
-                            <p:commandButton global="true" value="Iniciar Sesion" action="#{sesion.iniciarSesion}" ajax="false"/>
-                        </p:panel>
-                    </p:layoutUnit>
-                    <p:layoutUnit position="east" size="30%" header="Ventajas" collapsible="true">
+                            <div align="center" style="padding: 5px;">
+                            <p:commandButton global="true" value="Iniciar Sesion" action="#{sesion.iniciarSesion}" ajax="false" />
+                       
+                         </div></p:panel>
                     </p:layoutUnit>
                 </p:layout>
             </p:layoutUnit>
             <p:layoutUnit position="south" size="50" closable="true" collapsible="true" styleClass="footer">
                 <p:layout>
                     <p:layoutUnit position="center">
-                    </p:layoutUnit>
-                    <p:layoutUnit position="east" size="105">
-                        <p:graphicImage name="/img/univalle4.png"/>
+                        <p:outputLabel value="Universidad del Valle Sede Caicedonia - © 2016"/>
                     </p:layoutUnit>
                 </p:layout>
             </p:layoutUnit>
