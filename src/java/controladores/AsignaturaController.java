@@ -11,6 +11,10 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
 import javax.faces.event.ActionEvent;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -195,6 +199,46 @@ public class AsignaturaController implements Serializable {
      */
     public void setFiltro(List<Asignatura> filtro) {
         this.filtro = filtro;
+    }
+
+    @FacesConverter(forClass = Asignatura.class)
+    public static class UsuariosControllerConverter implements Converter {
+
+        @Override
+        public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
+            if (value == null || value.length() == 0) {
+                return null;
+            }
+            AsignaturaController controller = (AsignaturaController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "asignaturaController");
+            return controller.getJpaController().findAsignatura(value);
+        }
+
+        java.lang.Integer getKey(String value) {
+            java.lang.Integer key;
+            key = Integer.valueOf(value);
+            return key;
+        }
+
+        String getStringKey(java.lang.Integer value) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(value);
+            return sb.toString();
+        }
+
+        @Override
+        public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
+            if (object == null) {
+                return null;
+            }
+            if (object instanceof Asignatura) {
+                Asignatura o = (Asignatura) object;
+                return o.getCodasignatura();
+            } else {
+                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Asignatura.class.getName());
+            }
+        }
+
     }
 
     //Implementando Tabla Dinamica

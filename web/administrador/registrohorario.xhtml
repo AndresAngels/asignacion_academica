@@ -3,11 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+      xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <body>
 
-        <ui:composition template="./../templates/crud.xhtml">
+        <ui:composition template="./../templates/template.xhtml">
 
             <ui:define name="title">
                 Registro de Horarios:SAD
@@ -18,16 +21,137 @@
                 <p:menuitem styleClass="migas" value="Registro de Horarios" url="#"/>
             </ui:define>
 
-            <ui:define name="tabla">
-                <ezcomp:datatable id="tablaMapa" controller="#{horarioController}" 
-                                  datos="#{horarioController.consultaTabla}" 
-                                  campoPrimario="plan" 
-                                  listaFiltro="#{horarioController.filtro}" 
-                                  titulo="Sistemas de Riesgo" exporter="2"/>
-            </ui:define>
+            <ui:define name="content">
+                <h:form id="form">
+                    <p:schedule id="schedule" widgetVar="myschedule" timeZone="GMT-5" locale="es"
+                                view="agendaWeek" minTime="6:30am" rightHeaderTemplate=""
+                                leftHeaderTemplate="" centerHeaderTemplate="" maxTime="10:30pm"
+                                allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
+                                value="#{horarioController.eventModel}">
 
-            <ui:define name="formulario">
-                <ezcomp:formulariohorarios/>
+                        <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
+                        <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
+                        <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":growl" />
+                        <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":growl" />
+
+                    </p:schedule>
+                    <p:dialog id="registro" widgetVar="eventDialog" header="Registrar Horario" showEffect="clip" hideEffect="clip">
+                        <h:panelGrid id="eventDetails" columns="4">
+                            <p:outputLabel for="plan" value="Plan"/>
+                            <p:selectOneMenu id="plan"
+                                             value="#{planController.selected}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="cohorte" value="Cohorte"/>
+                            <p:selectOneMenu id="cohorte"
+                                             value="#{horarioController.selected.cohorte}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="1" itemValue="1" />
+                                <f:selectItem itemLabel="2" itemValue="2" />
+                                <f:selectItem itemLabel="3" itemValue="3" />
+                                <f:selectItem itemLabel="4" itemValue="4" />
+                                <f:selectItem itemLabel="5" itemValue="5" />
+                                <f:selectItem itemLabel="6" itemValue="6" />
+                                <f:selectItem itemLabel="7" itemValue="7" />
+                                <f:selectItem itemLabel="8" itemValue="8" />
+                                <f:selectItem itemLabel="9" itemValue="9" />
+                                <f:selectItem itemLabel="10" itemValue="10" />
+                                <f:selectItem itemLabel="11" itemValue="11" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="grupo" value="Grupo"/>
+                            <p:selectOneMenu id="grupo"
+                                             value="#{horarioController.selected.grupo}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="50" itemValue="50" />
+                                <f:selectItem itemLabel="51" itemValue="51" />
+                                <f:selectItem itemLabel="52" itemValue="52" />
+                                <f:selectItem itemLabel="53" itemValue="53" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="franja" value="Franja"/>
+                            <p:selectOneMenu id="franja"
+                                             value="#{horarioController.selected.franja}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="Diurno" itemValue="Diurno" />
+                                <f:selectItem itemLabel="Vespertino" itemValue="Vespertino" />
+                                <f:selectItem itemLabel="Nocturno" itemValue="Nocturno" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="anio" value="Año"/>
+                            <p:selectOneMenu id="anio"
+                                             value="#{horarioController.selected.anio}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="2016" itemValue="2016" />
+                                <f:selectItem itemLabel="2017" itemValue="2017" />
+                                <f:selectItem itemLabel="2018" itemValue="2018" />
+                                <f:selectItem itemLabel="2019" itemValue="2019" />
+                                <f:selectItem itemLabel="2020" itemValue="2020" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="periodo" value="Periodo"/>
+                            <p:selectOneMenu id="periodo"
+                                             value="#{horarioController.selected.periodo}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="Febrero-Junio" itemValue="Febrero-Junio" />
+                                <f:selectItem itemLabel="Agosto-Diciembre" itemValue="Agosto-Diciembre" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="Asignatura" value="Asignatura" />
+                            <p:selectOneMenu id="Asignatura"
+                                             value="#{asignaturaController.selected}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItems value="#{asignaturaController.consultaTabla}" var="asignatura" itemLabel="#{asignatura.nombreAsignatura}" itemValue="#{asignatura}"/>
+                            </p:selectOneMenu> 
+
+                            <p:outputLabel for="Docente" value="Docente" />
+                            <p:selectOneMenu id="Docente"
+                                             value="#{usuarioController.selected}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItems value="#{usuarioController.consultaTabla}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="dia" value="Dia"/>
+                            <p:selectOneMenu id="dia"
+                                             value="#{horarioController.selected.dia}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="Lunes" itemValue="Lunes" />
+                                <f:selectItem itemLabel="Martes" itemValue="Martes" />
+                                <f:selectItem itemLabel="Miercoles" itemValue="Miercoles" />
+                                <f:selectItem itemLabel="Jueves" itemValue="Jueves" />
+                                <f:selectItem itemLabel="Viernes" itemValue="Viernes" />
+                                <f:selectItem itemLabel="Sabado" itemValue="Sabado" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="inicio" value="Hora de Entrada:" />
+                            <p:calendar id="inicio" value="#{horarioController.event.startDate}"
+                                        locale="es" pattern="HH:mm" timeOnly="true" 
+                                        maxHour="22" minHour="7" stepMinute="30"
+                                        required="true"/>
+
+                            <p:outputLabel for="fin" value="Hora de Salida:" />
+                            <p:calendar id="fin" value="#{horarioController.event.endDate}"
+                                        locale="es" pattern="HH:mm" timeOnly="true" 
+                                        maxHour="22" minHour="7" stepMinute="30"
+                                        required="true"/>
+                        </h:panelGrid>
+                        <div align="center" style="padding: 5px;">
+                            <p:commandButton type="reset" value="Reset" />
+                            <p:commandButton id="addButton" value="Save" process="registro" actionListener="#{horarioController.addEvent}" onsuccess="PF('myschedule').update();PF('eventDialog').hide();" />
+                        </div>
+                    </p:dialog>  
+                </h:form>
             </ui:define>
 
         </ui:composition>

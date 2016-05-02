@@ -3,6 +3,8 @@ package vista;
 import controladores.UsuarioController;
 import entidades.Usuarios;
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -25,8 +27,14 @@ public class Sesion implements Serializable {
     private String width = "0";
     private String height = "0";
     private GuestPreferences gp = new GuestPreferences();
+    private Date fechaInicial;
 
     public Sesion() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, 2016);
+        c.set(Calendar.MONTH, 1);
+        c.set(Calendar.DAY_OF_MONTH, 4);
+        fechaInicial = c.getTime();
     }
 
     public void iniciarSesion() {
@@ -130,5 +138,19 @@ public class Sesion implements Serializable {
      */
     public void setUsuarioController(UsuarioController usuarioController) {
         this.usuarioController = usuarioController;
+    }
+
+    /**
+     * @return the fechaInicial
+     */
+    public Date getFechaInicial() {
+        return fechaInicial;
+    }
+
+    /**
+     * @param fechaInicial the fechaInicial to set
+     */
+    public void setFechaInicial(Date fechaInicial) {
+        this.fechaInicial = fechaInicial;
     }
 }
