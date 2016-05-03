@@ -29,8 +29,8 @@
                                 allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
                                 value="#{horarioController.eventModel}">
 
-                        <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
-                        <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
+                        <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
+                        <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
                         <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":growl" />
                         <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":growl" />
 
@@ -121,36 +121,24 @@
                                 <f:selectItems value="#{usuarioController.consultaTabla}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
                             </p:selectOneMenu>
 
-                            <p:outputLabel for="dia" value="Dia"/>
-                            <p:selectOneMenu id="dia"
-                                             value="#{horarioController.selected.dia}"
-                                             required="true">
-                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItem itemLabel="Lunes" itemValue="Lunes" />
-                                <f:selectItem itemLabel="Martes" itemValue="Martes" />
-                                <f:selectItem itemLabel="Miercoles" itemValue="Miercoles" />
-                                <f:selectItem itemLabel="Jueves" itemValue="Jueves" />
-                                <f:selectItem itemLabel="Viernes" itemValue="Viernes" />
-                                <f:selectItem itemLabel="Sabado" itemValue="Sabado" />
-                            </p:selectOneMenu>
-
                             <p:outputLabel for="inicio" value="Hora de Entrada:" />
                             <p:calendar id="inicio" value="#{horarioController.event.startDate}"
-                                        locale="es" pattern="HH:mm" timeOnly="true" 
+                                        locale="es" pattern="HH:mm" timeZone="GMT-5" timeOnly="true"
                                         maxHour="22" minHour="7" stepMinute="30"
                                         required="true"/>
 
                             <p:outputLabel for="fin" value="Hora de Salida:" />
                             <p:calendar id="fin" value="#{horarioController.event.endDate}"
-                                        locale="es" pattern="HH:mm" timeOnly="true" 
+                                        locale="es" pattern="HH:mm" timeZone="GMT-5" timeOnly="true"
                                         maxHour="22" minHour="7" stepMinute="30"
                                         required="true"/>
                         </h:panelGrid>
                         <div align="center" style="padding: 5px;">
                             <p:commandButton type="reset" value="Reset" />
-                            <p:commandButton id="addButton" value="Save" process="registro" actionListener="#{horarioController.addEvent}" onsuccess="PF('myschedule').update();PF('eventDialog').hide();" />
+                            <p:commandButton id="addButton" value="Save" actionListener="#{horarioController.addEvent}" onsuccess="PF('myschedule').update();PF('eventDialog').hide();" />
                         </div>
-                    </p:dialog>  
+                    </p:dialog>
+                    <p:remoteCommand name="funcion" process="@this" actionListener="#{horarioController.activarDia()}" update="eventDetails"/>
                 </h:form>
             </ui:define>
 

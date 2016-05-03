@@ -32,7 +32,7 @@ public class Sesion implements Serializable {
     public Sesion() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, 2016);
-        c.set(Calendar.MONTH, 1);
+        c.set(Calendar.MONTH, Calendar.JANUARY);
         c.set(Calendar.DAY_OF_MONTH, 4);
         fechaInicial = c.getTime();
     }
