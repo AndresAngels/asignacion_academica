@@ -62,6 +62,9 @@ public class Usuarios implements Serializable {
     @JoinColumn(name = "codigo_perfil", referencedColumnName = "codigo_perfil")
     @ManyToOne(optional = false)
     private Perfiles codigoPerfil;
+    @JoinColumn(name = "id_plan", referencedColumnName = "id_plan")
+    @ManyToOne
+    private Plan idPlan;
     @Transient
     private String nombreLogin;
     @Transient
@@ -158,6 +161,14 @@ public class Usuarios implements Serializable {
 
     public void setCodigoPerfil(Perfiles codigoPerfil) {
         this.codigoPerfil = codigoPerfil;
+    }
+
+    public Plan getIdPlan() {
+        return idPlan;
+    }
+
+    public void setIdPlan(Plan idPlan) {
+        this.idPlan = idPlan;
     }
 
     @Override

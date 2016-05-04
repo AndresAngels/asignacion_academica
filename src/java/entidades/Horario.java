@@ -34,8 +34,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Horario.findByDia", query = "SELECT h FROM Horario h WHERE h.dia = :dia"),
     @NamedQuery(name = "Horario.findByHEntrada", query = "SELECT h FROM Horario h WHERE h.hEntrada = :hEntrada"),
     @NamedQuery(name = "Horario.findByHSalida", query = "SELECT h FROM Horario h WHERE h.hSalida = :hSalida"),
-    @NamedQuery(name = "Horario.findByAnio", query = "SELECT h FROM Horario h WHERE h.anio = :anio"),
-    @NamedQuery(name = "Horario.findByPeriodo", query = "SELECT h FROM Horario h WHERE h.periodo = :periodo"),
     @NamedQuery(name = "Horario.findByEstado", query = "SELECT h FROM Horario h WHERE h.estado = :estado")})
 public class Horario implements Serializable {
 
@@ -73,12 +71,6 @@ public class Horario implements Serializable {
     @Column(name = "h_salida")
     private String hSalida;
     @Basic(optional = false)
-    @Column(name = "anio")
-    private String anio;
-    @Basic(optional = false)
-    @Column(name = "periodo")
-    private String periodo;
-    @Basic(optional = false)
     @Column(name = "estado")
     private int estado;
     @JoinColumn(name = "codasignatura", referencedColumnName = "codasignatura")
@@ -104,7 +96,7 @@ public class Horario implements Serializable {
         this.idHorario = idHorario;
     }
 
-    public Horario(Integer idHorario, int cohorte, int grupo, String franja, String nombreAsignatura, String intensidad, String salon, String dia, String hEntrada, String hSalida, String anio, String periodo, int estado) {
+    public Horario(Integer idHorario, int cohorte, int grupo, String franja, String nombreAsignatura, String intensidad, String salon, String dia, String hEntrada, String hSalida, int estado) {
         this.idHorario = idHorario;
         this.cohorte = cohorte;
         this.grupo = grupo;
@@ -115,8 +107,6 @@ public class Horario implements Serializable {
         this.dia = dia;
         this.hEntrada = hEntrada;
         this.hSalida = hSalida;
-        this.anio = anio;
-        this.periodo = periodo;
         this.estado = estado;
     }
 
@@ -200,22 +190,6 @@ public class Horario implements Serializable {
         this.hSalida = hSalida;
     }
 
-    public String getAnio() {
-        return anio;
-    }
-
-    public void setAnio(String anio) {
-        this.anio = anio;
-    }
-
-    public String getPeriodo() {
-        return periodo;
-    }
-
-    public void setPeriodo(String periodo) {
-        this.periodo = periodo;
-    }
-
     public int getEstado() {
         return estado;
     }
@@ -292,7 +266,7 @@ public class Horario implements Serializable {
      * @return the asignatura
      */
     public String getAsignatura() {
-        asignatura = codasignatura.getNombre();
+        asignatura = codasignatura.getNombreAsignatura();
         return asignatura;
     }
 

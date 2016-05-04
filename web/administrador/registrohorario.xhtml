@@ -84,27 +84,6 @@
                                 <f:selectItem itemLabel="Nocturno" itemValue="Nocturno" />
                             </p:selectOneMenu>
 
-                            <p:outputLabel for="anio" value="Año"/>
-                            <p:selectOneMenu id="anio"
-                                             value="#{horarioController.selected.anio}"
-                                             required="true">
-                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItem itemLabel="2016" itemValue="2016" />
-                                <f:selectItem itemLabel="2017" itemValue="2017" />
-                                <f:selectItem itemLabel="2018" itemValue="2018" />
-                                <f:selectItem itemLabel="2019" itemValue="2019" />
-                                <f:selectItem itemLabel="2020" itemValue="2020" />
-                            </p:selectOneMenu>
-
-                            <p:outputLabel for="periodo" value="Periodo"/>
-                            <p:selectOneMenu id="periodo"
-                                             value="#{horarioController.selected.periodo}"
-                                             required="true">
-                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItem itemLabel="Febrero-Junio" itemValue="Febrero-Junio" />
-                                <f:selectItem itemLabel="Agosto-Diciembre" itemValue="Agosto-Diciembre" />
-                            </p:selectOneMenu>
-
                             <p:outputLabel for="Asignatura" value="Asignatura" />
                             <p:selectOneMenu id="Asignatura"
                                              value="#{asignaturaController.selected}"

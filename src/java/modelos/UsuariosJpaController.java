@@ -2,6 +2,7 @@ package modelos;
 
 import entidades.Horario;
 import entidades.Perfiles;
+import entidades.Plan;
 import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,6 +45,11 @@ public class UsuariosJpaController implements Serializable {
                 codigoPerfil = em.getReference(codigoPerfil.getClass(), codigoPerfil.getCodigoPerfil());
                 usuarios.setCodigoPerfil(codigoPerfil);
             }
+            Plan idPlan = usuarios.getIdPlan();
+            if (idPlan != null) {
+                idPlan = em.getReference(idPlan.getClass(), idPlan.getIdPlan());
+                usuarios.setIdPlan(idPlan);
+            }
             List<Horario> attachedHorarioList = new ArrayList<Horario>();
             for (Horario horarioListHorarioToAttach : usuarios.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
@@ -54,6 +60,10 @@ public class UsuariosJpaController implements Serializable {
             if (codigoPerfil != null) {
                 codigoPerfil.getUsuariosList().add(usuarios);
                 codigoPerfil = em.merge(codigoPerfil);
+            }
+            if (idPlan != null) {
+                idPlan.getUsuariosList().add(usuarios);
+                idPlan = em.merge(idPlan);
             }
             for (Horario horarioListHorario : usuarios.getHorarioList()) {
                 Usuarios oldULoginOfHorarioListHorario = horarioListHorario.getULogin();
@@ -85,6 +95,8 @@ public class UsuariosJpaController implements Serializable {
             Usuarios persistentUsuarios = em.find(Usuarios.class, usuarios.getULogin());
             Perfiles codigoPerfilOld = persistentUsuarios.getCodigoPerfil();
             Perfiles codigoPerfilNew = usuarios.getCodigoPerfil();
+            Plan idPlanOld = persistentUsuarios.getIdPlan();
+            Plan idPlanNew = usuarios.getIdPlan();
             List<Horario> horarioListOld = persistentUsuarios.getHorarioList();
             List<Horario> horarioListNew = usuarios.getHorarioList();
             List<String> illegalOrphanMessages = null;
@@ -103,6 +115,10 @@ public class UsuariosJpaController implements Serializable {
                 codigoPerfilNew = em.getReference(codigoPerfilNew.getClass(), codigoPerfilNew.getCodigoPerfil());
                 usuarios.setCodigoPerfil(codigoPerfilNew);
             }
+            if (idPlanNew != null) {
+                idPlanNew = em.getReference(idPlanNew.getClass(), idPlanNew.getIdPlan());
+                usuarios.setIdPlan(idPlanNew);
+            }
             List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
             for (Horario horarioListNewHorarioToAttach : horarioListNew) {
                 horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
@@ -118,6 +134,14 @@ public class UsuariosJpaController implements Serializable {
             if (codigoPerfilNew != null && !codigoPerfilNew.equals(codigoPerfilOld)) {
                 codigoPerfilNew.getUsuariosList().add(usuarios);
                 codigoPerfilNew = em.merge(codigoPerfilNew);
+            }
+            if (idPlanOld != null && !idPlanOld.equals(idPlanNew)) {
+                idPlanOld.getUsuariosList().remove(usuarios);
+                idPlanOld = em.merge(idPlanOld);
+            }
+            if (idPlanNew != null && !idPlanNew.equals(idPlanOld)) {
+                idPlanNew.getUsuariosList().add(usuarios);
+                idPlanNew = em.merge(idPlanNew);
             }
             for (Horario horarioListNewHorario : horarioListNew) {
                 if (!horarioListOld.contains(horarioListNewHorario)) {
@@ -174,6 +198,11 @@ public class UsuariosJpaController implements Serializable {
             if (codigoPerfil != null) {
                 codigoPerfil.getUsuariosList().remove(usuarios);
                 codigoPerfil = em.merge(codigoPerfil);
+            }
+            Plan idPlan = usuarios.getIdPlan();
+            if (idPlan != null) {
+                idPlan.getUsuariosList().remove(usuarios);
+                idPlan = em.merge(idPlan);
             }
             em.remove(usuarios);
             em.getTransaction().commit();

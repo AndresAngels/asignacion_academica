@@ -41,6 +41,8 @@ public class Plan implements Serializable {
     private int estado;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPlan")
     private List<Horario> horarioList;
+    @OneToMany(mappedBy = "idPlan")
+    private List<Usuarios> usuariosList;
 
     public Plan() {
     }
@@ -86,6 +88,15 @@ public class Plan implements Serializable {
 
     public void setHorarioList(List<Horario> horarioList) {
         this.horarioList = horarioList;
+    }
+
+    @XmlTransient
+    public List<Usuarios> getUsuariosList() {
+        return usuariosList;
+    }
+
+    public void setUsuariosList(List<Usuarios> usuariosList) {
+        this.usuariosList = usuariosList;
     }
 
     @Override
