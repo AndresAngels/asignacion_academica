@@ -70,7 +70,7 @@ public class HorarioJpaController implements Serializable {
         }
     }
 
-    public void edit(Horario horario) throws NonexistentEntityException, Exception {
+    public void edit(Horario horario) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();

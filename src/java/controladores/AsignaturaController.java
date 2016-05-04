@@ -26,6 +26,7 @@ import vista.Sesion;
 @SessionScoped
 public class AsignaturaController implements Serializable {
 
+    private static final String bundle = "/Bundle";
     @ManagedProperty("#{sesion}")
     private Sesion sesion;
     @ManagedProperty("#{index}")
@@ -48,6 +49,7 @@ public class AsignaturaController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
         }
         return consultaTabla;
     }
@@ -68,11 +70,11 @@ public class AsignaturaController implements Serializable {
     public String update(ActionEvent ae) {
         try {
             getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("AsignaturaUpdated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("AsignaturaUpdated"));
             getIndex().setIndex(0);
             return "View";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
             return null;
         }
     }
@@ -80,11 +82,11 @@ public class AsignaturaController implements Serializable {
     public String create() {
         try {
             getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("AsignaturaCreated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("AsignaturaCreated"));
             selected = new Asignatura();
             return "Create";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
             return null;
         }
     }

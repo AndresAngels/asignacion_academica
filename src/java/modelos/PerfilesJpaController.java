@@ -30,7 +30,7 @@ public class PerfilesJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Perfiles perfiles) throws PreexistingEntityException, Exception {
+    public void create(Perfiles perfiles) throws PreexistingEntityException {
         if (perfiles.getUsuariosList() == null) {
             perfiles.setUsuariosList(new ArrayList<Usuarios>());
         }
@@ -67,7 +67,7 @@ public class PerfilesJpaController implements Serializable {
         }
     }
 
-    public void edit(Perfiles perfiles) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(Perfiles perfiles) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
