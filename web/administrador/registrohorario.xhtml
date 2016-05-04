@@ -31,8 +31,8 @@
 
                         <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
                         <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
-                        <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":growl" />
-                        <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":growl" />
+                        <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":form, :growl" />
+                        <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":form, :growl" />
 
                     </p:schedule>
                     <p:dialog id="registro" widgetVar="eventDialog" header="Registrar Horario" showEffect="clip" hideEffect="clip">

@@ -100,7 +100,7 @@ public class HorarioController implements Serializable {
     }
 
     public void addEvent() {
-        Calendar c = Calendar.getInstance();
+        Calendar c1 = Calendar.getInstance();
         int n = 0;
         switch (selected.getDia()) {
             case "Lunes":
@@ -122,20 +122,54 @@ public class HorarioController implements Serializable {
                 n = 5;
                 break;
         }
-        c.setTime(event.getStartDate());
-        c.set(Calendar.YEAR, 2016);
-        c.set(Calendar.MONTH, Calendar.JANUARY);
-        c.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setStartDate(c.getTime());
-        c = Calendar.getInstance();
-        c.setTime(event.getEndDate());
-        c.set(Calendar.YEAR, 2016);
-        c.set(Calendar.MONTH, Calendar.JANUARY);
-        c.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setEndDate(c.getTime());
+        c1.setTime(event.getStartDate());
+        c1.set(Calendar.YEAR, 2016);
+        c1.set(Calendar.MONTH, Calendar.JANUARY);
+        c1.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setStartDate(c1.getTime());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(event.getEndDate());
+        c2.set(Calendar.YEAR, 2016);
+        c2.set(Calendar.MONTH, Calendar.JANUARY);
+        c2.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setEndDate(c2.getTime());
         event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
         if (event.getId() == null) {
+            String minutos1 = "";
+            if (c1.get(Calendar.MINUTE) == 0) {
+                minutos1 = "00";
+            } else {
+                minutos1 = "30";
+            }
+            String minutos2 = "";
+            if (c2.get(Calendar.MINUTE) == 0) {
+                minutos2 = "00";
+            } else {
+                minutos2 = "30";
+            }
+            Calendar intensidad = Calendar.getInstance();
+            intensidad.setTime(event.getEndDate());
+            intensidad.add(Calendar.HOUR, -c2.get(Calendar.HOUR));
+            intensidad.add(Calendar.MINUTE, -c2.get(Calendar.MINUTE));
+            String minutosIntensidad = "";
+            if (intensidad.get(Calendar.MINUTE) == 0) {
+                minutosIntensidad = "00";
+            } else {
+                minutosIntensidad = "30";
+            }
+
+            selected.setIntensidad(intensidad.get(Calendar.HOUR) + ":" + minutosIntensidad);
+            selected.setHEntrada(c1.get(Calendar.HOUR) + ":" + minutos1);
+            selected.setHSalida(c2.get(Calendar.HOUR) + ":" + minutos2);
+            selected.setEstado(1);
+            selected.setNombreAsignatura(getAsignaturaController().getSelected().getNombreAsignatura());
+            selected.setSalon("");
+            selected.setCodasignatura(getAsignaturaController().getSelected());
+            selected.setIdPlan(getPlanController().getSelected());
+            selected.setULogin(getUsuarioController().getSelected());
+            create();
+            event.setId("" + selected.getIdHorario());
             getEventModel().addEvent(event);
         } else {
             getEventModel().updateEvent(event);
@@ -214,7 +248,6 @@ public class HorarioController implements Serializable {
         try {
             getJpaController().create(selected);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("HorarioCreated"));
-            selected = new Horario();
             return "Create";
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
