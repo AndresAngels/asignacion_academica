@@ -63,6 +63,7 @@ public class HorarioJpaController implements Serializable {
                 ULogin = em.merge(ULogin);
             }
             em.getTransaction().commit();
+            em.flush();
         } finally {
             if (em != null) {
                 em.close();

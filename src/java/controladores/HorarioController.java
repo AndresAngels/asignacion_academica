@@ -35,8 +35,6 @@ import vista.Sesion;
 @SessionScoped
 public class HorarioController implements Serializable {
 
-    @ManagedProperty("#{sesion}")
-    private Sesion sesion;
     @ManagedProperty("#{index}")
     private Index index;
     @ManagedProperty("#{usuarioController}")
@@ -47,13 +45,10 @@ public class HorarioController implements Serializable {
     private AsignaturaController asignaturaController;
     private Horario primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private HorarioJpaController jpaController = null;
-    private List<Horario> consultaTabla;
-    private List<Horario> filtro;
     private Horario selected;
-    private Date inicio;
-    private Date fin;
     private ScheduleModel eventModel = new DefaultScheduleModel();
     private DefaultScheduleEvent event = new DefaultScheduleEvent();
+    private List consultaTabla;
 
     public HorarioController() {
         setColumnTemplate("plan cohorte grupo asignatura docente");
@@ -100,7 +95,7 @@ public class HorarioController implements Serializable {
     }
 
     public void addEvent() {
-        Calendar c = Calendar.getInstance();
+        Calendar c1 = Calendar.getInstance();
         int n = 0;
         switch (selected.getDia()) {
             case "Lunes":
@@ -122,21 +117,58 @@ public class HorarioController implements Serializable {
                 n = 5;
                 break;
         }
-        c.setTime(event.getStartDate());
-        c.set(Calendar.YEAR, 2016);
-        c.set(Calendar.MONTH, Calendar.JANUARY);
-        c.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setStartDate(c.getTime());
-        c = Calendar.getInstance();
-        c.setTime(event.getEndDate());
-        c.set(Calendar.YEAR, 2016);
-        c.set(Calendar.MONTH, Calendar.JANUARY);
-        c.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setEndDate(c.getTime());
+        c1.setTime(event.getStartDate());
+        c1.set(Calendar.YEAR, 2016);
+        c1.set(Calendar.MONTH, Calendar.JANUARY);
+        c1.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setStartDate(c1.getTime());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(event.getEndDate());
+        c2.set(Calendar.YEAR, 2016);
+        c2.set(Calendar.MONTH, Calendar.JANUARY);
+        c2.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setEndDate(c2.getTime());
         event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
         if (event.getId() == null) {
+            String minutos1 = "";
+            if (c1.get(Calendar.MINUTE) == 0) {
+                minutos1 = "00";
+            } else {
+                minutos1 = "30";
+            }
+            String minutos2 = "";
+            if (c2.get(Calendar.MINUTE) == 0) {
+                minutos2 = "00";
+            } else {
+                minutos2 = "30";
+            }
+            Calendar intensidad = Calendar.getInstance();
+            intensidad.setTime(event.getEndDate());
+            intensidad.add(Calendar.HOUR, -c2.get(Calendar.HOUR));
+            intensidad.add(Calendar.MINUTE, -c2.get(Calendar.MINUTE));
+            String minutosIntensidad = "";
+            if (intensidad.get(Calendar.MINUTE) == 0) {
+                minutosIntensidad = "00";
+            } else {
+                minutosIntensidad = "30";
+            }
+
+            selected.setIntensidad(intensidad.get(Calendar.HOUR) + ":" + minutosIntensidad);
+            selected.setHEntrada(c1.get(Calendar.HOUR) + ":" + minutos1);
+            selected.setHSalida(c2.get(Calendar.HOUR) + ":" + minutos2);
+            selected.setEstado(1);
+            selected.setNombreAsignatura(getAsignaturaController().getSelected().getNombreAsignatura());
+            selected.setSalon("");
+            selected.setCodasignatura(getAsignaturaController().getSelected());
+            selected.setIdPlan(getPlanController().getSelected());
+            selected.setULogin(getUsuarioController().getSelected());
+            create();
+            event.setId("" + selected.getIdHorario());
+            event.setData(selected);
             getEventModel().addEvent(event);
+            event = new DefaultScheduleEvent();
+            selected = new Horario();
         } else {
             getEventModel().updateEvent(event);
         }
@@ -162,6 +194,66 @@ public class HorarioController implements Serializable {
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
 
         FacesContext.getCurrentInstance().addMessage("Horario ", message);
+    }
+
+    public void cargarEventos() {
+        Query query;
+        query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.estado=:ESTADO");
+        query.setParameter("ESTADO", 1);
+        eventModel = new DefaultScheduleModel();
+        List<Horario> consulta = query.getResultList();
+        for (Horario h : consulta) {
+            DefaultScheduleEvent evt = new DefaultScheduleEvent();
+
+            int n = 0;
+            Calendar start = Calendar.getInstance();
+            switch (h.getDia()) {
+                case "Lunes":
+                    n = 0;
+                    break;
+                case "Martes":
+                    n = 1;
+                    break;
+                case "Miercoles":
+                    n = 2;
+                    break;
+                case "Jueves":
+                    n = 3;
+                    break;
+                case "Viernes":
+                    n = 4;
+                    break;
+                case "Sabado":
+                    n = 5;
+                    break;
+            }
+            start.setTime(new Date());
+            start.set(Calendar.YEAR, 2016);
+            start.set(Calendar.MONTH, Calendar.JANUARY);
+            start.set(Calendar.DAY_OF_MONTH, 4 + n);
+            String hEntrada = h.getHEntrada();
+            String[] entrada = hEntrada.split(":");
+            start.set(Calendar.HOUR, Integer.parseInt(entrada[0]));
+            start.set(Calendar.MINUTE, Integer.parseInt(entrada[1]));
+            evt.setStartDate(start.getTime());
+            Calendar end = Calendar.getInstance();
+
+            end.setTime(new Date());
+            end.set(Calendar.YEAR, 2016);
+            end.set(Calendar.MONTH, Calendar.JANUARY);
+            end.set(Calendar.DAY_OF_MONTH, 4 + n);
+            String hSalida = h.getHSalida();
+            String[] salida = hSalida.split(":");
+            end.set(Calendar.HOUR, Integer.parseInt(salida[0]));
+            end.set(Calendar.MINUTE, Integer.parseInt(salida[1]));
+            evt.setEndDate(end.getTime());
+
+            evt.setData(h);
+            evt.setTitle(h.getCodasignatura().getCodasignatura()
+                    + " - " + h.getCodasignatura().getNombreAsignatura()
+                    + " - " + h.getULogin().getNombreLogin());
+            eventModel.addEvent(evt);
+        }
     }
 
     public void activarDia() {
@@ -214,7 +306,6 @@ public class HorarioController implements Serializable {
         try {
             getJpaController().create(selected);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("HorarioCreated"));
-            selected = new Horario();
             return "Create";
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
@@ -309,34 +400,6 @@ public class HorarioController implements Serializable {
         this.selected = selected;
     }
 
-    /**
-     * @return the sesion
-     */
-    public Sesion getSesion() {
-        return sesion;
-    }
-
-    /**
-     * @param sesion the sesion to set
-     */
-    public void setSesion(Sesion sesion) {
-        this.sesion = sesion;
-    }
-
-    /**
-     * @return the filtro
-     */
-    public List<Horario> getFiltro() {
-        return filtro;
-    }
-
-    /**
-     * @param filtro the filtro to set
-     */
-    public void setFiltro(List<Horario> filtro) {
-        this.filtro = filtro;
-    }
-
     public UsuarioController getUsuarioController() {
         return usuarioController;
     }
@@ -357,6 +420,7 @@ public class HorarioController implements Serializable {
      * @return the eventModel
      */
     public ScheduleModel getEventModel() {
+        cargarEventos();
         return eventModel;
     }
 
@@ -365,34 +429,6 @@ public class HorarioController implements Serializable {
      */
     public void setEventModel(ScheduleModel eventModel) {
         this.eventModel = eventModel;
-    }
-
-    /**
-     * @return the inicio
-     */
-    public Date getInicio() {
-        return inicio;
-    }
-
-    /**
-     * @param inicio the inicio to set
-     */
-    public void setInicio(Date inicio) {
-        this.inicio = inicio;
-    }
-
-    /**
-     * @return the fin
-     */
-    public Date getFin() {
-        return fin;
-    }
-
-    /**
-     * @param fin the fin to set
-     */
-    public void setFin(Date fin) {
-        this.fin = fin;
     }
 
     /**

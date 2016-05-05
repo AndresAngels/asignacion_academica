@@ -26,8 +26,6 @@ import vista.Sesion;
 @SessionScoped
 public class AsignaturaController implements Serializable {
 
-    @ManagedProperty("#{sesion}")
-    private Sesion sesion;
     @ManagedProperty("#{index}")
     private Index index;
     private Asignatura primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
@@ -122,20 +120,6 @@ public class AsignaturaController implements Serializable {
 
     public void mantenerIndex() {
         getIndex().setIndex(1);
-    }
-
-    /**
-     * @return the sesion
-     */
-    public Sesion getSesion() {
-        return sesion;
-    }
-
-    /**
-     * @param sesion the sesion to set
-     */
-    public void setSesion(Sesion sesion) {
-        this.sesion = sesion;
     }
 
     /**
