@@ -4,7 +4,6 @@ import controladores.util.JsfUtil;
 import entidades.Perfiles;
 import entidades.Usuarios;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -24,9 +23,9 @@ import vista.Index;
 
 @ManagedBean(name = "usuarioController")
 @SessionScoped
-public class UsuarioController implements Serializable {
+public class UsuarioController extends Controller implements Serializable {
 
-    private static final String bundle="/Bundle";
+    private static final String BUNDLE = "/Bundle";
     @ManagedProperty("#{perfilesController}")
     private PerfilesController perfilesController;
     @ManagedProperty("#{index}")
@@ -73,14 +72,14 @@ public class UsuarioController implements Serializable {
         return jpaController;
     }
 
-    public String update(ActionEvent ae) {
+    public String update() {
         try {
             getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("UsuariosUpdated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
             getIndex().setIndex(0);
             return "View";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             return null;
         }
     }
@@ -88,11 +87,11 @@ public class UsuarioController implements Serializable {
     public String create() {
         try {
             getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("UsuariosCreated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
             selected = new Usuarios();
             return "Create";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             return null;
         }
     }
@@ -106,13 +105,13 @@ public class UsuarioController implements Serializable {
         }
     }
 
-    public void desactivar(ActionEvent actionEvent) {
+    public void desactivar() {
         try {
             if (primaryKey != null) {
                 selected = getJpaController().findUsuarios(primaryKey.getULogin());
                 if (selected != null) {
                     selected.setUActivo((short) 2);
-                    update(actionEvent);
+                    update();
                     if (getConsultaTabla().isEmpty()) {
                         getIndex().setIndex(1);
                     } else {
@@ -246,18 +245,6 @@ public class UsuarioController implements Serializable {
             return controller.getJpaController().findUsuarios(value);
         }
 
-        java.lang.Integer getKey(String value) {
-            java.lang.Integer key;
-            key = Integer.valueOf(value);
-            return key;
-        }
-
-        String getStringKey(java.lang.Integer value) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(value);
-            return sb.toString();
-        }
-
         @Override
         public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
             if (object == null) {
@@ -271,55 +258,5 @@ public class UsuarioController implements Serializable {
             }
         }
 
-    }
-
-    //Implementando Tabla Dinamica
-    public static class ColumnModel implements Serializable {
-
-        private String header;
-        private String property;
-
-        public ColumnModel(String header, String property) {
-            this.header = header;
-            this.property = property;
-        }
-
-        public String getHeader() {
-            return header;
-        }
-
-        public String getProperty() {
-            return property;
-        }
-    }
-
-    private List<ColumnModel> columns = new ArrayList<ColumnModel>();
-    private String columnTemplate;
-
-    public List<ColumnModel> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(List<ColumnModel> columns) {
-        this.columns = columns;
-    }
-
-    public String getColumnTemplate() {
-        return columnTemplate;
-    }
-
-    public void setColumnTemplate(String columnTemplate) {
-        this.columnTemplate = columnTemplate;
-    }
-
-    public void createDynamicColumns() {
-        String[] columnKeys = columnTemplate.split(" ");
-        columns.clear();
-
-        for (String columnKey : columnKeys) {
-            String key = columnKey.trim();
-            key = key.substring(0, 1).toUpperCase() + key.substring(1);
-            columns.add(new ColumnModel(key, columnKey));
-        }
     }
 }

@@ -51,17 +51,17 @@ public class Sesion implements Serializable {
             Query query;
             query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO");
             query.setParameter("ESTADO", 1);
-            Usuarios usuario=null;
+            Usuarios usuario = null;
             for (Usuarios u : (List<Usuarios>) query.getResultList()) {
                 if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
                         && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())) {
-                    usuario=u;
+                    usuario = u;
                 }
             }
             if (usuario == null) {
                 getUsuarioController().setUsuario(new Usuarios());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "Datos invalidos"));
-            }else{
+            } else {
                 getUsuarioController().setUsuario(usuario);
             }
         } catch (Exception e) {

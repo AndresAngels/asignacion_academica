@@ -3,7 +3,6 @@ package controladores;
 import controladores.util.JsfUtil;
 import entidades.Asignatura;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -15,18 +14,18 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
-import javax.faces.event.ActionEvent;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.AsignaturaJpaController;
 import vista.Index;
-import vista.Sesion;
 
 @ManagedBean
 @SessionScoped
-public class AsignaturaController implements Serializable {
+public class AsignaturaController extends Controller implements Serializable {
 
-    private static final String bundle = "/Bundle";
+    private static final String BUNDLE = "/Bundle";
+    private static final String CREATE = "CREATE";
+    private static final String UPDATE = "UPDATE";
     @ManagedProperty("#{index}")
     private Index index;
     private Asignatura primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
@@ -47,12 +46,12 @@ public class AsignaturaController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return consultaTabla;
     }
 
-    public void insertar(ActionEvent ae) {
+    public void insertar() {
         selected.setEstado(1);
         create();
         getIndex().setIndex(0);
@@ -65,28 +64,12 @@ public class AsignaturaController implements Serializable {
         return jpaController;
     }
 
-    public String update(ActionEvent ae) {
-        try {
-            getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("AsignaturaUpdated"));
-            getIndex().setIndex(0);
-            return "View";
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
-            return null;
-        }
+    public String update() {
+        return createOrUpdate(UPDATE);
     }
 
     public String create() {
-        try {
-            getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("AsignaturaCreated"));
-            selected = new Asignatura();
-            return "Create";
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
-            return null;
-        }
+        return createOrUpdate(CREATE);
     }
 
     public void prepararEdicion() {
@@ -98,18 +81,13 @@ public class AsignaturaController implements Serializable {
         }
     }
 
-    public void desactivar(ActionEvent actionEvent) {
+    public void desactivar() {
         try {
             if (primaryKey != null) {
                 selected = getJpaController().findAsignatura(primaryKey.getCodasignatura());
                 if (selected != null) {
                     selected.setEstado(2);
-                    update(actionEvent);
-                    if (getConsultaTabla().isEmpty()) {
-                        getIndex().setIndex(1);
-                    } else {
-                        getIndex().setIndex(0);
-                    }
+                    update();
                 }
             } else {
                 Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "Llave Primaria del Registro Vacia o Nula");
@@ -122,6 +100,23 @@ public class AsignaturaController implements Serializable {
 
     public void mantenerIndex() {
         getIndex().setIndex(1);
+    }
+
+    public String createOrUpdate(String opcion) {
+        try {
+            if (opcion == CREATE) {
+                getJpaController().create(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
+            } else {
+                getJpaController().edit(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+            }
+            selected = new Asignatura();
+            return "Create";
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
+            return null;
+        }
     }
 
     /**
@@ -200,18 +195,6 @@ public class AsignaturaController implements Serializable {
             return controller.getJpaController().findAsignatura(value);
         }
 
-        java.lang.Integer getKey(String value) {
-            java.lang.Integer key;
-            key = Integer.valueOf(value);
-            return key;
-        }
-
-        String getStringKey(java.lang.Integer value) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(value);
-            return sb.toString();
-        }
-
         @Override
         public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
             if (object == null) {
@@ -225,55 +208,5 @@ public class AsignaturaController implements Serializable {
             }
         }
 
-    }
-
-    //Implementando Tabla Dinamica
-    public static class ColumnModel implements Serializable {
-
-        private String header;
-        private String property;
-
-        public ColumnModel(String header, String property) {
-            this.header = header;
-            this.property = property;
-        }
-
-        public String getHeader() {
-            return header;
-        }
-
-        public String getProperty() {
-            return property;
-        }
-    }
-
-    private List<ColumnModel> columns = new ArrayList<ColumnModel>();
-    private String columnTemplate;
-
-    public List<ColumnModel> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(List<ColumnModel> columns) {
-        this.columns = columns;
-    }
-
-    public String getColumnTemplate() {
-        return columnTemplate;
-    }
-
-    public void setColumnTemplate(String columnTemplate) {
-        this.columnTemplate = columnTemplate;
-    }
-
-    public void createDynamicColumns() {
-        String[] columnKeys = columnTemplate.split(" ");
-        columns.clear();
-
-        for (String columnKey : columnKeys) {
-            String key = columnKey.trim();
-            key = key.substring(0, 1).toUpperCase() + key.substring(1);
-            columns.add(new ColumnModel(key, columnKey));
-        }
     }
 }

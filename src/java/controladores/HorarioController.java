@@ -3,7 +3,6 @@ package controladores;
 import controladores.util.JsfUtil;
 import entidades.Horario;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +17,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
-import javax.faces.event.ActionEvent;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.HorarioJpaController;
@@ -29,13 +27,17 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import vista.Index;
-import vista.Sesion;
 
 @ManagedBean
 @SessionScoped
-public class HorarioController implements Serializable {
+public class HorarioController extends Controller implements Serializable {
 
-    private static final String bundle="/Bundle";
+    private static final String LUNES = "Lunes";
+    private static final String MARTES = "Martes";
+    private static final String MIERCOLES = "Miércoles";
+    private static final String JUEVES = "Jueves";
+    private static final String VIERNES = "Viernes";
+    private static final String SABADO = "Sábado";
     @ManagedProperty("#{index}")
     private Index index;
     @ManagedProperty("#{usuarioController}")
@@ -49,12 +51,7 @@ public class HorarioController implements Serializable {
     private Horario selected;
     private ScheduleModel eventModel = new DefaultScheduleModel();
     private DefaultScheduleEvent event = new DefaultScheduleEvent();
-    private List consultaTabla;
-
-    public HorarioController() {
-        setColumnTemplate("plan cohorte grupo asignatura docente");
-        createDynamicColumns();
-    }
+    private List<Horario> consultaTabla;
 
     public List<Horario> getConsultaHorarioPrograma() {
         try {
@@ -92,75 +89,40 @@ public class HorarioController implements Serializable {
         return consultaTabla;
     }
 
-    public void insertar(ActionEvent ae) {
+    public void insertar() {
         selected.setEstado(1);
         create();
         getIndex().setIndex(0);
     }
 
     public void addEvent() {
-        Calendar c1 = Calendar.getInstance();
-        int n = 0;
-        switch (selected.getDia()) {
-            case "Lunes":
-                n = 0;
-                break;
-            case "Martes":
-                n = 1;
-                break;
-            case "Miercoles":
-                n = 2;
-                break;
-            case "Jueves":
-                n = 3;
-                break;
-            case "Viernes":
-                n = 4;
-                break;
-            case "Sabado":
-                n = 5;
-                break;
-        }
-        c1.setTime(event.getStartDate());
-        c1.set(Calendar.YEAR, 2016);
-        c1.set(Calendar.MONTH, Calendar.JANUARY);
-        c1.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setStartDate(c1.getTime());
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(event.getEndDate());
-        c2.set(Calendar.YEAR, 2016);
-        c2.set(Calendar.MONTH, Calendar.JANUARY);
-        c2.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setEndDate(c2.getTime());
+        Calendar fechaEntrada = Calendar.getInstance();
+        Calendar fechaSalida = Calendar.getInstance();
+        int n=obtenerDia(selected.getDia());
+        fechaEntrada.setTime(event.getStartDate());
+        fechaEntrada.set(Calendar.YEAR, 2016);
+        fechaEntrada.set(Calendar.MONTH, Calendar.JANUARY);
+        fechaEntrada.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setStartDate(fechaEntrada.getTime());
+        fechaSalida.setTime(event.getEndDate());
+        fechaSalida.set(Calendar.YEAR, 2016);
+        fechaSalida.set(Calendar.MONTH, Calendar.JANUARY);
+        fechaSalida.set(Calendar.DAY_OF_MONTH, 4 + n);
+        event.setEndDate(fechaSalida.getTime());
         event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
         if (event.getId() == null) {
-            String minutos1 = "";
-            if (c1.get(Calendar.MINUTE) == 0) {
-                minutos1 = "00";
-            } else {
-                minutos1 = "30";
-            }
-            String minutos2 = "";
-            if (c2.get(Calendar.MINUTE) == 0) {
-                minutos2 = "00";
-            } else {
-                minutos2 = "30";
-            }
-            Calendar intensidad = Calendar.getInstance();
-            intensidad.setTime(event.getEndDate());
-            intensidad.add(Calendar.HOUR, -c2.get(Calendar.HOUR));
-            intensidad.add(Calendar.MINUTE, -c2.get(Calendar.MINUTE));
-            String minutosIntensidad = "";
-            if (intensidad.get(Calendar.MINUTE) == 0) {
-                minutosIntensidad = "00";
-            } else {
-                minutosIntensidad = "30";
-            }
+            String entrada = extraerHora(fechaEntrada);
+            String salida = extraerHora(fechaSalida);
+            Calendar fechaIntencidad = Calendar.getInstance();
+            fechaIntencidad.setTime(event.getEndDate());
+            fechaIntencidad.add(Calendar.HOUR, -fechaSalida.get(Calendar.HOUR));
+            fechaIntencidad.add(Calendar.MINUTE, -fechaSalida.get(Calendar.MINUTE));
+            String intensidad = extraerHora(fechaIntencidad);
 
-            selected.setIntensidad(intensidad.get(Calendar.HOUR) + ":" + minutosIntensidad);
-            selected.setHEntrada(c1.get(Calendar.HOUR) + ":" + minutos1);
-            selected.setHSalida(c2.get(Calendar.HOUR) + ":" + minutos2);
+            selected.setIntensidad(intensidad);
+            selected.setHEntrada(entrada);
+            selected.setHSalida(salida);
             selected.setEstado(1);
             selected.setNombreAsignatura(getAsignaturaController().getSelected().getNombreAsignatura());
             selected.setSalon("");
@@ -209,28 +171,9 @@ public class HorarioController implements Serializable {
         for (Horario h : consulta) {
             DefaultScheduleEvent evt = new DefaultScheduleEvent();
 
-            int n = 0;
             Calendar start = Calendar.getInstance();
-            switch (h.getDia()) {
-                case "Lunes":
-                    n = 0;
-                    break;
-                case "Martes":
-                    n = 1;
-                    break;
-                case "Miercoles":
-                    n = 2;
-                    break;
-                case "Jueves":
-                    n = 3;
-                    break;
-                case "Viernes":
-                    n = 4;
-                    break;
-                case "Sabado":
-                    n = 5;
-                    break;
-            }
+            Calendar end = Calendar.getInstance();
+            int n=obtenerDia(h.getDia());
             start.setTime(new Date());
             start.set(Calendar.YEAR, 2016);
             start.set(Calendar.MONTH, Calendar.JANUARY);
@@ -240,7 +183,6 @@ public class HorarioController implements Serializable {
             start.set(Calendar.HOUR, Integer.parseInt(entrada[0]));
             start.set(Calendar.MINUTE, Integer.parseInt(entrada[1]));
             evt.setStartDate(start.getTime());
-            Calendar end = Calendar.getInstance();
 
             end.setTime(new Date());
             end.set(Calendar.YEAR, 2016);
@@ -266,22 +208,24 @@ public class HorarioController implements Serializable {
             c.setTime(event.getStartDate());
             switch (c.get(Calendar.DAY_OF_MONTH)) {
                 case 4:
-                    selected.setDia("Lunes");
+                    selected.setDia(LUNES);
                     break;
                 case 5:
-                    selected.setDia("Martes");
+                    selected.setDia(MARTES);
                     break;
                 case 6:
-                    selected.setDia("Miercoles");
+                    selected.setDia(MIERCOLES);
                     break;
                 case 7:
-                    selected.setDia("Jueves");
+                    selected.setDia(JUEVES);
                     break;
                 case 8:
-                    selected.setDia("Viernes");
+                    selected.setDia(VIERNES);
                     break;
                 case 9:
-                    selected.setDia("Sabado");
+                    selected.setDia(SABADO);
+                    break;
+                default:
                     break;
             }
         }
@@ -294,26 +238,27 @@ public class HorarioController implements Serializable {
         return jpaController;
     }
 
-    public String update(ActionEvent ae) {
-        try {
-            getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("HorarioUpdated"));
-            getIndex().setIndex(0);
-            return "View";
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
-            return null;
-        }
+    public String update() {
+        return createOrUpdate(UPDATE);
     }
 
     public String create() {
+        return createOrUpdate(CREATE);
+    }
+
+    public String createOrUpdate(String opcion) {
         try {
-            getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("HorarioCreated"));
+            if (opcion == CREATE) {
+                getJpaController().create(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
+            } else {
+                getJpaController().edit(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+            }
             selected = new Horario();
             return "Create";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             return null;
         }
     }
@@ -327,18 +272,13 @@ public class HorarioController implements Serializable {
         }
     }
 
-    public void desactivar(ActionEvent actionEvent) {
+    public void desactivar() {
         try {
             if (primaryKey != null) {
                 selected = getJpaController().findHorario(primaryKey.getIdHorario());
                 if (selected != null) {
                     selected.setEstado(2);
-                    update(actionEvent);
-                    if (getConsultaTabla().isEmpty()) {
-                        getIndex().setIndex(1);
-                    } else {
-                        getIndex().setIndex(0);
-                    }
+                    update();
                 }
             } else {
                 Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "Llave Primaria del Registro Vacia o Nula");
@@ -351,6 +291,35 @@ public class HorarioController implements Serializable {
 
     public void mantenerIndex() {
         getIndex().setIndex(1);
+    }
+
+    public String extraerHora(Calendar objetivo) {
+        String minutos;
+        if (objetivo.get(Calendar.MINUTE) == 0) {
+            minutos = "00";
+        } else {
+            minutos = "30";
+        }
+        return objetivo.get(Calendar.HOUR) + ":" + minutos;
+    }
+
+    public int obtenerDia(String dia) {
+        switch (selected.getDia()) {
+            case LUNES:
+                return 0;
+            case MARTES:
+                return 1;
+            case MIERCOLES:
+                return 2;
+            case JUEVES:
+                return 3;
+            case VIERNES:
+                return 4;
+            case SABADO:
+                return 5;
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -502,55 +471,5 @@ public class HorarioController implements Serializable {
             }
         }
 
-    }
-
-    //Implementando Tabla Dinamica
-    public static class ColumnModel implements Serializable {
-
-        private String header;
-        private String property;
-
-        public ColumnModel(String header, String property) {
-            this.header = header;
-            this.property = property;
-        }
-
-        public String getHeader() {
-            return header;
-        }
-
-        public String getProperty() {
-            return property;
-        }
-    }
-
-    private List<ColumnModel> columns = new ArrayList<ColumnModel>();
-    private String columnTemplate;
-
-    public List<ColumnModel> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(List<ColumnModel> columns) {
-        this.columns = columns;
-    }
-
-    public String getColumnTemplate() {
-        return columnTemplate;
-    }
-
-    public void setColumnTemplate(String columnTemplate) {
-        this.columnTemplate = columnTemplate;
-    }
-
-    public void createDynamicColumns() {
-        String[] columnKeys = columnTemplate.split(" ");
-        columns.clear();
-
-        for (String columnKey : columnKeys) {
-            String key = columnKey.trim();
-            key = key.substring(0, 1).toUpperCase() + key.substring(1);
-            columns.add(new ColumnModel(key, columnKey));
-        }
     }
 }

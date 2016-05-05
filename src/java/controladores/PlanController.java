@@ -28,7 +28,7 @@ import modelos.PlanJpaController;
 @SessionScoped
 public class PlanController implements Serializable {
 
-    private static final String bundle = "/Bundle";
+    private static final String BUNDLE = "/Bundle";
     private Plan selected;
     private PlanJpaController jpaController;
     private List<Plan> consultaTabla;
@@ -93,18 +93,6 @@ public class PlanController implements Serializable {
             PlanController controller = (PlanController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "planController");
             return controller.getJpaController().findPlan(value);
-        }
-
-        java.lang.Integer getKey(String value) {
-            java.lang.Integer key;
-            key = Integer.valueOf(value);
-            return key;
-        }
-
-        String getStringKey(java.lang.Integer value) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(value);
-            return sb.toString();
         }
 
         @Override

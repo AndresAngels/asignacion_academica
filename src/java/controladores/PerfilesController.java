@@ -18,7 +18,6 @@ import modelos.PerfilesJpaController;
 @SessionScoped
 public class PerfilesController {
 
-    private static final String bundle = "/Bundle";
     private Perfiles selected;
     private PerfilesJpaController jpaController;
     private List<Perfiles> perfiles;
@@ -69,18 +68,6 @@ public class PerfilesController {
             PerfilesController controller = (PerfilesController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "perfilesController");
             return controller.getJpaController().findPerfiles(value);
-        }
-
-        java.lang.Integer getKey(String value) {
-            java.lang.Integer key;
-            key = Integer.valueOf(value);
-            return key;
-        }
-
-        String getStringKey(java.lang.Integer value) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(value);
-            return sb.toString();
         }
 
         @Override
