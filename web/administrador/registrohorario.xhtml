@@ -23,26 +23,24 @@
 
             <ui:define name="content">
                 <h:form id="form">
-                    <p:schedule id="schedule" widgetVar="myschedule" timeZone="GMT-5" locale="es"
-                                view="agendaWeek" minTime="6:30am" rightHeaderTemplate=""
-                                leftHeaderTemplate="" centerHeaderTemplate="" maxTime="10:30pm"
-                                allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
-                                value="#{horarioController.eventModel}">
-
-                        <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
-                        <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
-                        <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":form, :growl" />
-                        <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":form, :growl" />
-
-                    </p:schedule>
-                    <p:dialog id="registro" widgetVar="eventDialog" header="Registrar Horario" showEffect="clip" hideEffect="clip">
-                        <h:panelGrid id="eventDetails" columns="4">
+                    <p:panel header="Control de horarios">
+                        <h:panelGrid id="preseleccion" columns="2">
                             <p:outputLabel for="plan" value="Plan"/>
                             <p:selectOneMenu id="plan"
                                              value="#{planController.selected}"
                                              required="true">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
                                 <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="franja" value="Franja"/>
+                            <p:selectOneMenu id="franja"
+                                             value="#{horarioController.selected.franja}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItem itemLabel="Diurno" itemValue="Diurno" />
+                                <f:selectItem itemLabel="Vespertino" itemValue="Vespertino" />
+                                <f:selectItem itemLabel="Nocturno" itemValue="Nocturno" />
                             </p:selectOneMenu>
 
                             <p:outputLabel for="cohorte" value="Cohorte"/>
@@ -73,16 +71,23 @@
                                 <f:selectItem itemLabel="52" itemValue="52" />
                                 <f:selectItem itemLabel="53" itemValue="53" />
                             </p:selectOneMenu>
+                        </h:panelGrid>
+                    </p:panel>
 
-                            <p:outputLabel for="franja" value="Franja"/>
-                            <p:selectOneMenu id="franja"
-                                             value="#{horarioController.selected.franja}"
-                                             required="true">
-                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItem itemLabel="Diurno" itemValue="Diurno" />
-                                <f:selectItem itemLabel="Vespertino" itemValue="Vespertino" />
-                                <f:selectItem itemLabel="Nocturno" itemValue="Nocturno" />
-                            </p:selectOneMenu>
+                    <p:schedule id="schedule" widgetVar="myschedule" timeZone="GMT-5" locale="es"
+                                view="agendaWeek" minTime="6:30am" rightHeaderTemplate=""
+                                leftHeaderTemplate="" centerHeaderTemplate="" maxTime="10:30pm"
+                                allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
+                                value="#{horarioController.eventModel}">
+
+                        <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
+                        <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
+                        <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update=":form, :growl" />
+                        <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update=":form, :growl" />
+
+                    </p:schedule>
+                    <p:dialog id="registro" widgetVar="eventDialog" header="Registrar Horario" showEffect="clip" hideEffect="clip">
+                        <h:panelGrid id="eventDetails" columns="4">
 
                             <p:outputLabel for="Asignatura" value="Asignatura" />
                             <p:selectOneMenu id="Asignatura"
@@ -113,8 +118,11 @@
                                         required="true"/>
                         </h:panelGrid>
                         <div align="center" style="padding: 5px;">
-                            <p:commandButton type="reset" value="Reset" />
-                            <p:commandButton id="addButton" value="Save" actionListener="#{horarioController.addEvent}" onsuccess="PF('myschedule').update();PF('eventDialog').hide();" />
+                            <p:commandButton id="addButton" value="Grabar" 
+                                             process=":form" 
+                                             actionListener="#{horarioController.addEvent}" 
+                                             onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
+                                             update=":growl"/>
                         </div>
                     </p:dialog>
                     <p:remoteCommand name="funcion" process="@this" actionListener="#{horarioController.activarDia()}" update="eventDetails"/>

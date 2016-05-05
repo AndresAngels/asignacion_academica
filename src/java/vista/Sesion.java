@@ -1,5 +1,9 @@
 package vista;
 
+import controladores.AsignaturaController;
+import controladores.HorarioController;
+import controladores.PerfilesController;
+import controladores.PlanController;
 import controladores.UsuarioController;
 import entidades.Usuarios;
 import java.io.Serializable;
@@ -20,13 +24,17 @@ import modelos.SesionJpaController;
 @SessionScoped
 public class Sesion implements Serializable {
 
+    @ManagedProperty("#{asignaturaController}")
+    private AsignaturaController asignaturaController;
+    @ManagedProperty("#{horarioController}")
+    private HorarioController horarioController;
+    @ManagedProperty("#{perfilesController}")
+    private PerfilesController perfilesController;
+    @ManagedProperty("#{planController}")
+    private PlanController planController;
     @ManagedProperty("#{usuarioController}")
     private UsuarioController usuarioController;
     private SesionJpaController jpaController;
-    private String tema = "aristo";
-    private String width = "0";
-    private String height = "0";
-    private GuestPreferences gp = new GuestPreferences();
     private Date fechaInicial;
 
     public Sesion() {
@@ -59,7 +67,11 @@ public class Sesion implements Serializable {
     }
 
     public String cerrarSesion() {
-        getUsuarioController().setUsuario(new Usuarios());
+        setAsignaturaController(new AsignaturaController());
+        setHorarioController(new HorarioController());
+        setPerfilesController(new PerfilesController());
+        setPlanController(new PlanController());
+        setUsuarioController(new UsuarioController());
         return "success";
     }
 
@@ -68,62 +80,6 @@ public class Sesion implements Serializable {
             jpaController = new SesionJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
         }
         return jpaController;
-    }
-
-    /**
-     * @return the tema
-     */
-    public String getTema() {
-        return tema;
-    }
-
-    /**
-     * @param tema the tema to set
-     */
-    public void setTema(String tema) {
-        this.tema = tema;
-    }
-
-    /**
-     * @return the gp
-     */
-    public GuestPreferences getGp() {
-        return gp;
-    }
-
-    /**
-     * @param gp the gp to set
-     */
-    public void setGp(GuestPreferences gp) {
-        this.gp = gp;
-    }
-
-    /**
-     * @return the width
-     */
-    public String getWidth() {
-        return width;
-    }
-
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(String width) {
-        this.width = width;
-    }
-
-    /**
-     * @return the height
-     */
-    public String getHeight() {
-        return height;
-    }
-
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(String height) {
-        this.height = height;
     }
 
     /**
@@ -152,5 +108,61 @@ public class Sesion implements Serializable {
      */
     public void setFechaInicial(Date fechaInicial) {
         this.fechaInicial = fechaInicial;
+    }
+
+    /**
+     * @return the asignaturaController
+     */
+    public AsignaturaController getAsignaturaController() {
+        return asignaturaController;
+    }
+
+    /**
+     * @param asignaturaController the asignaturaController to set
+     */
+    public void setAsignaturaController(AsignaturaController asignaturaController) {
+        this.asignaturaController = asignaturaController;
+    }
+
+    /**
+     * @return the horarioController
+     */
+    public HorarioController getHorarioController() {
+        return horarioController;
+    }
+
+    /**
+     * @param horarioController the horarioController to set
+     */
+    public void setHorarioController(HorarioController horarioController) {
+        this.horarioController = horarioController;
+    }
+
+    /**
+     * @return the PerfilesController
+     */
+    public PerfilesController getPerfilesController() {
+        return perfilesController;
+    }
+
+    /**
+     * @param PerfilesController the PerfilesController to set
+     */
+    public void setPerfilesController(PerfilesController perfilesController) {
+        this.perfilesController = perfilesController;
+    }
+
+    /**
+     * @return the planController
+     */
+    public PlanController getPlanController() {
+        return planController;
+    }
+
+    /**
+     * @param planController the planController to set
+     */
+    public void setPlanController(PlanController planController) {
+        this.planController = planController;
     }
 }

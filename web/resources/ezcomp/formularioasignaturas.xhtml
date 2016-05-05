@@ -31,11 +31,11 @@
             </h:panelGrid>
             <c:choose>
                 <c:when test="#{asignaturaController.selected.codasignatura==null}">
-                    <p:commandButton value="Grabar Sistema de Riesgo" 
+                    <p:commandButton value="Grabar Asignatura" 
                                      actionListener="#{asignaturaController.insertar}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
-                    <p:commandButton value="Actualizar Sistema de Riesgo" 
+                    <p:commandButton value="Actualizar Asignatura" 
                                      actionListener="#{asignaturaController.update}" 
                                      process="panel" update=":tabview" onclick="funcion1();" 
                                      onsuccess="tabla.clearFilters();"/>
