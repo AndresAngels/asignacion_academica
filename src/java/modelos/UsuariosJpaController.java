@@ -32,7 +32,7 @@ public class UsuariosJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Usuarios usuarios) throws PreexistingEntityException, Exception {
+    public void create(Usuarios usuarios) throws PreexistingEntityException {
         if (usuarios.getHorarioList() == null) {
             usuarios.setHorarioList(new ArrayList<Horario>());
         }
@@ -87,7 +87,7 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public void edit(Usuarios usuarios) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(Usuarios usuarios) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();

@@ -8,6 +8,8 @@ package controladores;
 import entidades.Plan;
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -26,8 +28,9 @@ import modelos.PlanJpaController;
 @SessionScoped
 public class PlanController implements Serializable {
 
+    private static final String bundle = "/Bundle";
+    private Plan selected;
     private PlanJpaController jpaController;
-    Plan selected;
     private List<Plan> consultaTabla;
 
     /**
@@ -43,6 +46,7 @@ public class PlanController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
         }
         return consultaTabla;
     }

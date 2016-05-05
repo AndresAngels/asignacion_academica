@@ -35,6 +35,7 @@ import vista.Sesion;
 @SessionScoped
 public class HorarioController implements Serializable {
 
+    private static final String bundle="/Bundle";
     @ManagedProperty("#{index}")
     private Index index;
     @ManagedProperty("#{usuarioController}")
@@ -59,9 +60,10 @@ public class HorarioController implements Serializable {
         try {
             Query query;
             query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan:PLAN");
-            query.setParameter("PLAN", getPlanController().selected);
+            query.setParameter("PLAN", getPlanController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
         }
         return consultaTabla;
     }
@@ -73,6 +75,7 @@ public class HorarioController implements Serializable {
             query.setParameter("DOCENTE", getUsuarioController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
         }
         return consultaTabla;
     }
@@ -84,6 +87,7 @@ public class HorarioController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
         }
         return consultaTabla;
     }
@@ -293,11 +297,11 @@ public class HorarioController implements Serializable {
     public String update(ActionEvent ae) {
         try {
             getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("HorarioUpdated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("HorarioUpdated"));
             getIndex().setIndex(0);
             return "View";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
             return null;
         }
     }
@@ -305,10 +309,11 @@ public class HorarioController implements Serializable {
     public String create() {
         try {
             getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("HorarioCreated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(bundle).getString("HorarioCreated"));
+            selected = new Horario();
             return "Create";
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(bundle).getString("PersistenceErrorOccured"));
             return null;
         }
     }

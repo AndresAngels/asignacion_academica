@@ -31,7 +31,7 @@ public class PlanJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Plan plan) throws PreexistingEntityException, Exception {
+    public void create(Plan plan) throws PreexistingEntityException {
         if (plan.getHorarioList() == null) {
             plan.setHorarioList(new ArrayList<Horario>());
         }
@@ -86,7 +86,7 @@ public class PlanJpaController implements Serializable {
         }
     }
 
-    public void edit(Plan plan) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(Plan plan) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();

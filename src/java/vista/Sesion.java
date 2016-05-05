@@ -9,6 +9,7 @@ import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -48,16 +49,20 @@ public class Sesion implements Serializable {
     public void iniciarSesion() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uLogin=:LOGIN AND u.uPassword=:CONTRASENA AND u.uActivo=:ESTADO");
-            query.setParameter("LOGIN", getUsuarioController().getUsuario().getULogin());
-            query.setParameter("CONTRASENA", getUsuarioController().getUsuario().getUPassword());
+            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO");
             query.setParameter("ESTADO", 1);
-            if (!query.getResultList().isEmpty()) {
-                Usuarios get = (Usuarios) query.getSingleResult();
-                getUsuarioController().setUsuario(get);
-            } else {
+            Usuarios usuario=null;
+            for (Usuarios u : (List<Usuarios>) query.getResultList()) {
+                if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
+                        && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())) {
+                    usuario=u;
+                }
+            }
+            if (usuario == null) {
                 getUsuarioController().setUsuario(new Usuarios());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "Datos invalidos"));
+            }else{
+                getUsuarioController().setUsuario(usuario);
             }
         } catch (Exception e) {
             getUsuarioController().setUsuario(new Usuarios());

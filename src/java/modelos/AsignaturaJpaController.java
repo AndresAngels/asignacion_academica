@@ -30,7 +30,7 @@ public class AsignaturaJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Asignatura asignatura) throws PreexistingEntityException, Exception {
+    public void create(Asignatura asignatura) throws PreexistingEntityException {
         if (asignatura.getHorarioList() == null) {
             asignatura.setHorarioList(new ArrayList<Horario>());
         }
@@ -67,7 +67,7 @@ public class AsignaturaJpaController implements Serializable {
         }
     }
 
-    public void edit(Asignatura asignatura) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(Asignatura asignatura) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
