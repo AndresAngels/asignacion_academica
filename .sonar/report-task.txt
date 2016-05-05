@@ -1,0 +1,5 @@
+projectKey=asignacion_academica
+serverUrl=http://localhost:9000
+dashboardUrl=http://localhost:9000/dashboard/index/asignacion_academica
+ceTaskId=AVSBP8u_pTfMwujjpFgL
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVSBP8u_pTfMwujjpFgL
