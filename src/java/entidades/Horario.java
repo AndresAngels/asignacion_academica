@@ -29,7 +29,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Horario.findByGrupo", query = "SELECT h FROM Horario h WHERE h.grupo = :grupo"),
     @NamedQuery(name = "Horario.findByFranja", query = "SELECT h FROM Horario h WHERE h.franja = :franja"),
     @NamedQuery(name = "Horario.findByIntensidad", query = "SELECT h FROM Horario h WHERE h.intensidad = :intensidad"),
-    @NamedQuery(name = "Horario.findBySalon", query = "SELECT h FROM Horario h WHERE h.salon = :salon"),
     @NamedQuery(name = "Horario.findByDia", query = "SELECT h FROM Horario h WHERE h.dia = :dia"),
     @NamedQuery(name = "Horario.findByHEntrada", query = "SELECT h FROM Horario h WHERE h.hEntrada = :hEntrada"),
     @NamedQuery(name = "Horario.findByHSalida", query = "SELECT h FROM Horario h WHERE h.hSalida = :hSalida"),
