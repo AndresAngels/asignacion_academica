@@ -31,13 +31,13 @@ public class AsignaturaJpaController implements Serializable {
 
     public void create(Asignatura asignatura) throws PreexistingEntityException {
         if (asignatura.getHorarioList() == null) {
-            asignatura.setHorarioList(new ArrayList<>());
+            asignatura.setHorarioList(new ArrayList<Horario>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<>();
+            List<Horario> attachedHorarioList = new ArrayList<Horario>();
             for (Horario horarioListHorarioToAttach : asignatura.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
                 attachedHorarioList.add(horarioListHorarioToAttach);
@@ -74,7 +74,7 @@ public class AsignaturaJpaController implements Serializable {
             Asignatura persistentAsignatura = em.find(Asignatura.class, asignatura.getCodasignatura());
             List<Horario> horarioListOld = persistentAsignatura.getHorarioList();
             List<Horario> horarioListNew = asignatura.getHorarioList();
-            List<Horario> attachedHorarioListNew = new ArrayList<>();
+            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
             for (Horario horarioListNewHorarioToAttach : horarioListNew) {
                 horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
                 attachedHorarioListNew.add(horarioListNewHorarioToAttach);

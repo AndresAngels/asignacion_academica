@@ -31,13 +31,13 @@ public class PerfilesJpaController implements Serializable {
 
     public void create(Perfiles perfiles) throws PreexistingEntityException {
         if (perfiles.getUsuariosList() == null) {
-            perfiles.setUsuariosList(new ArrayList<>());
+            perfiles.setUsuariosList(new ArrayList<Usuarios>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Usuarios> attachedUsuariosList = new ArrayList<>();
+            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
             for (Usuarios usuariosListUsuariosToAttach : perfiles.getUsuariosList()) {
                 usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
                 attachedUsuariosList.add(usuariosListUsuariosToAttach);
@@ -74,7 +74,7 @@ public class PerfilesJpaController implements Serializable {
             Perfiles persistentPerfiles = em.find(Perfiles.class, perfiles.getCodigoPerfil());
             List<Usuarios> usuariosListOld = persistentPerfiles.getUsuariosList();
             List<Usuarios> usuariosListNew = perfiles.getUsuariosList();
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<>();
+            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
             for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
                 usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
                 attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);
