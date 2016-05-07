@@ -112,7 +112,7 @@ public class HorarioController extends Controller implements Serializable {
             String salida = extraerHora(fechaSalida);
             Calendar fechaIntencidad = Calendar.getInstance();
             fechaIntencidad.setTime(event.getEndDate());
-            fechaIntencidad.add(Calendar.HOUR, -fechaSalida.get(Calendar.HOUR));
+            fechaIntencidad.add(Calendar.HOUR_OF_DAY, -fechaSalida.get(Calendar.HOUR_OF_DAY));
             fechaIntencidad.add(Calendar.MINUTE, -fechaSalida.get(Calendar.MINUTE));
             String intensidad = extraerHora(fechaIntencidad);
 
@@ -174,7 +174,7 @@ public class HorarioController extends Controller implements Serializable {
             start.set(Calendar.DAY_OF_MONTH, 4 + n);
             String hEntrada = h.getHEntrada();
             String[] entrada = hEntrada.split(":");
-            start.set(Calendar.HOUR, Integer.parseInt(entrada[0]));
+            start.set(Calendar.HOUR_OF_DAY, Integer.parseInt(entrada[0]));
             start.set(Calendar.MINUTE, Integer.parseInt(entrada[1]));
             evt.setStartDate(start.getTime());
 
@@ -184,7 +184,7 @@ public class HorarioController extends Controller implements Serializable {
             end.set(Calendar.DAY_OF_MONTH, 4 + n);
             String hSalida = h.getHSalida();
             String[] salida = hSalida.split(":");
-            end.set(Calendar.HOUR, Integer.parseInt(salida[0]));
+            end.set(Calendar.HOUR_OF_DAY, Integer.parseInt(salida[0]));
             end.set(Calendar.MINUTE, Integer.parseInt(salida[1]));
             evt.setEndDate(end.getTime());
 
@@ -281,11 +281,11 @@ public class HorarioController extends Controller implements Serializable {
         } else {
             minutos = "30";
         }
-        return objetivo.get(Calendar.HOUR) + ":" + minutos;
+        return objetivo.get(Calendar.HOUR_OF_DAY) + ":" + minutos+":";
     }
 
     public int obtenerDia(String dia) {
-        switch (selected.getDia()) {
+        switch (dia) {
             case LUNES:
                 return 0;
             case MARTES:

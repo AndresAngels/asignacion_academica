@@ -15,6 +15,8 @@ import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.UsuariosJpaController;
+import modelos.exceptions.NonexistentEntityException;
+import modelos.exceptions.PreexistingEntityException;
 
 @ManagedBean(name = "usuarioController")
 @SessionScoped
@@ -66,7 +68,9 @@ public class UsuarioController extends Controller implements Serializable {
 
     public void createOrUpdate(String opcion) {
         try {
-            if (opcion == CREATE) {
+            if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
+                selected.setUPassword(selected.getULogin());
+                selected.setCodigoPerfil(getPerfilesController().getSelected());
                 selected.setUActivo((short) 1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
@@ -76,7 +80,7 @@ public class UsuarioController extends Controller implements Serializable {
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
                 selected = new Usuarios();
             }
-        } catch (Exception e) {
+        } catch (PreexistingEntityException | NonexistentEntityException e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
     }
