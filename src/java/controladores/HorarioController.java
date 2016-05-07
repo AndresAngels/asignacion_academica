@@ -74,6 +74,20 @@ public class HorarioController extends Controller implements Serializable {
         return consultaTabla;
     }
 
+    public List<Horario> getConsultaAsignaturaConflicto(String dia, String entrada, String salida) {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.uLogin=:DOCENTE AND (h.hEntrada>=:ENTRADA AND h.hSalida<=:SALIDA)");
+            query.setParameter("DOCENTE", getUsuarioController().getSelected());
+            query.setParameter("ENTRADA", entrada);
+            query.setParameter("SALIDA", salida);
+            return query.getResultList();
+        } catch (NullPointerException npe) {
+            JsfUtil.addErrorMessage(npe, "Error al generar la consulta");
+            return null;
+        }
+    }
+
     public List<Horario> getConsultaTabla() {
         try {
             Query query;
@@ -95,25 +109,33 @@ public class HorarioController extends Controller implements Serializable {
         Calendar fechaEntrada = Calendar.getInstance();
         Calendar fechaSalida = Calendar.getInstance();
         int n = obtenerDia(selected.getDia());
+
         fechaEntrada.setTime(event.getStartDate());
         fechaEntrada.set(Calendar.YEAR, 2016);
         fechaEntrada.set(Calendar.MONTH, Calendar.JANUARY);
         fechaEntrada.set(Calendar.DAY_OF_MONTH, 4 + n);
-        event.setStartDate(fechaEntrada.getTime());
+
         fechaSalida.setTime(event.getEndDate());
         fechaSalida.set(Calendar.YEAR, 2016);
         fechaSalida.set(Calendar.MONTH, Calendar.JANUARY);
         fechaSalida.set(Calendar.DAY_OF_MONTH, 4 + n);
+
+        event.setStartDate(fechaEntrada.getTime());
         event.setEndDate(fechaSalida.getTime());
         event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
-        if (event.getId() == null) {
+        if (event.getData() == null) {
             String entrada = extraerHora(fechaEntrada);
             String salida = extraerHora(fechaSalida);
+            if (!getConsultaAsignaturaConflicto(selected.getDia(), entrada, salida).isEmpty()) {
+                JsfUtil.addErrorMessage("El docente ya tiene una asignacion en este horario");
+                return;
+            }
+
             Calendar fechaIntencidad = Calendar.getInstance();
-            fechaIntencidad.setTime(event.getEndDate());
-            fechaIntencidad.add(Calendar.HOUR_OF_DAY, -fechaSalida.get(Calendar.HOUR_OF_DAY));
-            fechaIntencidad.add(Calendar.MINUTE, -fechaSalida.get(Calendar.MINUTE));
+            fechaIntencidad.setTime(fechaSalida.getTime());
+            fechaIntencidad.add(Calendar.HOUR_OF_DAY, -fechaEntrada.get(Calendar.HOUR_OF_DAY));
+            fechaIntencidad.add(Calendar.MINUTE, -fechaEntrada.get(Calendar.MINUTE));
             String intensidad = extraerHora(fechaIntencidad);
 
             selected.setIntensidad(intensidad);
@@ -259,8 +281,10 @@ public class HorarioController extends Controller implements Serializable {
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findHorario(getPrimaryKey().getIdHorario());
+
         } else {
-            Logger.getLogger(HorarioController.class.getName()).log(Level.INFO, "Parametros nulos");
+            Logger.getLogger(HorarioController.class
+                    .getName()).log(Level.INFO, "Parametros nulos");
         }
     }
 
@@ -281,7 +305,7 @@ public class HorarioController extends Controller implements Serializable {
         } else {
             minutos = "30";
         }
-        return objetivo.get(Calendar.HOUR_OF_DAY) + ":" + minutos+":";
+        return objetivo.get(Calendar.HOUR_OF_DAY) + ":" + minutos;
     }
 
     public int obtenerDia(String dia) {
@@ -398,6 +422,7 @@ public class HorarioController extends Controller implements Serializable {
      */
     public void setEvent(DefaultScheduleEvent event) {
         this.event = event;
+
     }
 
     @FacesConverter(forClass = Horario.class)

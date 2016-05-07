@@ -55,7 +55,7 @@ public class Sesion implements Serializable {
                 if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
                         && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())) {
                     usuario = u;
-                } 
+                }
             }
             if (usuario == null) {
                 getUsuarioController().setUsuario(new Usuarios());

@@ -1,6 +1,9 @@
 package controladores.util;
 
+import controladores.HorarioController;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -27,8 +30,9 @@ public class JsfUtil {
         return items;
     }
 
-    public static void addErrorMessage(Exception ex, String defaultMsg) {
+    public static void addErrorMessage(Exception ex, String defaultMsg){
         addErrorMessage(defaultMsg);
+        Logger.getLogger(HorarioController.class.getName()).log(Level.SEVERE, null, ex);
     }
 
     public static void addErrorMessages(List<String> messages) {
