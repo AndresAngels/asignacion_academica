@@ -53,14 +53,8 @@ public class Horario implements Serializable {
     @Column(name = "franja")
     private String franja;
     @Basic(optional = false)
-    @Column(name = "nombre_asignatura")
-    private String nombreAsignatura;
-    @Basic(optional = false)
     @Column(name = "intensidad")
     private String intensidad;
-    @Basic(optional = false)
-    @Column(name = "salon")
-    private String salon;
     @Basic(optional = false)
     @Column(name = "dia")
     private String dia;
@@ -90,24 +84,11 @@ public class Horario implements Serializable {
     private String docente;
 
     public Horario() {
+        //Contructor vacio para limpriar campos
     }
 
     public Horario(Integer idHorario) {
         this.idHorario = idHorario;
-    }
-
-    public Horario(Integer idHorario, int cohorte, int grupo, String franja, String nombreAsignatura, String intensidad, String salon, String dia, String hEntrada, String hSalida, int estado) {
-        this.idHorario = idHorario;
-        this.cohorte = cohorte;
-        this.grupo = grupo;
-        this.franja = franja;
-        this.nombreAsignatura = nombreAsignatura;
-        this.intensidad = intensidad;
-        this.salon = salon;
-        this.dia = dia;
-        this.hEntrada = hEntrada;
-        this.hSalida = hSalida;
-        this.estado = estado;
     }
 
     public Integer getIdHorario() {
@@ -142,28 +123,12 @@ public class Horario implements Serializable {
         this.franja = franja;
     }
 
-    public String getNombreAsignatura() {
-        return nombreAsignatura;
-    }
-
-    public void setNombreAsignatura(String nombreAsignatura) {
-        this.nombreAsignatura = nombreAsignatura;
-    }
-
     public String getIntensidad() {
         return intensidad;
     }
 
     public void setIntensidad(String intensidad) {
         this.intensidad = intensidad;
-    }
-
-    public String getSalon() {
-        return salon;
-    }
-
-    public void setSalon(String salon) {
-        this.salon = salon;
     }
 
     public String getDia() {
@@ -231,7 +196,6 @@ public class Horario implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Horario)) {
             return false;
         }

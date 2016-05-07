@@ -75,19 +75,11 @@ public class Usuarios implements Serializable {
     private String apellido;
 
     public Usuarios() {
+        //Contructor vacio para limpriar campos
     }
 
     public Usuarios(String uLogin) {
         this.uLogin = uLogin;
-    }
-
-    public Usuarios(String uLogin, int uId, String uPassword, String uNombre, String uEmail, short uActivo) {
-        this.uLogin = uLogin;
-        this.uId = uId;
-        this.uPassword = uPassword;
-        this.uNombre = uNombre;
-        this.uEmail = uEmail;
-        this.uActivo = uActivo;
     }
 
     public int getUId() {
@@ -180,7 +172,6 @@ public class Usuarios implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Usuarios)) {
             return false;
         }

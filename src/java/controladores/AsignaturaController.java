@@ -8,7 +8,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -17,7 +16,6 @@ import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.AsignaturaJpaController;
-import vista.Index;
 
 @ManagedBean
 @SessionScoped
@@ -25,9 +23,6 @@ public class AsignaturaController extends Controller implements Serializable {
 
     private static final String BUNDLE = "/Bundle";
     private static final String CREATE = "CREATE";
-    private static final String UPDATE = "UPDATE";
-    @ManagedProperty("#{index}")
-    private Index index;
     private Asignatura primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private AsignaturaJpaController jpaController = null;
     private List<Asignatura> consultaTabla;
@@ -51,12 +46,6 @@ public class AsignaturaController extends Controller implements Serializable {
         return consultaTabla;
     }
 
-    public void insertar() {
-        selected.setEstado(1);
-        create();
-        getIndex().setIndex(0);
-    }
-
     private AsignaturaJpaController getJpaController() {
         if (jpaController == null) {
             jpaController = new AsignaturaJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
@@ -64,73 +53,46 @@ public class AsignaturaController extends Controller implements Serializable {
         return jpaController;
     }
 
-    public String update() {
-        return createOrUpdate(UPDATE);
+    public void update() {
+        createOrUpdate(UPDATE);
     }
 
-    public String create() {
-        return createOrUpdate(CREATE);
+    public void create() {
+        createOrUpdate(CREATE);
+    }
+
+    public void createOrUpdate(String opcion) {
+        try {
+            if (opcion == CREATE) {
+                selected.setEstado(1);
+                getJpaController().create(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
+                selected = new Asignatura();
+            } else {
+                getJpaController().edit(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+                selected = new Asignatura();
+            }
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
+        }
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findAsignatura(getPrimaryKey().getCodasignatura());
-            getIndex().setIndex(1);
-        } else {
             Logger.getLogger(UsuarioController.class.getName()).log(Level.INFO, "Parametros nulos");
         }
     }
 
     public void desactivar() {
-        try {
-            if (primaryKey != null) {
-                selected = getJpaController().findAsignatura(primaryKey.getCodasignatura());
-                if (selected != null) {
-                    selected.setEstado(2);
-                    update();
-                }
-            } else {
-                Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "Llave Primaria del Registro Vacia o Nula");
-                JsfUtil.addErrorMessage("Llave Primaria del Registro Vacia o Nula");
+        if (primaryKey != null) {
+            selected = getJpaController().findAsignatura(primaryKey.getCodasignatura());
+            if (selected != null) {
+                selected.setEstado(2);
+                update();
             }
-        } catch (Exception e) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, "Doble intento de eliminar");
         }
-    }
-
-    public void mantenerIndex() {
-        getIndex().setIndex(1);
-    }
-
-    public String createOrUpdate(String opcion) {
-        try {
-            if (opcion == CREATE) {
-                getJpaController().create(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
-            } else {
-                getJpaController().edit(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
-            }
-            selected = new Asignatura();
-            return "Create";
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
-            return null;
-        }
-    }
-
-    /**
-     * @return the index
-     */
-    public Index getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(Index index) {
-        this.index = index;
     }
 
     /**

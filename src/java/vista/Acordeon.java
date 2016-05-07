@@ -22,26 +22,23 @@ public class Acordeon implements Serializable {
     private String tituloTabla = "";
     private String tituloFormulario = "";
 
-    public Acordeon() {
-    }
-
     public void llenar() {
         String value = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-        if (value.equals("/administrador/registrousuarios.xhtml")) {
+        if ("/administrador/registrousuarios.xhtml".equals(value)) {
             tituloTabla = "Consultar Usuarios";
             if (getUsuarioController().getSelected().getULogin() == null) {
                 tituloFormulario = "Grabar Usuario";
             } else {
                 tituloFormulario = "Actualizar Usuario";
             }
-        } else if (value.equals("/administrador/registroasignaturas.xhtml")) {
+        } else if ("/administrador/registroasignaturas.xhtml".equals(value)) {
             tituloTabla = "Consultar Asignaturas";
             if (getAsignaturaController().getSelected().getCodasignatura() == null) {
                 tituloFormulario = "Guardar Asignatura";
             } else {
                 tituloFormulario = "Actualizar Asignatura";
             }
-        } else if (value.equals("/administrador/registrohorario.xhtml")) {
+        } else if ("/administrador/registrohorario.xhtml".equals(value)) {
             tituloTabla = "Consultar Horarios";
             if (getHorarioController().getSelected().getIdHorario() == null) {
                 tituloFormulario = "Guardar Horario";

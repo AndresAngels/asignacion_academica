@@ -17,50 +17,36 @@ public class Menu implements Serializable {
     Sesion sesion;
     private MenuModel model;
 
-    public Menu() {
-    }
-
     private void llenarMenu() {
         model = new DefaultMenuModel();
-        DefaultMenuItem item = new DefaultMenuItem();
 
         // Formularios de ingreso
         DefaultSubMenu submenu = new DefaultSubMenu("Registro de Informacion");
-        item.setValue("Registrar Usuarios");
-        item.setUrl("/administrador/registrousuarios.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Registrar Usuarios", "/administrador/registrousuarios.xhtml"));
 
-        item = new DefaultMenuItem();
-        item.setValue("Registrar Asignaturas");
-        item.setUrl("/administrador/registroasignaturas.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Registrar Asignaturas", "/administrador/registroasignaturas.xhtml"));
 
-        item = new DefaultMenuItem();
-        item.setValue("Registrar Horarios");
-        item.setUrl("/administrador/registrohorario.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Registrar Horarios", "/administrador/registrohorario.xhtml"));
 
         model.addElement(submenu);
 
         // Reportes
         submenu = new DefaultSubMenu("Reportes");
 
-        item = new DefaultMenuItem();
-        item.setValue("Asignaturas por Docente");
-        item.setUrl("/administrador/reportedocente.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Asignaturas por Docente", "/administrador/reportedocente.xhtml"));
 
-        item = new DefaultMenuItem();
-        item.setValue("Horario por Programa");
-        item.setUrl("/administrador/reporteprograma.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Horario por Programa", "/administrador/reporteprograma.xhtml"));
 
-        item = new DefaultMenuItem();
-        item.setValue("Horario general");
-        item.setUrl("/administrador/reportegeneral.xhtml");
-        submenu.addElement(item);
+        submenu.addElement(crearItem("Horario general", "/administrador/reportegeneral.xhtml"));
 
         model.addElement(submenu);
+    }
+
+    public DefaultMenuItem crearItem(String valor, String url) {
+        DefaultMenuItem item = new DefaultMenuItem();
+        item.setValue(valor);
+        item.setUrl(url);
+        return item;
     }
 
     public MenuModel getModel() {

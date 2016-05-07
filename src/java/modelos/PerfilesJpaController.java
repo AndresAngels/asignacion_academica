@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import modelos.exceptions.IllegalOrphanException;
 import modelos.exceptions.NonexistentEntityException;
 import modelos.exceptions.PreexistingEntityException;
 
@@ -21,10 +19,11 @@ import modelos.exceptions.PreexistingEntityException;
  */
 public class PerfilesJpaController implements Serializable {
 
+    private EntityManagerFactory emf = null;
+
     public PerfilesJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -32,13 +31,13 @@ public class PerfilesJpaController implements Serializable {
 
     public void create(Perfiles perfiles) throws PreexistingEntityException {
         if (perfiles.getUsuariosList() == null) {
-            perfiles.setUsuariosList(new ArrayList<Usuarios>());
+            perfiles.setUsuariosList(new ArrayList<>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
+            List<Usuarios> attachedUsuariosList = new ArrayList<>();
             for (Usuarios usuariosListUsuariosToAttach : perfiles.getUsuariosList()) {
                 usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
                 attachedUsuariosList.add(usuariosListUsuariosToAttach);
@@ -67,7 +66,7 @@ public class PerfilesJpaController implements Serializable {
         }
     }
 
-    public void edit(Perfiles perfiles) throws IllegalOrphanException, NonexistentEntityException {
+    public void edit(Perfiles perfiles) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -75,19 +74,7 @@ public class PerfilesJpaController implements Serializable {
             Perfiles persistentPerfiles = em.find(Perfiles.class, perfiles.getCodigoPerfil());
             List<Usuarios> usuariosListOld = persistentPerfiles.getUsuariosList();
             List<Usuarios> usuariosListNew = perfiles.getUsuariosList();
-            List<String> illegalOrphanMessages = null;
-            for (Usuarios usuariosListOldUsuarios : usuariosListOld) {
-                if (!usuariosListNew.contains(usuariosListOldUsuarios)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Usuarios " + usuariosListOldUsuarios + " since its codigoPerfil field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
+            List<Usuarios> attachedUsuariosListNew = new ArrayList<>();
             for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
                 usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
                 attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);
@@ -116,38 +103,6 @@ public class PerfilesJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void destroy(String id) throws IllegalOrphanException, NonexistentEntityException {
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Perfiles perfiles;
-            try {
-                perfiles = em.getReference(Perfiles.class, id);
-                perfiles.getCodigoPerfil();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The perfiles with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<Usuarios> usuariosListOrphanCheck = perfiles.getUsuariosList();
-            for (Usuarios usuariosListOrphanCheckUsuarios : usuariosListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Perfiles (" + perfiles + ") cannot be destroyed since the Usuarios " + usuariosListOrphanCheckUsuarios + " in its usuariosList field has a non-nullable codigoPerfil field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            em.remove(perfiles);
-            em.getTransaction().commit();
         } finally {
             if (em != null) {
                 em.close();

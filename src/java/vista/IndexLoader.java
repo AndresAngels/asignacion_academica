@@ -31,42 +31,21 @@ public class IndexLoader implements Serializable {
     private AsignaturaController asignaturaController;
     @ManagedProperty("#{horarioController}")
     private HorarioController horarioControlller;
-    @ManagedProperty("#{index}")
-    private Index index;
     @ManagedProperty("#{sesion}")
     private Sesion sesion;
-
-    public IndexLoader() {
-    }
 
     public void indexLoader() {
         getUsuarioController().setSelected(new Usuarios());
         getAsignaturaController().setSelected(new Asignatura());
         getHorarioController().setSelected(new Horario());
         getUsuarioController().setReactivar(false);
-        getIndex().setIndex(0);
     }
 
     public void limpiarCruds() {
         getUsuarioController().setSelected(new Usuarios());
         getAsignaturaController().setSelected(new Asignatura());
         getHorarioController().setSelected(new Horario());
-        getIndex().setIndex(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Actualizacion cancelada", "La actulizacion del registro a sido cancelada"));
-    }
-
-    /**
-     * @return the index
-     */
-    public Index getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(Index index) {
-        this.index = index;
     }
 
     /**

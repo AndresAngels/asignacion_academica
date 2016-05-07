@@ -48,16 +48,11 @@ public class Asignatura implements Serializable {
     private String nombre;
 
     public Asignatura() {
+        //Contructor vacio para limpriar campos
     }
 
     public Asignatura(String codasignatura) {
         this.codasignatura = codasignatura;
-    }
-
-    public Asignatura(String codasignatura, String nombreAsignatura, int estado) {
-        this.codasignatura = codasignatura;
-        this.nombreAsignatura = nombreAsignatura;
-        this.estado = estado;
     }
 
     public String getCodasignatura() {
@@ -102,7 +97,6 @@ public class Asignatura implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Asignatura)) {
             return false;
         }

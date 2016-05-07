@@ -1,9 +1,8 @@
 package controladores;
 
+import controladores.util.JsfUtil;
 import entidades.Perfiles;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -28,7 +27,7 @@ public class PerfilesController {
             query = getJpaController().getEntityManager().createQuery("SELECT p FROM Perfiles p ORDER BY p.descripcionPerfil");
             perfiles = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return perfiles;
     }

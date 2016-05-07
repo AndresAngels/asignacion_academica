@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -20,10 +19,11 @@ import modelos.exceptions.NonexistentEntityException;
  */
 public class HorarioJpaController implements Serializable {
 
+    private EntityManagerFactory emf = null;
+
     public HorarioJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -130,42 +130,6 @@ public class HorarioJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void destroy(Integer id) throws NonexistentEntityException {
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Horario horario;
-            try {
-                horario = em.getReference(Horario.class, id);
-                horario.getIdHorario();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The horario with id " + id + " no longer exists.", enfe);
-            }
-            Asignatura codasignatura = horario.getCodasignatura();
-            if (codasignatura != null) {
-                codasignatura.getHorarioList().remove(horario);
-                codasignatura = em.merge(codasignatura);
-            }
-            Plan idPlan = horario.getIdPlan();
-            if (idPlan != null) {
-                idPlan.getHorarioList().remove(horario);
-                idPlan = em.merge(idPlan);
-            }
-            Usuarios ULogin = horario.getULogin();
-            if (ULogin != null) {
-                ULogin.getHorarioList().remove(horario);
-                ULogin = em.merge(ULogin);
-            }
-            em.remove(horario);
-            em.getTransaction().commit();
         } finally {
             if (em != null) {
                 em.close();

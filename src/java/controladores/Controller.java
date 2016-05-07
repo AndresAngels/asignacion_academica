@@ -39,7 +39,7 @@ public class Controller {
         }
     }
 
-    private List<ColumnModel> columns = new ArrayList<ColumnModel>();
+    private List<ColumnModel> columns = new ArrayList<>();
     private String columnTemplate;
 
     public List<ColumnModel> getColumns() {

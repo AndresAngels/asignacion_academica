@@ -5,11 +5,10 @@
  */
 package controladores;
 
+import controladores.util.JsfUtil;
 import entidades.Plan;
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -28,16 +27,9 @@ import modelos.PlanJpaController;
 @SessionScoped
 public class PlanController implements Serializable {
 
-    private static final String BUNDLE = "/Bundle";
     private Plan selected;
     private PlanJpaController jpaController;
     private List<Plan> consultaTabla;
-
-    /**
-     * Creates a new instance of PlanController
-     */
-    public PlanController() {
-    }
 
     public List<Plan> getConsultaTabla() {
         try {
@@ -46,7 +38,7 @@ public class PlanController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return consultaTabla;
     }

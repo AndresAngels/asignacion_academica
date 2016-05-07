@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import modelos.exceptions.IllegalOrphanException;
 import modelos.exceptions.NonexistentEntityException;
 import modelos.exceptions.PreexistingEntityException;
 
@@ -21,10 +19,11 @@ import modelos.exceptions.PreexistingEntityException;
  */
 public class AsignaturaJpaController implements Serializable {
 
+    private EntityManagerFactory emf = null;
+
     public AsignaturaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -32,13 +31,13 @@ public class AsignaturaJpaController implements Serializable {
 
     public void create(Asignatura asignatura) throws PreexistingEntityException {
         if (asignatura.getHorarioList() == null) {
-            asignatura.setHorarioList(new ArrayList<Horario>());
+            asignatura.setHorarioList(new ArrayList<>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<Horario>();
+            List<Horario> attachedHorarioList = new ArrayList<>();
             for (Horario horarioListHorarioToAttach : asignatura.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
                 attachedHorarioList.add(horarioListHorarioToAttach);
@@ -67,7 +66,7 @@ public class AsignaturaJpaController implements Serializable {
         }
     }
 
-    public void edit(Asignatura asignatura) throws IllegalOrphanException, NonexistentEntityException {
+    public void edit(Asignatura asignatura) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -75,19 +74,7 @@ public class AsignaturaJpaController implements Serializable {
             Asignatura persistentAsignatura = em.find(Asignatura.class, asignatura.getCodasignatura());
             List<Horario> horarioListOld = persistentAsignatura.getHorarioList();
             List<Horario> horarioListNew = asignatura.getHorarioList();
-            List<String> illegalOrphanMessages = null;
-            for (Horario horarioListOldHorario : horarioListOld) {
-                if (!horarioListNew.contains(horarioListOldHorario)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Horario " + horarioListOldHorario + " since its codasignatura field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
+            List<Horario> attachedHorarioListNew = new ArrayList<>();
             for (Horario horarioListNewHorarioToAttach : horarioListNew) {
                 horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
                 attachedHorarioListNew.add(horarioListNewHorarioToAttach);
@@ -116,38 +103,6 @@ public class AsignaturaJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void destroy(String id) throws IllegalOrphanException, NonexistentEntityException {
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Asignatura asignatura;
-            try {
-                asignatura = em.getReference(Asignatura.class, id);
-                asignatura.getCodasignatura();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The asignatura with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<Horario> horarioListOrphanCheck = asignatura.getHorarioList();
-            for (Horario horarioListOrphanCheckHorario : horarioListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Asignatura (" + asignatura + ") cannot be destroyed since the Horario " + horarioListOrphanCheckHorario + " in its horarioList field has a non-nullable codasignatura field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            em.remove(asignatura);
-            em.getTransaction().commit();
         } finally {
             if (em != null) {
                 em.close();

@@ -38,6 +38,7 @@ public class Perfiles implements Serializable {
     private List<Usuarios> usuariosList;
 
     public Perfiles() {
+        //Contructor vacio para limpriar campos
     }
 
     public Perfiles(String codigoPerfil) {
@@ -78,7 +79,6 @@ public class Perfiles implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Perfiles)) {
             return false;
         }

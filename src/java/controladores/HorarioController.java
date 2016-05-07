@@ -26,7 +26,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
-import vista.Index;
 
 @ManagedBean
 @SessionScoped
@@ -38,8 +37,6 @@ public class HorarioController extends Controller implements Serializable {
     private static final String JUEVES = "Jueves";
     private static final String VIERNES = "Viernes";
     private static final String SABADO = "Sábado";
-    @ManagedProperty("#{index}")
-    private Index index;
     @ManagedProperty("#{usuarioController}")
     private UsuarioController usuarioController;
     @ManagedProperty("#{planController}")
@@ -56,11 +53,11 @@ public class HorarioController extends Controller implements Serializable {
     public List<Horario> getConsultaHorarioPrograma() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan:PLAN");
+            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan:PLAN");
             query.setParameter("PLAN", getPlanController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return consultaTabla;
     }
@@ -72,7 +69,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("DOCENTE", getUsuarioController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar la consulta");
         }
         return consultaTabla;
     }
@@ -84,7 +81,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error generando la consultas");
         }
         return consultaTabla;
     }
@@ -92,13 +89,12 @@ public class HorarioController extends Controller implements Serializable {
     public void insertar() {
         selected.setEstado(1);
         create();
-        getIndex().setIndex(0);
     }
 
     public void addEvent() {
         Calendar fechaEntrada = Calendar.getInstance();
         Calendar fechaSalida = Calendar.getInstance();
-        int n=obtenerDia(selected.getDia());
+        int n = obtenerDia(selected.getDia());
         fechaEntrada.setTime(event.getStartDate());
         fechaEntrada.set(Calendar.YEAR, 2016);
         fechaEntrada.set(Calendar.MONTH, Calendar.JANUARY);
@@ -124,8 +120,6 @@ public class HorarioController extends Controller implements Serializable {
             selected.setHEntrada(entrada);
             selected.setHSalida(salida);
             selected.setEstado(1);
-            selected.setNombreAsignatura(getAsignaturaController().getSelected().getNombreAsignatura());
-            selected.setSalon("");
             selected.setCodasignatura(getAsignaturaController().getSelected());
             selected.setIdPlan(getPlanController().getSelected());
             selected.setULogin(getUsuarioController().getSelected());
@@ -173,7 +167,7 @@ public class HorarioController extends Controller implements Serializable {
 
             Calendar start = Calendar.getInstance();
             Calendar end = Calendar.getInstance();
-            int n=obtenerDia(h.getDia());
+            int n = obtenerDia(h.getDia());
             start.setTime(new Date());
             start.set(Calendar.YEAR, 2016);
             start.set(Calendar.MONTH, Calendar.JANUARY);
@@ -238,59 +232,46 @@ public class HorarioController extends Controller implements Serializable {
         return jpaController;
     }
 
-    public String update() {
-        return createOrUpdate(UPDATE);
+    public void update() {
+        createOrUpdate(UPDATE);
     }
 
-    public String create() {
-        return createOrUpdate(CREATE);
+    public void create() {
+        createOrUpdate(CREATE);
     }
 
-    public String createOrUpdate(String opcion) {
+    public void createOrUpdate(String opcion) {
         try {
             if (opcion == CREATE) {
                 getJpaController().create(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorarioCreated"));
+                selected = new Horario();
             } else {
                 getJpaController().edit(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorarioUpdated"));
+                selected = new Horario();
             }
-            selected = new Horario();
-            return "Create";
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
-            return null;
         }
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findHorario(getPrimaryKey().getIdHorario());
-            getIndex().setIndex(1);
         } else {
             Logger.getLogger(HorarioController.class.getName()).log(Level.INFO, "Parametros nulos");
         }
     }
 
     public void desactivar() {
-        try {
-            if (primaryKey != null) {
-                selected = getJpaController().findHorario(primaryKey.getIdHorario());
-                if (selected != null) {
-                    selected.setEstado(2);
-                    update();
-                }
-            } else {
-                Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "Llave Primaria del Registro Vacia o Nula");
-                JsfUtil.addErrorMessage("Llave Primaria del Registro Vacia o Nula");
+        if (primaryKey != null) {
+            selected = getJpaController().findHorario(primaryKey.getIdHorario());
+            if (selected != null) {
+                selected.setEstado(2);
+                update();
             }
-        } catch (Exception e) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, "Doble intento de eliminar");
         }
-    }
-
-    public void mantenerIndex() {
-        getIndex().setIndex(1);
     }
 
     public String extraerHora(Calendar objetivo) {
@@ -320,20 +301,6 @@ public class HorarioController extends Controller implements Serializable {
             default:
                 return 0;
         }
-    }
-
-    /**
-     * @return the index
-     */
-    public Index getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(Index index) {
-        this.index = index;
     }
 
     /**

@@ -5,13 +5,12 @@ import controladores.HorarioController;
 import controladores.PerfilesController;
 import controladores.PlanController;
 import controladores.UsuarioController;
+import controladores.util.JsfUtil;
 import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -65,9 +64,7 @@ public class Sesion implements Serializable {
                 getUsuarioController().setUsuario(usuario);
             }
         } catch (Exception e) {
-            getUsuarioController().setUsuario(new Usuarios());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "La operacion no se pudo completar"));
-            Logger.getLogger(Sesion.class.getName()).log(Level.WARNING, e.toString());
+            JsfUtil.addErrorMessage(e, "La operacion no se pudo completar");
         }
     }
 

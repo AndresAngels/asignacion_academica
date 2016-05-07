@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import modelos.exceptions.IllegalOrphanException;
 import modelos.exceptions.NonexistentEntityException;
 import modelos.exceptions.PreexistingEntityException;
 
@@ -22,10 +20,11 @@ import modelos.exceptions.PreexistingEntityException;
  */
 public class PlanJpaController implements Serializable {
 
+    private EntityManagerFactory emf = null;
+
     public PlanJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
@@ -33,22 +32,22 @@ public class PlanJpaController implements Serializable {
 
     public void create(Plan plan) throws PreexistingEntityException {
         if (plan.getHorarioList() == null) {
-            plan.setHorarioList(new ArrayList<Horario>());
+            plan.setHorarioList(new ArrayList<>());
         }
         if (plan.getUsuariosList() == null) {
-            plan.setUsuariosList(new ArrayList<Usuarios>());
+            plan.setUsuariosList(new ArrayList<>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<Horario>();
+            List<Horario> attachedHorarioList = new ArrayList<>();
             for (Horario horarioListHorarioToAttach : plan.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
                 attachedHorarioList.add(horarioListHorarioToAttach);
             }
             plan.setHorarioList(attachedHorarioList);
-            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
+            List<Usuarios> attachedUsuariosList = new ArrayList<>();
             for (Usuarios usuariosListUsuariosToAttach : plan.getUsuariosList()) {
                 usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
                 attachedUsuariosList.add(usuariosListUsuariosToAttach);
@@ -86,7 +85,7 @@ public class PlanJpaController implements Serializable {
         }
     }
 
-    public void edit(Plan plan) throws IllegalOrphanException, NonexistentEntityException {
+    public void edit(Plan plan) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -96,26 +95,14 @@ public class PlanJpaController implements Serializable {
             List<Horario> horarioListNew = plan.getHorarioList();
             List<Usuarios> usuariosListOld = persistentPlan.getUsuariosList();
             List<Usuarios> usuariosListNew = plan.getUsuariosList();
-            List<String> illegalOrphanMessages = null;
-            for (Horario horarioListOldHorario : horarioListOld) {
-                if (!horarioListNew.contains(horarioListOldHorario)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Horario " + horarioListOldHorario + " since its idPlan field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
+            List<Horario> attachedHorarioListNew = new ArrayList<>();
             for (Horario horarioListNewHorarioToAttach : horarioListNew) {
                 horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
                 attachedHorarioListNew.add(horarioListNewHorarioToAttach);
             }
             horarioListNew = attachedHorarioListNew;
             plan.setHorarioList(horarioListNew);
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
+            List<Usuarios> attachedUsuariosListNew = new ArrayList<>();
             for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
                 usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
                 attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);
@@ -161,43 +148,6 @@ public class PlanJpaController implements Serializable {
                 }
             }
             throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void destroy(String id) throws IllegalOrphanException, NonexistentEntityException {
-        EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Plan plan;
-            try {
-                plan = em.getReference(Plan.class, id);
-                plan.getIdPlan();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The plan with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<Horario> horarioListOrphanCheck = plan.getHorarioList();
-            for (Horario horarioListOrphanCheckHorario : horarioListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Plan (" + plan + ") cannot be destroyed since the Horario " + horarioListOrphanCheckHorario + " in its horarioList field has a non-nullable idPlan field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<Usuarios> usuariosList = plan.getUsuariosList();
-            for (Usuarios usuariosListUsuarios : usuariosList) {
-                usuariosListUsuarios.setIdPlan(null);
-                usuariosListUsuarios = em.merge(usuariosListUsuarios);
-            }
-            em.remove(plan);
-            em.getTransaction().commit();
         } finally {
             if (em != null) {
                 em.close();

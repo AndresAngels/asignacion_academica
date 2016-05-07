@@ -1,13 +1,10 @@
 package controladores;
 
 import controladores.util.JsfUtil;
-import entidades.Perfiles;
 import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -15,11 +12,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
-import javax.faces.event.ActionEvent;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.UsuariosJpaController;
-import vista.Index;
 
 @ManagedBean(name = "usuarioController")
 @SessionScoped
@@ -28,13 +23,10 @@ public class UsuarioController extends Controller implements Serializable {
     private static final String BUNDLE = "/Bundle";
     @ManagedProperty("#{perfilesController}")
     private PerfilesController perfilesController;
-    @ManagedProperty("#{index}")
-    private Index index;
     private Usuarios primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private UsuariosJpaController jpaController = null;
     private List<Usuarios> consultaTabla;
     private List<Usuarios> filtro;
-    private List<Perfiles> perfiles;
     private Usuarios usuario;
     private Usuarios selected;
     private boolean reactivar = false;
@@ -52,17 +44,9 @@ public class UsuarioController extends Controller implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, npe.getMessage());
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return consultaTabla;
-    }
-
-    public void insertar(ActionEvent ae) {
-        selected.setUPassword(selected.getULogin());
-        selected.setUActivo((short) 1);
-        selected.setCodigoPerfil(getPerfilesController().getSelected());
-        create();
-        getIndex().setIndex(0);
     }
 
     private UsuariosJpaController getJpaController() {
@@ -72,63 +56,47 @@ public class UsuarioController extends Controller implements Serializable {
         return jpaController;
     }
 
-    public String update() {
-        try {
-            getJpaController().edit(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
-            getIndex().setIndex(0);
-            return "View";
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
-            return null;
-        }
+    public void update() {
+        createOrUpdate(UPDATE);
     }
 
-    public String create() {
+    public void create() {
+        createOrUpdate(CREATE);
+    }
+
+    public void createOrUpdate(String opcion) {
         try {
-            getJpaController().create(selected);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
-            selected = new Usuarios();
-            return "Create";
+            if (opcion == CREATE) {
+                selected.setUActivo((short) 1);
+                getJpaController().create(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
+                selected = new Usuarios();
+            } else {
+                getJpaController().edit(selected);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
+                selected = new Usuarios();
+            }
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
-            return null;
         }
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findUsuarios(getPrimaryKey().getULogin());
-            getIndex().setIndex(1);
         } else {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.INFO, "Parametros nulos");
+            JsfUtil.addErrorMessage("Error al generar las consultas");
         }
     }
 
     public void desactivar() {
-        try {
-            if (primaryKey != null) {
-                selected = getJpaController().findUsuarios(primaryKey.getULogin());
-                if (selected != null) {
-                    selected.setUActivo((short) 2);
-                    update();
-                    if (getConsultaTabla().isEmpty()) {
-                        getIndex().setIndex(1);
-                    } else {
-                        getIndex().setIndex(0);
-                    }
-                }
-            } else {
-                Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, "Llave Primaria del Registro Vacia o Nula");
-                JsfUtil.addErrorMessage("Llave Primaria del Registro Vacia o Nula");
+        if (primaryKey != null) {
+            selected = getJpaController().findUsuarios(primaryKey.getULogin());
+            if (selected != null) {
+                selected.setUActivo((short) 2);
+                update();
             }
-        } catch (Exception e) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.WARNING, "Doble intento de eliminar");
         }
-    }
-
-    public void mantenerIndex() {
-        getIndex().setIndex(1);
     }
 
     /**
@@ -160,20 +128,6 @@ public class UsuarioController extends Controller implements Serializable {
      */
     public void setSelected(Usuarios selected) {
         this.selected = selected;
-    }
-
-    /**
-     * @return the index
-     */
-    public Index getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(Index index) {
-        this.index = index;
     }
 
     /**
