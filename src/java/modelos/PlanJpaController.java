@@ -32,22 +32,22 @@ public class PlanJpaController implements Serializable {
 
     public void create(Plan plan) throws PreexistingEntityException {
         if (plan.getHorarioList() == null) {
-            plan.setHorarioList(new ArrayList<>());
+            plan.setHorarioList(new ArrayList<Horario>());
         }
         if (plan.getUsuariosList() == null) {
-            plan.setUsuariosList(new ArrayList<>());
+            plan.setUsuariosList(new ArrayList<Usuarios>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<>();
+            List<Horario> attachedHorarioList = new ArrayList<Horario>();
             for (Horario horarioListHorarioToAttach : plan.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
                 attachedHorarioList.add(horarioListHorarioToAttach);
             }
             plan.setHorarioList(attachedHorarioList);
-            List<Usuarios> attachedUsuariosList = new ArrayList<>();
+            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
             for (Usuarios usuariosListUsuariosToAttach : plan.getUsuariosList()) {
                 usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
                 attachedUsuariosList.add(usuariosListUsuariosToAttach);
@@ -95,14 +95,14 @@ public class PlanJpaController implements Serializable {
             List<Horario> horarioListNew = plan.getHorarioList();
             List<Usuarios> usuariosListOld = persistentPlan.getUsuariosList();
             List<Usuarios> usuariosListNew = plan.getUsuariosList();
-            List<Horario> attachedHorarioListNew = new ArrayList<>();
+            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
             for (Horario horarioListNewHorarioToAttach : horarioListNew) {
                 horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
                 attachedHorarioListNew.add(horarioListNewHorarioToAttach);
             }
             horarioListNew = attachedHorarioListNew;
             plan.setHorarioList(horarioListNew);
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<>();
+            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
             for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
                 usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
                 attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);

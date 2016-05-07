@@ -35,7 +35,7 @@ public class UsuariosJpaController implements Serializable {
     public void create(Usuarios usua) throws PreexistingEntityException {
         this.usuarios = usua;
         if (usuarios.getHorarioList() == null) {
-            usuarios.setHorarioList(new ArrayList<>());
+            usuarios.setHorarioList(new ArrayList<Horario>());
         }
         EntityManager em = null;
         try {
@@ -51,7 +51,7 @@ public class UsuariosJpaController implements Serializable {
                 idPlan = em.getReference(idPlan.getClass(), idPlan.getIdPlan());
                 usuarios.setIdPlan(idPlan);
             }
-            List<Horario> attachedHorarioList = new ArrayList<>();
+            List<Horario> attachedHorarioList = new ArrayList<Horario>();
             for (Horario horarioListHorarioToAttach : usuarios.getHorarioList()) {
                 horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
                 attachedHorarioList.add(horarioListHorarioToAttach);
