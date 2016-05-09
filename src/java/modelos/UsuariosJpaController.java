@@ -22,7 +22,6 @@ import modelos.exceptions.PreexistingEntityException;
 public class UsuariosJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
-    private Usuarios usuarios;
 
     public UsuariosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
@@ -32,49 +31,12 @@ public class UsuariosJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Usuarios usua) throws PreexistingEntityException {
-        this.usuarios = usua;
-        if (usuarios.getHorarioList() == null) {
-            usuarios.setHorarioList(new ArrayList<Horario>());
-        }
+    public void create(Usuarios usuarios) throws PreexistingEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Perfiles codigoPerfil = usuarios.getCodigoPerfil();
-            if (codigoPerfil != null) {
-                codigoPerfil = em.getReference(codigoPerfil.getClass(), codigoPerfil.getCodigoPerfil());
-                usuarios.setCodigoPerfil(codigoPerfil);
-            }
-            Plan idPlan = usuarios.getIdPlan();
-            if (idPlan != null) {
-                idPlan = em.getReference(idPlan.getClass(), idPlan.getIdPlan());
-                usuarios.setIdPlan(idPlan);
-            }
-            List<Horario> attachedHorarioList = new ArrayList<Horario>();
-            for (Horario horarioListHorarioToAttach : usuarios.getHorarioList()) {
-                horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
-                attachedHorarioList.add(horarioListHorarioToAttach);
-            }
-            usuarios.setHorarioList(attachedHorarioList);
             em.persist(usuarios);
-            if (codigoPerfil != null) {
-                codigoPerfil.getUsuariosList().add(usuarios);
-                codigoPerfil = em.merge(codigoPerfil);
-            }
-            if (idPlan != null) {
-                idPlan.getUsuariosList().add(usuarios);
-                idPlan = em.merge(idPlan);
-            }
-            for (Horario horarioListHorario : usuarios.getHorarioList()) {
-                Usuarios oldULoginOfHorarioListHorario = horarioListHorario.getULogin();
-                horarioListHorario.setULogin(usuarios);
-                horarioListHorario = em.merge(horarioListHorario);
-                if (oldULoginOfHorarioListHorario != null) {
-                    oldULoginOfHorarioListHorario.getHorarioList().remove(horarioListHorario);
-                    oldULoginOfHorarioListHorario = em.merge(oldULoginOfHorarioListHorario);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findUsuarios(usuarios.getULogin()) != null) {
@@ -88,42 +50,11 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public void edit(Usuarios usua) throws NonexistentEntityException {
-        this.usuarios = usua;
+    public void edit(Usuarios usuarios) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Usuarios persistentUsuarios = em.find(Usuarios.class, usuarios.getULogin());
-            Perfiles codigoPerfilOld = persistentUsuarios.getCodigoPerfil();
-            Perfiles codigoPerfilNew = usuarios.getCodigoPerfil();
-            Plan idPlanOld = persistentUsuarios.getIdPlan();
-            Plan idPlanNew = usuarios.getIdPlan();
-            if (codigoPerfilNew != null) {
-                codigoPerfilNew = em.getReference(codigoPerfilNew.getClass(), codigoPerfilNew.getCodigoPerfil());
-                usuarios.setCodigoPerfil(codigoPerfilNew);
-            }
-            if (idPlanNew != null) {
-                idPlanNew = em.getReference(idPlanNew.getClass(), idPlanNew.getIdPlan());
-                usuarios.setIdPlan(idPlanNew);
-            }
-            usuarios = em.merge(usuarios);
-            if (codigoPerfilOld != null && !codigoPerfilOld.equals(codigoPerfilNew)) {
-                codigoPerfilOld.getUsuariosList().remove(usuarios);
-                codigoPerfilOld = em.merge(codigoPerfilOld);
-            }
-            if (codigoPerfilNew != null && !codigoPerfilNew.equals(codigoPerfilOld)) {
-                codigoPerfilNew.getUsuariosList().add(usuarios);
-                codigoPerfilNew = em.merge(codigoPerfilNew);
-            }
-            if (idPlanOld != null && !idPlanOld.equals(idPlanNew)) {
-                idPlanOld.getUsuariosList().remove(usuarios);
-                idPlanOld = em.merge(idPlanOld);
-            }
-            if (idPlanNew != null && !idPlanNew.equals(idPlanOld)) {
-                idPlanNew.getUsuariosList().add(usuarios);
-                idPlanNew = em.merge(idPlanNew);
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

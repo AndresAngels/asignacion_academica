@@ -1,18 +1,14 @@
 package entidades;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -39,10 +35,6 @@ public class Plan implements Serializable {
     @Basic(optional = false)
     @Column(name = "estado")
     private int estado;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPlan")
-    private List<Horario> horarioList;
-    @OneToMany(mappedBy = "idPlan")
-    private List<Usuarios> usuariosList;
 
     public Plan() {
         //Contructor vacio para limpriar campos
@@ -74,24 +66,6 @@ public class Plan implements Serializable {
 
     public void setEstado(int estado) {
         this.estado = estado;
-    }
-
-    @XmlTransient
-    public List<Horario> getHorarioList() {
-        return horarioList;
-    }
-
-    public void setHorarioList(List<Horario> horarioList) {
-        this.horarioList = horarioList;
-    }
-
-    @XmlTransient
-    public List<Usuarios> getUsuariosList() {
-        return usuariosList;
-    }
-
-    public void setUsuariosList(List<Usuarios> usuariosList) {
-        this.usuariosList = usuariosList;
     }
 
     @Override

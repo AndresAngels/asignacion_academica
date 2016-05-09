@@ -1,8 +1,10 @@
 package controladores;
 
 import controladores.util.JsfUtil;
+import entidades.Plan;
 import entidades.Usuarios;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.faces.bean.ManagedBean;
@@ -22,9 +24,10 @@ import modelos.exceptions.PreexistingEntityException;
 @SessionScoped
 public class UsuarioController extends Controller implements Serializable {
 
-    private static final String BUNDLE = "/Bundle";
     @ManagedProperty("#{perfilesController}")
     private PerfilesController perfilesController;
+    @ManagedProperty("#{planController}")
+    private PlanController planController;
     private Usuarios primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private UsuariosJpaController jpaController = null;
     private List<Usuarios> consultaTabla;
@@ -51,6 +54,20 @@ public class UsuarioController extends Controller implements Serializable {
         return consultaTabla;
     }
 
+    public List<Usuarios> getConsultaDocentes() {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO AND (u.codigoPerfil.codigoPerfil=:DOCENTE OR u.codigoPerfil.codigoPerfil=:DOCENTEM) ORDER BY u.uLogin");
+            query.setParameter("ESTADO", 1);
+            query.setParameter("DOCENTE", "4");
+            query.setParameter("DOCENTEM", "5");
+            return query.getResultList();
+        } catch (NullPointerException npe) {
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+        }
+        return new ArrayList<Usuarios>();
+    }
+
     private UsuariosJpaController getJpaController() {
         if (jpaController == null) {
             jpaController = new UsuariosJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
@@ -68,18 +85,21 @@ public class UsuarioController extends Controller implements Serializable {
 
     public void createOrUpdate(String opcion) {
         try {
+            if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
+                selected.setIdPlan(getPlanController().getSelected());
+            }
             if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
                 selected.setUPassword(selected.getULogin());
                 selected.setCodigoPerfil(getPerfilesController().getSelected());
                 selected.setUActivo((short) 1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
-                selected = new Usuarios();
             } else {
                 getJpaController().edit(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
-                selected = new Usuarios();
             }
+            selected = new Usuarios();
+            getPlanController().setSelected(new Plan());
         } catch (PreexistingEntityException | NonexistentEntityException e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
@@ -188,6 +208,20 @@ public class UsuarioController extends Controller implements Serializable {
      */
     public void setPerfilesController(PerfilesController perfilesController) {
         this.perfilesController = perfilesController;
+    }
+
+    /**
+     * @return the planController
+     */
+    public PlanController getPlanController() {
+        return planController;
+    }
+
+    /**
+     * @param planController the planController to set
+     */
+    public void setPlanController(PlanController planController) {
+        this.planController = planController;
     }
 
     @FacesConverter(forClass = Usuarios.class)

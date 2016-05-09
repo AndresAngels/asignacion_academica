@@ -30,29 +30,11 @@ public class AsignaturaJpaController implements Serializable {
     }
 
     public void create(Asignatura asignatura) throws PreexistingEntityException {
-        if (asignatura.getHorarioList() == null) {
-            asignatura.setHorarioList(new ArrayList<Horario>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<Horario>();
-            for (Horario horarioListHorarioToAttach : asignatura.getHorarioList()) {
-                horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
-                attachedHorarioList.add(horarioListHorarioToAttach);
-            }
-            asignatura.setHorarioList(attachedHorarioList);
             em.persist(asignatura);
-            for (Horario horarioListHorario : asignatura.getHorarioList()) {
-                Asignatura oldCodasignaturaOfHorarioListHorario = horarioListHorario.getCodasignatura();
-                horarioListHorario.setCodasignatura(asignatura);
-                horarioListHorario = em.merge(horarioListHorario);
-                if (oldCodasignaturaOfHorarioListHorario != null) {
-                    oldCodasignaturaOfHorarioListHorario.getHorarioList().remove(horarioListHorario);
-                    oldCodasignaturaOfHorarioListHorario = em.merge(oldCodasignaturaOfHorarioListHorario);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findAsignatura(asignatura.getCodasignatura()) != null) {
@@ -71,28 +53,7 @@ public class AsignaturaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Asignatura persistentAsignatura = em.find(Asignatura.class, asignatura.getCodasignatura());
-            List<Horario> horarioListOld = persistentAsignatura.getHorarioList();
-            List<Horario> horarioListNew = asignatura.getHorarioList();
-            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
-            for (Horario horarioListNewHorarioToAttach : horarioListNew) {
-                horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
-                attachedHorarioListNew.add(horarioListNewHorarioToAttach);
-            }
-            horarioListNew = attachedHorarioListNew;
-            asignatura.setHorarioList(horarioListNew);
             asignatura = em.merge(asignatura);
-            for (Horario horarioListNewHorario : horarioListNew) {
-                if (!horarioListOld.contains(horarioListNewHorario)) {
-                    Asignatura oldCodasignaturaOfHorarioListNewHorario = horarioListNewHorario.getCodasignatura();
-                    horarioListNewHorario.setCodasignatura(asignatura);
-                    horarioListNewHorario = em.merge(horarioListNewHorario);
-                    if (oldCodasignaturaOfHorarioListNewHorario != null && !oldCodasignaturaOfHorarioListNewHorario.equals(asignatura)) {
-                        oldCodasignaturaOfHorarioListNewHorario.getHorarioList().remove(horarioListNewHorario);
-                        oldCodasignaturaOfHorarioListNewHorario = em.merge(oldCodasignaturaOfHorarioListNewHorario);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

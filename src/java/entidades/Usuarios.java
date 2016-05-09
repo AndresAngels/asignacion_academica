@@ -1,9 +1,7 @@
 package entidades;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,11 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -57,8 +53,6 @@ public class Usuarios implements Serializable {
     @Basic(optional = false)
     @Column(name = "u_activo")
     private short uActivo;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "uLogin")
-    private List<Horario> horarioList;
     @JoinColumn(name = "codigo_perfil", referencedColumnName = "codigo_perfil")
     @ManyToOne(optional = false)
     private Perfiles codigoPerfil;
@@ -136,15 +130,6 @@ public class Usuarios implements Serializable {
 
     public void setUActivo(short uActivo) {
         this.uActivo = uActivo;
-    }
-
-    @XmlTransient
-    public List<Horario> getHorarioList() {
-        return horarioList;
-    }
-
-    public void setHorarioList(List<Horario> horarioList) {
-        this.horarioList = horarioList;
     }
 
     public Perfiles getCodigoPerfil() {

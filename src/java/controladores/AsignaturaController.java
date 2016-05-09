@@ -67,12 +67,11 @@ public class AsignaturaController extends Controller implements Serializable {
                 selected.setEstado(1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
-                selected = new Asignatura();
             } else {
                 getJpaController().edit(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
-                selected = new Asignatura();
             }
+            selected = new Asignatura();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }

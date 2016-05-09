@@ -44,10 +44,20 @@
                 <p:selectOneMenu id="perfil"
                                  value="#{perfilesController.selected}"
                                  required="true">
+                    <p:ajax event="change" update="panel"/>
                     <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
                     <f:selectItems value="#{perfilesController.consultaPerfiles}" var="perfiles" itemLabel="#{perfiles.descripcionPerfil}" itemValue="#{perfiles}"/>
                 </p:selectOneMenu>
                 <p:message for="perfil" />
+                <p:outputLabel for="plan" value="Plan" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
+                <p:selectOneMenu id="plan"
+                                 value="#{planController.selected}"
+                                 required="true"
+                                 rendered="#{perfilesController.selected.codigoPerfil==3}">
+                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
+                    <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
+                </p:selectOneMenu>
+                <p:message for="perfil" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
             </h:panelGrid>
             <c:choose>
                 <c:when test="#{usuarioController.selected.ULogin==null}">

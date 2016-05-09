@@ -31,47 +31,11 @@ public class PlanJpaController implements Serializable {
     }
 
     public void create(Plan plan) throws PreexistingEntityException {
-        if (plan.getHorarioList() == null) {
-            plan.setHorarioList(new ArrayList<Horario>());
-        }
-        if (plan.getUsuariosList() == null) {
-            plan.setUsuariosList(new ArrayList<Usuarios>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Horario> attachedHorarioList = new ArrayList<Horario>();
-            for (Horario horarioListHorarioToAttach : plan.getHorarioList()) {
-                horarioListHorarioToAttach = em.getReference(horarioListHorarioToAttach.getClass(), horarioListHorarioToAttach.getIdHorario());
-                attachedHorarioList.add(horarioListHorarioToAttach);
-            }
-            plan.setHorarioList(attachedHorarioList);
-            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
-            for (Usuarios usuariosListUsuariosToAttach : plan.getUsuariosList()) {
-                usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
-                attachedUsuariosList.add(usuariosListUsuariosToAttach);
-            }
-            plan.setUsuariosList(attachedUsuariosList);
             em.persist(plan);
-            for (Horario horarioListHorario : plan.getHorarioList()) {
-                Plan oldIdPlanOfHorarioListHorario = horarioListHorario.getIdPlan();
-                horarioListHorario.setIdPlan(plan);
-                horarioListHorario = em.merge(horarioListHorario);
-                if (oldIdPlanOfHorarioListHorario != null) {
-                    oldIdPlanOfHorarioListHorario.getHorarioList().remove(horarioListHorario);
-                    oldIdPlanOfHorarioListHorario = em.merge(oldIdPlanOfHorarioListHorario);
-                }
-            }
-            for (Usuarios usuariosListUsuarios : plan.getUsuariosList()) {
-                Plan oldIdPlanOfUsuariosListUsuarios = usuariosListUsuarios.getIdPlan();
-                usuariosListUsuarios.setIdPlan(plan);
-                usuariosListUsuarios = em.merge(usuariosListUsuarios);
-                if (oldIdPlanOfUsuariosListUsuarios != null) {
-                    oldIdPlanOfUsuariosListUsuarios.getUsuariosList().remove(usuariosListUsuarios);
-                    oldIdPlanOfUsuariosListUsuarios = em.merge(oldIdPlanOfUsuariosListUsuarios);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findPlan(plan.getIdPlan()) != null) {
@@ -90,54 +54,7 @@ public class PlanJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Plan persistentPlan = em.find(Plan.class, plan.getIdPlan());
-            List<Horario> horarioListOld = persistentPlan.getHorarioList();
-            List<Horario> horarioListNew = plan.getHorarioList();
-            List<Usuarios> usuariosListOld = persistentPlan.getUsuariosList();
-            List<Usuarios> usuariosListNew = plan.getUsuariosList();
-            List<Horario> attachedHorarioListNew = new ArrayList<Horario>();
-            for (Horario horarioListNewHorarioToAttach : horarioListNew) {
-                horarioListNewHorarioToAttach = em.getReference(horarioListNewHorarioToAttach.getClass(), horarioListNewHorarioToAttach.getIdHorario());
-                attachedHorarioListNew.add(horarioListNewHorarioToAttach);
-            }
-            horarioListNew = attachedHorarioListNew;
-            plan.setHorarioList(horarioListNew);
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
-            for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
-                usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
-                attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);
-            }
-            usuariosListNew = attachedUsuariosListNew;
-            plan.setUsuariosList(usuariosListNew);
             plan = em.merge(plan);
-            for (Horario horarioListNewHorario : horarioListNew) {
-                if (!horarioListOld.contains(horarioListNewHorario)) {
-                    Plan oldIdPlanOfHorarioListNewHorario = horarioListNewHorario.getIdPlan();
-                    horarioListNewHorario.setIdPlan(plan);
-                    horarioListNewHorario = em.merge(horarioListNewHorario);
-                    if (oldIdPlanOfHorarioListNewHorario != null && !oldIdPlanOfHorarioListNewHorario.equals(plan)) {
-                        oldIdPlanOfHorarioListNewHorario.getHorarioList().remove(horarioListNewHorario);
-                        oldIdPlanOfHorarioListNewHorario = em.merge(oldIdPlanOfHorarioListNewHorario);
-                    }
-                }
-            }
-            for (Usuarios usuariosListOldUsuarios : usuariosListOld) {
-                if (!usuariosListNew.contains(usuariosListOldUsuarios)) {
-                    usuariosListOldUsuarios.setIdPlan(null);
-                    usuariosListOldUsuarios = em.merge(usuariosListOldUsuarios);
-                }
-            }
-            for (Usuarios usuariosListNewUsuarios : usuariosListNew) {
-                if (!usuariosListOld.contains(usuariosListNewUsuarios)) {
-                    Plan oldIdPlanOfUsuariosListNewUsuarios = usuariosListNewUsuarios.getIdPlan();
-                    usuariosListNewUsuarios.setIdPlan(plan);
-                    usuariosListNewUsuarios = em.merge(usuariosListNewUsuarios);
-                    if (oldIdPlanOfUsuariosListNewUsuarios != null && !oldIdPlanOfUsuariosListNewUsuarios.equals(plan)) {
-                        oldIdPlanOfUsuariosListNewUsuarios.getUsuariosList().remove(usuariosListNewUsuarios);
-                        oldIdPlanOfUsuariosListNewUsuarios = em.merge(oldIdPlanOfUsuariosListNewUsuarios);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

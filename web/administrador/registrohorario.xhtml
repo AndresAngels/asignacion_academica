@@ -25,10 +25,11 @@
                 <h:form id="form">
                     <p:panel header="Control de horarios">
                         <h:panelGrid id="preseleccion" columns="2">
-                            <p:outputLabel for="plan" value="Plan"/>
+                            <p:outputLabel for="plan" value="Plan" rendered="#{perfilesController.selected.codigoPerfil!=3}"/>
                             <p:selectOneMenu id="plan"
                                              value="#{planController.selected}"
-                                             required="true">
+                                             required="true"
+                                             rendered="#{perfilesController.selected.codigoPerfil!=3}">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
                                 <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
                             </p:selectOneMenu>
@@ -92,7 +93,8 @@
                             <p:outputLabel for="Asignatura" value="Asignatura" />
                             <p:selectOneMenu id="Asignatura"
                                              value="#{asignaturaController.selected}"
-                                             required="true">
+                                             required="true"
+                                             filter="true" filterMatchMode="startsWith">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
                                 <f:selectItems value="#{asignaturaController.consultaTabla}" var="asignatura" itemLabel="#{asignatura.nombreAsignatura}" itemValue="#{asignatura}"/>
                             </p:selectOneMenu> 
@@ -100,9 +102,10 @@
                             <p:outputLabel for="Docente" value="Docente" />
                             <p:selectOneMenu id="Docente"
                                              value="#{usuarioController.selected}"
-                                             required="true">
+                                             required="true" filter="true"
+                                             filterMatchMode="startsWith">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItems value="#{usuarioController.consultaTabla}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
+                                <f:selectItems value="#{usuarioController.consultaDocentes}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
                             </p:selectOneMenu>
 
                             <p:outputLabel for="inicio" value="Hora de Entrada:" />

@@ -31,44 +31,16 @@ public class HorarioJpaController implements Serializable {
 
     public void create(Horario horario) {
         EntityManager em = null;
-        try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Asignatura codasignatura = horario.getCodasignatura();
-            if (codasignatura != null) {
-                codasignatura = em.getReference(codasignatura.getClass(), codasignatura.getCodasignatura());
-                horario.setCodasignatura(codasignatura);
-            }
-            Plan idPlan = horario.getIdPlan();
-            if (idPlan != null) {
-                idPlan = em.getReference(idPlan.getClass(), idPlan.getIdPlan());
-                horario.setIdPlan(idPlan);
-            }
-            Usuarios ULogin = horario.getULogin();
-            if (ULogin != null) {
-                ULogin = em.getReference(ULogin.getClass(), ULogin.getULogin());
-                horario.setULogin(ULogin);
-            }
-            em.persist(horario);
-            if (codasignatura != null) {
-                codasignatura.getHorarioList().add(horario);
-                codasignatura = em.merge(codasignatura);
-            }
-            if (idPlan != null) {
-                idPlan.getHorarioList().add(horario);
-                idPlan = em.merge(idPlan);
-            }
-            if (ULogin != null) {
-                ULogin.getHorarioList().add(horario);
-                ULogin = em.merge(ULogin);
-            }
-            em.flush();
-            em.getTransaction().commit();
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
+         try {
+             em = getEntityManager();
+             em.getTransaction().begin();
+             em.persist(horario);
+             em.getTransaction().commit();
+         } finally {
+             if (em != null) {
+                 em.close();
+             }
+         }
     }
 
     public void edit(Horario horario) throws NonexistentEntityException {
@@ -76,50 +48,7 @@ public class HorarioJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Horario persistentHorario = em.find(Horario.class, horario.getIdHorario());
-            Asignatura codasignaturaOld = persistentHorario.getCodasignatura();
-            Asignatura codasignaturaNew = horario.getCodasignatura();
-            Plan idPlanOld = persistentHorario.getIdPlan();
-            Plan idPlanNew = horario.getIdPlan();
-            Usuarios ULoginOld = persistentHorario.getULogin();
-            Usuarios ULoginNew = horario.getULogin();
-            if (codasignaturaNew != null) {
-                codasignaturaNew = em.getReference(codasignaturaNew.getClass(), codasignaturaNew.getCodasignatura());
-                horario.setCodasignatura(codasignaturaNew);
-            }
-            if (idPlanNew != null) {
-                idPlanNew = em.getReference(idPlanNew.getClass(), idPlanNew.getIdPlan());
-                horario.setIdPlan(idPlanNew);
-            }
-            if (ULoginNew != null) {
-                ULoginNew = em.getReference(ULoginNew.getClass(), ULoginNew.getULogin());
-                horario.setULogin(ULoginNew);
-            }
             horario = em.merge(horario);
-            if (codasignaturaOld != null && !codasignaturaOld.equals(codasignaturaNew)) {
-                codasignaturaOld.getHorarioList().remove(horario);
-                codasignaturaOld = em.merge(codasignaturaOld);
-            }
-            if (codasignaturaNew != null && !codasignaturaNew.equals(codasignaturaOld)) {
-                codasignaturaNew.getHorarioList().add(horario);
-                codasignaturaNew = em.merge(codasignaturaNew);
-            }
-            if (idPlanOld != null && !idPlanOld.equals(idPlanNew)) {
-                idPlanOld.getHorarioList().remove(horario);
-                idPlanOld = em.merge(idPlanOld);
-            }
-            if (idPlanNew != null && !idPlanNew.equals(idPlanOld)) {
-                idPlanNew.getHorarioList().add(horario);
-                idPlanNew = em.merge(idPlanNew);
-            }
-            if (ULoginOld != null && !ULoginOld.equals(ULoginNew)) {
-                ULoginOld.getHorarioList().remove(horario);
-                ULoginOld = em.merge(ULoginOld);
-            }
-            if (ULoginNew != null && !ULoginNew.equals(ULoginOld)) {
-                ULoginNew.getHorarioList().add(horario);
-                ULoginNew = em.merge(ULoginNew);
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

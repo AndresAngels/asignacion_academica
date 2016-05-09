@@ -30,29 +30,11 @@ public class PerfilesJpaController implements Serializable {
     }
 
     public void create(Perfiles perfiles) throws PreexistingEntityException {
-        if (perfiles.getUsuariosList() == null) {
-            perfiles.setUsuariosList(new ArrayList<Usuarios>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Usuarios> attachedUsuariosList = new ArrayList<Usuarios>();
-            for (Usuarios usuariosListUsuariosToAttach : perfiles.getUsuariosList()) {
-                usuariosListUsuariosToAttach = em.getReference(usuariosListUsuariosToAttach.getClass(), usuariosListUsuariosToAttach.getULogin());
-                attachedUsuariosList.add(usuariosListUsuariosToAttach);
-            }
-            perfiles.setUsuariosList(attachedUsuariosList);
             em.persist(perfiles);
-            for (Usuarios usuariosListUsuarios : perfiles.getUsuariosList()) {
-                Perfiles oldCodigoPerfilOfUsuariosListUsuarios = usuariosListUsuarios.getCodigoPerfil();
-                usuariosListUsuarios.setCodigoPerfil(perfiles);
-                usuariosListUsuarios = em.merge(usuariosListUsuarios);
-                if (oldCodigoPerfilOfUsuariosListUsuarios != null) {
-                    oldCodigoPerfilOfUsuariosListUsuarios.getUsuariosList().remove(usuariosListUsuarios);
-                    oldCodigoPerfilOfUsuariosListUsuarios = em.merge(oldCodigoPerfilOfUsuariosListUsuarios);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findPerfiles(perfiles.getCodigoPerfil()) != null) {
@@ -71,28 +53,7 @@ public class PerfilesJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Perfiles persistentPerfiles = em.find(Perfiles.class, perfiles.getCodigoPerfil());
-            List<Usuarios> usuariosListOld = persistentPerfiles.getUsuariosList();
-            List<Usuarios> usuariosListNew = perfiles.getUsuariosList();
-            List<Usuarios> attachedUsuariosListNew = new ArrayList<Usuarios>();
-            for (Usuarios usuariosListNewUsuariosToAttach : usuariosListNew) {
-                usuariosListNewUsuariosToAttach = em.getReference(usuariosListNewUsuariosToAttach.getClass(), usuariosListNewUsuariosToAttach.getULogin());
-                attachedUsuariosListNew.add(usuariosListNewUsuariosToAttach);
-            }
-            usuariosListNew = attachedUsuariosListNew;
-            perfiles.setUsuariosList(usuariosListNew);
             perfiles = em.merge(perfiles);
-            for (Usuarios usuariosListNewUsuarios : usuariosListNew) {
-                if (!usuariosListOld.contains(usuariosListNewUsuarios)) {
-                    Perfiles oldCodigoPerfilOfUsuariosListNewUsuarios = usuariosListNewUsuarios.getCodigoPerfil();
-                    usuariosListNewUsuarios.setCodigoPerfil(perfiles);
-                    usuariosListNewUsuarios = em.merge(usuariosListNewUsuarios);
-                    if (oldCodigoPerfilOfUsuariosListNewUsuarios != null && !oldCodigoPerfilOfUsuariosListNewUsuarios.equals(perfiles)) {
-                        oldCodigoPerfilOfUsuariosListNewUsuarios.getUsuariosList().remove(usuariosListNewUsuarios);
-                        oldCodigoPerfilOfUsuariosListNewUsuarios = em.merge(oldCodigoPerfilOfUsuariosListNewUsuarios);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
