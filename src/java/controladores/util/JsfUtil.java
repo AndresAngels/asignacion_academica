@@ -30,7 +30,7 @@ public class JsfUtil {
         return items;
     }
 
-    public static void addErrorMessage(Exception ex, String defaultMsg){
+    public static void addErrorMessage(Exception ex, String defaultMsg) {
         addErrorMessage(defaultMsg);
         Logger.getLogger(HorarioController.class.getName()).log(Level.SEVERE, null, ex);
     }

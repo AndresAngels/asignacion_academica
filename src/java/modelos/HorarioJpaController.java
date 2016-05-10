@@ -1,9 +1,6 @@
 package modelos;
 
-import entidades.Asignatura;
 import entidades.Horario;
-import entidades.Plan;
-import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -31,16 +28,16 @@ public class HorarioJpaController implements Serializable {
 
     public void create(Horario horario) {
         EntityManager em = null;
-         try {
-             em = getEntityManager();
-             em.getTransaction().begin();
-             em.persist(horario);
-             em.getTransaction().commit();
-         } finally {
-             if (em != null) {
-                 em.close();
-             }
-         }
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.persist(horario);
+            em.getTransaction().commit();
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
     }
 
     public void edit(Horario horario) throws NonexistentEntityException {

@@ -20,7 +20,7 @@ import modelos.UsuariosJpaController;
 import modelos.exceptions.NonexistentEntityException;
 import modelos.exceptions.PreexistingEntityException;
 
-@ManagedBean(name = "usuarioController")
+@ManagedBean(name = "usuarioController", eager = true)
 @SessionScoped
 public class UsuarioController extends Controller implements Serializable {
 

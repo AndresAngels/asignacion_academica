@@ -66,6 +66,9 @@
                         </p:layoutUnit>
                     </p:layout>
                 </c:when>
+                <c:when test="#{!menu.esVisible()}">
+                    <ezcomp:accesodenegado/>
+                </c:when>
                 <c:otherwise>
                     <h:form id="formlogin">
                         <ezcomp:login/>

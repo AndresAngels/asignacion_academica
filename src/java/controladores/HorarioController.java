@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -55,11 +54,12 @@ public class HorarioController extends Controller implements Serializable {
     public List<Horario> getConsultaHorarioPrograma() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan:PLAN");
-            query.setParameter("PLAN", getPlanController().getSelected());
+            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan=:PLAN");
+            query.setParameter("PLAN", selected.getIdPlan());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            consultaTabla = new ArrayList<Horario>();
         }
         return consultaTabla;
     }
@@ -497,7 +497,7 @@ public class HorarioController extends Controller implements Serializable {
         if ("3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())) {
             selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
         }
-        if (selected != null && selected.getPlan() != null && !selected.getPlan().equals("")&&selected.getCohorte()!=0) {
+        if (selected != null && selected.getPlan() != null && !selected.getPlan().equals("") && selected.getCohorte() != 0) {
             return true;
         }
         return false;

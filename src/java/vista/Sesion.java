@@ -53,7 +53,10 @@ public class Sesion implements Serializable {
             Usuarios usuario = null;
             for (Usuarios u : (List<Usuarios>) query.getResultList()) {
                 if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
-                        && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())) {
+                        && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())
+                        && ("1".equals(u.getCodigoPerfil().getCodigoPerfil())
+                        || "2".equals(u.getCodigoPerfil().getCodigoPerfil())
+                        || "3".equals(u.getCodigoPerfil().getCodigoPerfil()))) {
                     usuario = u;
                 }
             }
@@ -70,11 +73,7 @@ public class Sesion implements Serializable {
     }
 
     public String cerrarSesion() {
-        setAsignaturaController(new AsignaturaController());
-        setHorarioController(new HorarioController());
-        setPerfilesController(new PerfilesController());
-        setPlanController(new PlanController());
-        setUsuarioController(new UsuarioController());
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "success";
     }
 

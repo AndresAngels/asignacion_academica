@@ -38,13 +38,6 @@ public class Acordeon implements Serializable {
             } else {
                 tituloFormulario = "Actualizar Asignatura";
             }
-        } else if ("/administrador/registrohorario.xhtml".equals(value)) {
-            tituloTabla = "Consultar Horarios";
-            if (getHorarioController().getSelected().getIdHorario() == null) {
-                tituloFormulario = "Guardar Horario";
-            } else {
-                tituloFormulario = "Actualizar Horario";
-            }
         }
     }
 

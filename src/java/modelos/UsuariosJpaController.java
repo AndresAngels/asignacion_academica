@@ -1,11 +1,7 @@
 package modelos;
 
-import entidades.Horario;
-import entidades.Perfiles;
-import entidades.Plan;
 import entidades.Usuarios;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

@@ -133,7 +133,7 @@ public class Asignatura implements Serializable {
      * @return the codigoNombre
      */
     public String getCodigoNombre() {
-        codigoNombre=codasignatura+" - "+nombreAsignatura;
+        codigoNombre = codasignatura + " - " + nombreAsignatura;
         return codigoNombre;
     }
 

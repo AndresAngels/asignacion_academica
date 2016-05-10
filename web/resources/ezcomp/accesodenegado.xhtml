@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ezcomp="http://java.sun.com/jsf/composite/ezcomp"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:growl id="growl" showDetail="true"/>  
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="90" resizable="true" closable="true" collapsible="true">
+                <p:graphicImage name="/img/Header.png"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <h:outputText value="No tiene permisos para acceder a este recurso" style="font: arial; font-size: 20px"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="south" size="50" closable="true" collapsible="true" styleClass="footer">
+                <p:layout>
+                    <p:layoutUnit position="center">
+                        <p:outputLabel value="Universidad del Valle Sede Caicedonia - © 2016"/>
+                    </p:layoutUnit>
+                </p:layout>
+            </p:layoutUnit>
+        </p:layout>
+    </cc:implementation>
+</html>
