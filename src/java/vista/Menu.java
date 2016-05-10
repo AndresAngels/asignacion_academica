@@ -26,18 +26,14 @@ public class Menu implements Serializable {
 
         submenu.addElement(crearItem("Registrar Asignaturas", "/administrador/registroasignaturas.xhtml"));
 
-        submenu.addElement(crearItem("Registrar Horarios", "/administrador/registrohorario.xhtml"));
+        submenu.addElement(crearItem("Registrar Horarios", "/coordinador/registrohorario.xhtml"));
 
         model.addElement(submenu);
 
         // Reportes
         submenu = new DefaultSubMenu("Reportes");
 
-        submenu.addElement(crearItem("Asignaturas por Docente", "/administrador/reportedocente.xhtml"));
-
-        submenu.addElement(crearItem("Horario por Programa", "/administrador/reporteprograma.xhtml"));
-
-        submenu.addElement(crearItem("Horario general", "/administrador/reportegeneral.xhtml"));
+        submenu.addElement(crearItem("Generar reportes", "/secretario/reportes.xhtml"));
 
         model.addElement(submenu);
     }

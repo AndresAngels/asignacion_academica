@@ -85,12 +85,12 @@ public class UsuarioController extends Controller implements Serializable {
 
     public void createOrUpdate(String opcion) {
         try {
-            if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
-                selected.setIdPlan(getPlanController().getSelected());
-            }
             if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
                 selected.setUPassword(selected.getULogin());
                 selected.setCodigoPerfil(getPerfilesController().getSelected());
+                if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
+                    selected.setIdPlan(getPlanController().getSelected());
+                }
                 selected.setUActivo((short) 1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));

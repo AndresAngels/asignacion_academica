@@ -40,6 +40,8 @@ public class Asignatura implements Serializable {
     private String codigo;
     @Transient
     private String nombre;
+    @Transient
+    private String codigoNombre;
 
     public Asignatura() {
         //Contructor vacio para limpriar campos
@@ -125,5 +127,20 @@ public class Asignatura implements Serializable {
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    /**
+     * @return the codigoNombre
+     */
+    public String getCodigoNombre() {
+        codigoNombre=codasignatura+" - "+nombreAsignatura;
+        return codigoNombre;
+    }
+
+    /**
+     * @param codigoNombre the codigoNombre to set
+     */
+    public void setCodigoNombre(String codigoNombre) {
+        this.codigoNombre = codigoNombre;
     }
 }

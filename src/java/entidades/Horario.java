@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Horario.findByIdHorario", query = "SELECT h FROM Horario h WHERE h.idHorario = :idHorario"),
     @NamedQuery(name = "Horario.findByCohorte", query = "SELECT h FROM Horario h WHERE h.cohorte = :cohorte"),
     @NamedQuery(name = "Horario.findByGrupo", query = "SELECT h FROM Horario h WHERE h.grupo = :grupo"),
-    @NamedQuery(name = "Horario.findByFranja", query = "SELECT h FROM Horario h WHERE h.franja = :franja"),
     @NamedQuery(name = "Horario.findByIntensidad", query = "SELECT h FROM Horario h WHERE h.intensidad = :intensidad"),
     @NamedQuery(name = "Horario.findByDia", query = "SELECT h FROM Horario h WHERE h.dia = :dia"),
     @NamedQuery(name = "Horario.findByHEntrada", query = "SELECT h FROM Horario h WHERE h.hEntrada = :hEntrada"),
@@ -47,9 +46,6 @@ public class Horario implements Serializable {
     @Basic(optional = false)
     @Column(name = "grupo")
     private int grupo;
-    @Basic(optional = false)
-    @Column(name = "franja")
-    private String franja;
     @Basic(optional = false)
     @Column(name = "intensidad")
     private String intensidad;
@@ -111,14 +107,6 @@ public class Horario implements Serializable {
 
     public void setGrupo(int grupo) {
         this.grupo = grupo;
-    }
-
-    public String getFranja() {
-        return franja;
-    }
-
-    public void setFranja(String franja) {
-        this.franja = franja;
     }
 
     public String getIntensidad() {

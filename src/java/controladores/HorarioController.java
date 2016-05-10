@@ -3,6 +3,7 @@ package controladores;
 import controladores.util.JsfUtil;
 import entidades.Horario;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +62,19 @@ public class HorarioController extends Controller implements Serializable {
             JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
         }
         return consultaTabla;
+    }
+
+    public List<Horario> getConsultaHorarioCohorte() {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan=:PLAN AND p.cohorte=:COHORTE");
+            query.setParameter("PLAN", getPlanController().getSelected());
+            query.setParameter("COHORTE", selected.getCohorte());
+            return query.getResultList();
+        } catch (NullPointerException npe) {
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+        }
+        return new ArrayList<>();
     }
 
     public List<Horario> getConsultaAsignaturaDocente() {
@@ -126,6 +140,10 @@ public class HorarioController extends Controller implements Serializable {
         if (event.getData() == null) {
             String entrada = extraerHora(fechaEntrada);
             String salida = extraerHora(fechaSalida);
+            if (salida.equals("10:30")) {
+                JsfUtil.addErrorMessage("No se puede seleccionar salidas a las 10:30 PM");
+                return;
+            }
             if (validarHorarioNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
                     getConsultaAsignaturaDocente(), selected.getDia(), entrada, salida)) {
                 return;
@@ -166,15 +184,11 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-
-        FacesContext.getCurrentInstance().addMessage("Horario Registrado", message);
+        cargarEventos();
     }
 
     public void onEventResize(ScheduleEntryResizeEvent event) {
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-
-        FacesContext.getCurrentInstance().addMessage("Horario ", message);
+        cargarEventos();
     }
 
     private boolean validarHorarioNuevo(String perfil,
@@ -233,10 +247,8 @@ public class HorarioController extends Controller implements Serializable {
 
     public void cargarEventos() {
         Query query;
-        query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.estado=:ESTADO");
-        query.setParameter("ESTADO", 1);
         eventModel = new DefaultScheduleModel();
-        List<Horario> consulta = query.getResultList();
+        List<Horario> consulta = getConsultaHorarioCohorte();
         for (Horario h : consulta) {
             DefaultScheduleEvent evt = new DefaultScheduleEvent();
 
@@ -479,6 +491,16 @@ public class HorarioController extends Controller implements Serializable {
     public void setEvent(DefaultScheduleEvent event) {
         this.event = event;
 
+    }
+
+    public boolean activarCalendario() {
+        if ("3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())) {
+            selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
+        }
+        if (selected != null && selected.getPlan() != null && !selected.getPlan().equals("")&&selected.getCohorte()!=0) {
+            return true;
+        }
+        return false;
     }
 
     @FacesConverter(forClass = Horario.class)

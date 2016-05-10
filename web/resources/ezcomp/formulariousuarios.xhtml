@@ -44,7 +44,7 @@
                 <p:selectOneMenu id="perfil"
                                  value="#{perfilesController.selected}"
                                  required="true">
-                    <p:ajax event="change" update="panel"/>
+                    <p:ajax event="change" update="panel" process="perfil"/>
                     <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
                     <f:selectItems value="#{perfilesController.consultaPerfiles}" var="perfiles" itemLabel="#{perfiles.descripcionPerfil}" itemValue="#{perfiles}"/>
                 </p:selectOneMenu>
