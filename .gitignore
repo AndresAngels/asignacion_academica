@@ -4,6 +4,5 @@ build/*
 dist/*
 Entrega1/*
 nbbuild.xml
-test/*
 nbproject/*
 build.xml
