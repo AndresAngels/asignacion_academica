@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class Controller {
 
+    public static final String CONSULTA = "Error al generar la consulta";
     public static final String BUNDLE = "/Bundle";
     public static final String CREATE = "CREATE";
     public static final String UPDATE = "UPDATE";

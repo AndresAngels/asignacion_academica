@@ -41,7 +41,7 @@ public class AsignaturaController extends Controller implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return consultaTabla;
     }

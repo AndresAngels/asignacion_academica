@@ -31,6 +31,7 @@ import org.primefaces.model.ScheduleModel;
 @SessionScoped
 public class HorarioController extends Controller implements Serializable {
 
+    private static final String CARGA = "La carga del docente supera el horario";
     private static final String LUNES = "Lunes";
     private static final String MARTES = "Martes";
     private static final String MIERCOLES = "Miércoles";
@@ -58,7 +59,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("PLAN", selected.getIdPlan());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
             consultaTabla = new ArrayList<Horario>();
         }
         return consultaTabla;
@@ -72,7 +73,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("COHORTE", selected.getCohorte());
             return query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return new ArrayList<>();
     }
@@ -84,7 +85,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("DOCENTE", getUsuarioController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar la consulta");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return consultaTabla;
     }
@@ -96,7 +97,7 @@ public class HorarioController extends Controller implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error generando la consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return consultaTabla;
     }
@@ -137,41 +138,40 @@ public class HorarioController extends Controller implements Serializable {
         }
         event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
-        if (event.getData() == null) {
-            String entrada = extraerHora(fechaEntrada);
-            String salida = extraerHora(fechaSalida);
-            if (salida.equals("10:30")) {
-                JsfUtil.addErrorMessage("No se puede seleccionar salidas a las 10:30 PM");
-                return;
-            }
-            if (validarHorarioNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
-                    getConsultaAsignaturaDocente(), selected.getDia(), entrada, salida)) {
-                return;
-            }
-
-            Calendar fechaIntencidad = Calendar.getInstance();
-            fechaIntencidad.setTime(fechaSalida.getTime());
-            fechaIntencidad.add(Calendar.HOUR_OF_DAY, -fechaEntrada.get(Calendar.HOUR_OF_DAY));
-            fechaIntencidad.add(Calendar.MINUTE, -fechaEntrada.get(Calendar.MINUTE));
-            String intensidad = extraerHora(fechaIntencidad);
-
-            selected.setIntensidad(intensidad);
-            selected.setHEntrada(entrada);
-            selected.setHSalida(salida);
-            selected.setEstado(1);
-            selected.setCodasignatura(getAsignaturaController().getSelected());
-            selected.setIdPlan(getPlanController().getSelected());
-            selected.setULogin(getUsuarioController().getSelected());
-            create();
-            event.setId("" + selected.getIdHorario());
-            event.setData(selected);
-            getEventModel().addEvent(event);
-            event = new DefaultScheduleEvent();
-            selected = new Horario();
-        } else {
-            getEventModel().updateEvent(event);
+        String entrada = extraerHora(fechaEntrada);
+        String salida = extraerHora(fechaSalida);
+        if ("10:30".equals(salida)) {
+            JsfUtil.addErrorMessage("No se puede seleccionar salidas a las 10:30 PM");
+            return;
+        }
+        if (validarHorarioNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
+                getConsultaAsignaturaDocente(), selected.getDia(), entrada, salida)) {
+            return;
         }
 
+        Calendar fechaIntencidad = Calendar.getInstance();
+        fechaIntencidad.setTime(fechaSalida.getTime());
+        fechaIntencidad.add(Calendar.HOUR_OF_DAY, -fechaEntrada.get(Calendar.HOUR_OF_DAY));
+        fechaIntencidad.add(Calendar.MINUTE, -fechaEntrada.get(Calendar.MINUTE));
+        String intensidad = extraerHora(fechaIntencidad);
+
+        selected.setIntensidad(intensidad);
+        selected.setHEntrada(entrada);
+        selected.setHSalida(salida);
+        selected.setEstado(1);
+        selected.setCodasignatura(getAsignaturaController().getSelected());
+        selected.setIdPlan(getPlanController().getSelected());
+        selected.setULogin(getUsuarioController().getSelected());
+        if (event.getData() == null) {
+            create();
+        } else {
+            update();
+        }
+        event.setId("" + selected.getIdHorario());
+        event.setData(selected);
+        getEventModel().addEvent(event);
+        event = new DefaultScheduleEvent();
+        selected = new Horario();
         event = new DefaultScheduleEvent();
     }
 
@@ -183,20 +183,35 @@ public class HorarioController extends Controller implements Serializable {
         event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
     }
 
-    public void onEventMove(ScheduleEntryMoveEvent event) {
-        cargarEventos();
+    public void onEventMove(ScheduleEntryMoveEvent eve) {
+        this.event = (DefaultScheduleEvent) eve.getScheduleEvent();
+        Calendar c1=Calendar.getInstance();
+        c1.setTime(event.getStartDate());
+        c1.add(Calendar.DAY_OF_MONTH, eve.getDayDelta());
+        c1.add(Calendar.MINUTE, eve.getMinuteDelta());
+        event.setStartDate(c1.getTime());
+        Calendar c2=Calendar.getInstance();
+        c2.setTime(event.getEndDate());
+        c2.add(Calendar.DAY_OF_MONTH, eve.getDayDelta());
+        c2.add(Calendar.MINUTE, eve.getMinuteDelta());
+        event.setStartDate(c2.getTime());
+        addEvent();
     }
 
-    public void onEventResize(ScheduleEntryResizeEvent event) {
-        cargarEventos();
+    public void onEventResize(ScheduleEntryResizeEvent eve) {
+        this.event = (DefaultScheduleEvent) eve.getScheduleEvent();
+        Calendar c=Calendar.getInstance();
+        c.setTime(event.getEndDate());
+        c.add(Calendar.MINUTE, eve.getMinuteDelta());
+        event.setStartDate(c.getTime());
+        addEvent();
     }
 
     private boolean validarHorarioNuevo(String perfil,
             List<Horario> consultadoHorarios, String dia, String entrada, String salida) {
-        if (validarEntradaSalida(consultadoHorarios, dia, entrada, salida)) {
-            if (validarCarga(perfil, consultadoHorarios, entrada, salida)) {
-                return false;
-            }
+        if (validarEntradaSalida(consultadoHorarios, dia, entrada, salida)
+                && validarCarga(perfil, consultadoHorarios, entrada, salida)) {
+            return false;
         }
         return true;
     }
@@ -204,9 +219,10 @@ public class HorarioController extends Controller implements Serializable {
     private boolean validarEntradaSalida(List<Horario> consultahHorarios,
             String dia, String entrada, String salida) {
         for (Horario h : consultahHorarios) {
+            boolean ent = entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0;
+            boolean sal = salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0;
             if (dia.equals(h.getDia())
-                    && ((entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0)
-                    || (salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0))) {
+                    && (ent || sal)) {
                 JsfUtil.addErrorMessage("El docente ya tiene una asignatura en este horario");
                 return false;
             }
@@ -215,18 +231,18 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     private boolean validarCarga(String perfil, List<Horario> consultahHorarios, String entrada, String salida) {
-        double acumulador = 0;
-        entrada = entrada.replace(":", ".");
-        entrada = entrada.replace("30", "5");
-        salida = salida.replace(":", ".");
-        salida = salida.replace("30", "5");
-        acumulador = Double.parseDouble(salida) - Double.parseDouble(entrada);
-        if (perfil.equals("4") && acumulador > 12) {
-            JsfUtil.addErrorMessage("La carga del docente supera el horario");
+        double acumulador;
+        String ent = entrada.replace(":", ".");
+        ent = ent.replace("30", "5");
+        String sal = salida.replace(":", ".");
+        sal = sal.replace("30", "5");
+        acumulador = Double.parseDouble(sal) - Double.parseDouble(ent);
+        if ("4".equals(perfil) && acumulador > 12) {
+            JsfUtil.addErrorMessage(CARGA);
             return false;
         }
-        if (perfil.equals("5") && acumulador > 8) {
-            JsfUtil.addErrorMessage("La carga del docente supera el horario");
+        if ("5".equals(perfil) && acumulador > 8) {
+            JsfUtil.addErrorMessage(CARGA);
             return false;
         }
         for (Horario h : consultahHorarios) {
@@ -234,19 +250,18 @@ public class HorarioController extends Controller implements Serializable {
             intensidad = intensidad.replace("30", "5");
             acumulador += Double.parseDouble(intensidad);
         }
-        if (perfil.equals("4") && acumulador > 12) {
-            JsfUtil.addErrorMessage("La carga del docente supera el horario");
+        if ("4".equals(perfil) && acumulador > 12) {
+            JsfUtil.addErrorMessage(CARGA);
             return false;
         }
-        if (perfil.equals("5") && acumulador > 8) {
-            JsfUtil.addErrorMessage("La carga del docente supera el horario");
+        if ("5".equals(perfil) && acumulador > 8) {
+            JsfUtil.addErrorMessage(CARGA);
             return false;
         }
         return true;
     }
 
     public void cargarEventos() {
-        Query query;
         eventModel = new DefaultScheduleModel();
         List<Horario> consulta = getConsultaHorarioCohorte();
         for (Horario h : consulta) {
@@ -497,10 +512,11 @@ public class HorarioController extends Controller implements Serializable {
         if ("3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())) {
             selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
         }
-        if (selected != null && selected.getPlan() != null && !selected.getPlan().equals("") && selected.getCohorte() != 0) {
+        if (selected != null && selected.getPlan() != null && !"".equals(selected.getPlan()) && selected.getCohorte() != 0) {
             return true;
         }
         return false;
+
     }
 
     @FacesConverter(forClass = Horario.class)

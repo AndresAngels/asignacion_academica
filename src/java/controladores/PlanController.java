@@ -25,7 +25,7 @@ import modelos.PlanJpaController;
  */
 @ManagedBean(name = "planController")
 @SessionScoped
-public class PlanController implements Serializable {
+public class PlanController extends Controller implements Serializable {
 
     private Plan selected;
     private PlanJpaController jpaController;
@@ -38,7 +38,7 @@ public class PlanController implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return consultaTabla;
     }

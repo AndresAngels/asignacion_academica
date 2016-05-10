@@ -21,8 +21,12 @@ import java.awt.Font;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -43,11 +47,13 @@ public class Reportes {
     private HorarioController horarioController;
     private Date inicio = null;
     private Date fin = null;
+    private Document document;
+    private PdfPTable tabla;
 
     public void pdfCruds(int tipo) {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
-            Document document = new Document(PageSize.LETTER);
+            document = new Document(PageSize.LETTER);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PdfWriter.getInstance(document, baos);
             if (!document.isOpen()) {
@@ -57,27 +63,27 @@ public class Reportes {
             switch (tipo) {
                 case 0:
                     fileName = "Usuarios";
-                    reporteUsuarios(document);
+                    reporteUsuarios();
                     break;
                 case 1:
                     fileName = "Asignaturas Docente";
-                    reporteAsignaturasDocente(document);
+                    reporteAsignaturas();
                     break;
                 case 2:
                     fileName = "Asignaturas por Doncente";
-                    reporteHorarioAsignaturaDocente(document);
+                    reporteHorarioAsignaturaDocente();
                     break;
                 case 3:
                     fileName = "Horarios Plan";
-                    reporteHorarioPlan(document);
+                    reporteHorarioPlan();
                     break;
                 case 4:
                     fileName = "Horarios General";
-                    reporteHorarioGeneral(document);
+                    reporteHorarioGeneral();
                     break;
                 case 5:
                     fileName = "Horarios por Cohorte";
-                    reporteHorarioCohorte(document);
+                    reporteHorarioCohorte();
                     break;
                 default:
             }
@@ -99,26 +105,17 @@ public class Reportes {
         }
     }
 
-    public Document reporteUsuarios(Document document) {
+    public Document reporteUsuarios() {
         try {
             String titulo = "Usuarios";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(3);// Numero de campos de la tabla
+            document = reporteEncabezado(titulo);
+            tabla = new PdfPTable(3);// Numero de campos de la tabla
             tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Nombres", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Apellidos", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Perfiles", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
+            ArrayList<String> nombres = new ArrayList<>();
+            nombres.add("Nombres");
+            nombres.add("Apellidos");
+            nombres.add("Perfiles");
+            reporteTablaGeneral(nombres);
             for (Usuarios m : getUsuarioController().getConsultaTabla()) {
                 tabla.addCell(new PdfPCell(new Phrase(m.getNombre(), FontFactory.getFont(ARIAL, 10))));
                 tabla.addCell(new PdfPCell(new Phrase(m.getApellido(), FontFactory.getFont(ARIAL, 10))));
@@ -131,23 +128,16 @@ public class Reportes {
         return document;
     }
 
-    public Document reporteAsignaturasDocente(Document document) {
+    public Document reporteAsignaturas() {
         try {
-            String titulo = "Asignaturas Docente";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(2);// Numero de campos de la tabla
+            String titulo = "Asignaturas";
+            document = reporteEncabezado(titulo);
+            tabla = new PdfPTable(2);// Numero de campos de la tabla
             tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Código Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Nombre Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
+            ArrayList<String> nombres = new ArrayList<>();
+            nombres.add("Codigo Asignatura");
+            nombres.add("Nombre Asignatura");
+            reporteTablaGeneral(nombres);
             for (Asignatura m : getAsignaturaController().getConsultaTabla()) {
                 tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
                 tabla.addCell(new PdfPCell(new Phrase(m.getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
@@ -159,55 +149,12 @@ public class Reportes {
         return document;
     }
 
-    public Document reporteHorarioAsignaturaDocente(Document document) {
+    public Document reporteHorarioAsignaturaDocente() {
         try {
             String titulo = "Asignaturas por Docente";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(9);
-            tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Plán", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Cohorte", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Código Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Nombre Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Docente", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Intensidad", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Día", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Entrada", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Salida", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            for (Horario m : getHorarioController().getConsultaAsignaturaDocente()) {
-                tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
-            }
+            document = reporteEncabezado(titulo);
+            reporteTablaHorario();
+            reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -215,55 +162,12 @@ public class Reportes {
         return document;
     }
 
-    public Document reporteHorarioPlan(Document document) {
+    public Document reporteHorarioPlan() {
         try {
             String titulo = "Horarios Programa";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(9);
-            tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Plán", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Cohorte", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Código Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Nombre Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Docente", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Intensidad", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Día", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Entrada", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Salida", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            for (Horario m : getHorarioController().getConsultaHorarioPrograma()) {
-                tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
-            }
+            document = reporteEncabezado(titulo);
+            reporteTablaHorario();
+            reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -271,55 +175,12 @@ public class Reportes {
         return document;
     }
 
-    public Document reporteHorarioGeneral(Document document) {
+    public Document reporteHorarioGeneral() {
         try {
-            String titulo = "Asignaturas por Docente";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(9);
-            tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Plán", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Cohorte", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Código Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Nombre Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Docente", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Intensidad", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Día", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Entrada", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Salida", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            for (Horario m : getHorarioController().getConsultaTabla()) {
-                tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
-            }
+            String titulo = "Horario General";
+            document = reporteEncabezado(titulo);
+            reporteTablaHorario();
+            reporteLlenarTabla(getHorarioController().getConsultaTabla());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -327,60 +188,69 @@ public class Reportes {
         return document;
     }
 
-    public Document reporteHorarioCohorte(Document document) {
+    public Document reporteHorarioCohorte() {
         try {
             String titulo = "Asignaturas por Docente";
-            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            paragraph = new Paragraph(" ", FontFactory.getFont("arial", 14, Font.BOLD));
-            paragraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(paragraph);
-            PdfPTable tabla = new PdfPTable(9);
-            tabla.setWidthPercentage(100);
-            PdfPCell cell = new PdfPCell(new Phrase("Plán", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Cohorte", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Código Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Nombre Asignatura", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Docente", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Intensidad", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Día", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Entrada", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            cell = new PdfPCell(new Phrase("Hora Salida", FontFactory.getFont("arial", 10, Font.BOLD)));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabla.addCell(cell);
-            for (Horario m : getHorarioController().getConsultaHorarioCohorte()) {
-                tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
-                tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
-            }
+            document = reporteEncabezado(titulo);
+            reporteTablaHorario();
+            reporteLlenarTabla(getHorarioController().getConsultaHorarioCohorte());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
         }
         return document;
+    }
+
+    public Document reporteEncabezado(String titulo) {
+        try {
+            Paragraph paragraph = new Paragraph(titulo, FontFactory.getFont(ARIAL, 14, Font.BOLD));
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            document.add(paragraph);
+            paragraph = new Paragraph(" ", FontFactory.getFont(ARIAL, 14, Font.BOLD));
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            document.add(paragraph);
+        } catch (DocumentException ex) {
+            Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return document;
+    }
+
+    public void reporteTablaHorario() {
+        tabla = new PdfPTable(9);
+        tabla.setWidthPercentage(100);
+        ArrayList<String> nombres = new ArrayList<>();
+        nombres.add("Plán");
+        nombres.add("Cohorte");
+        nombres.add("Código Asignatura");
+        nombres.add("Nombre Asignatura");
+        nombres.add("Docente");
+        nombres.add("Intensidad");
+        nombres.add("Día");
+        nombres.add("Hora Entrada");
+        nombres.add("Hora Salida");
+        reporteTablaGeneral(nombres);
+    }
+
+    public void reporteTablaGeneral(List<String> nombres) {
+        for (String n : nombres) {
+            PdfPCell cell = new PdfPCell(new Phrase(n, FontFactory.getFont(ARIAL, 10, Font.BOLD)));
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tabla.addCell(cell);
+        }
+    }
+
+    public void reporteLlenarTabla(List<Horario> consulta) {
+        for (Horario m : consulta) {
+            tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
+        }
     }
 
     /**

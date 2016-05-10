@@ -15,7 +15,7 @@ import modelos.PerfilesJpaController;
 
 @ManagedBean(name = "perfilesController")
 @SessionScoped
-public class PerfilesController {
+public class PerfilesController extends Controller{
 
     private Perfiles selected;
     private PerfilesJpaController jpaController;
@@ -27,7 +27,7 @@ public class PerfilesController {
             query = getJpaController().getEntityManager().createQuery("SELECT p FROM Perfiles p ORDER BY p.descripcionPerfil");
             perfiles = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return perfiles;
     }

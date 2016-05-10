@@ -51,7 +51,7 @@ public class PlanJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            plan = em.merge(plan);
+            em.merge(plan);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

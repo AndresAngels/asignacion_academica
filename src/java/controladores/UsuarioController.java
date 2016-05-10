@@ -49,7 +49,7 @@ public class UsuarioController extends Controller implements Serializable {
             query.setParameter("ESTADO", 1);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return consultaTabla;
     }
@@ -63,7 +63,7 @@ public class UsuarioController extends Controller implements Serializable {
             query.setParameter("DOCENTEM", "5");
             return query.getResultList();
         } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+            JsfUtil.addErrorMessage(npe, CONSULTA);
         }
         return new ArrayList<Usuarios>();
     }

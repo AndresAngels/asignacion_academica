@@ -51,7 +51,7 @@ public class AsignaturaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            asignatura = em.merge(asignatura);
+            em.merge(asignatura);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

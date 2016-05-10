@@ -52,11 +52,12 @@ public class Sesion implements Serializable {
             query.setParameter("ESTADO", 1);
             Usuarios usuario = null;
             for (Usuarios u : (List<Usuarios>) query.getResultList()) {
+                boolean perfil = "1".equals(u.getCodigoPerfil().getCodigoPerfil())
+                        || "2".equals(u.getCodigoPerfil().getCodigoPerfil())
+                        || "3".equals(u.getCodigoPerfil().getCodigoPerfil());
                 if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
                         && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())
-                        && ("1".equals(u.getCodigoPerfil().getCodigoPerfil())
-                        || "2".equals(u.getCodigoPerfil().getCodigoPerfil())
-                        || "3".equals(u.getCodigoPerfil().getCodigoPerfil()))) {
+                        && perfil) {
                     usuario = u;
                 }
             }
