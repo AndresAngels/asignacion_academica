@@ -507,7 +507,7 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     public boolean activarCalendario() {
-        if ("3".equals(getUsuarioController().getUsuario().getIdPlan().getIdPlan())) {
+        if (getUsuarioController().getUsuario().getIdPlan() != null) {
             selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
         }
         if (selected != null && selected.getPlan() != null && !"".equals(selected.getPlan()) && selected.getCohorte() != 0) {
