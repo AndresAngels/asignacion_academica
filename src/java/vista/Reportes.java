@@ -215,7 +215,7 @@ public class Reportes {
         return document;
     }
 
-    public void reporteTablaHorario() {
+    public PdfPTable reporteTablaHorario() {
         tabla = new PdfPTable(9);
         tabla.setWidthPercentage(100);
         ArrayList<String> nombres = new ArrayList<>();
@@ -229,17 +229,19 @@ public class Reportes {
         nombres.add("Hora Entrada");
         nombres.add("Hora Salida");
         reporteTablaGeneral(nombres);
+        return tabla;
     }
 
-    public void reporteTablaGeneral(List<String> nombres) {
+    public PdfPTable reporteTablaGeneral(List<String> nombres) {
         for (String n : nombres) {
             PdfPCell cell = new PdfPCell(new Phrase(n, FontFactory.getFont(ARIAL, 10, Font.BOLD)));
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             tabla.addCell(cell);
         }
+        return tabla;
     }
 
-    public void reporteLlenarTabla(List<Horario> consulta) {
+    public PdfPTable reporteLlenarTabla(List<Horario> consulta) {
         for (Horario m : consulta) {
             tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
             tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
@@ -251,6 +253,7 @@ public class Reportes {
             tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
             tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
         }
+        return tabla;
     }
 
     /**

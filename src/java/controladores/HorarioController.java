@@ -185,12 +185,12 @@ public class HorarioController extends Controller implements Serializable {
 
     public void onEventMove(ScheduleEntryMoveEvent eve) {
         this.event = (DefaultScheduleEvent) eve.getScheduleEvent();
-        Calendar c1=Calendar.getInstance();
+        Calendar c1 = Calendar.getInstance();
         c1.setTime(event.getStartDate());
         c1.add(Calendar.DAY_OF_MONTH, eve.getDayDelta());
         c1.add(Calendar.MINUTE, eve.getMinuteDelta());
         event.setStartDate(c1.getTime());
-        Calendar c2=Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
         c2.setTime(event.getEndDate());
         c2.add(Calendar.DAY_OF_MONTH, eve.getDayDelta());
         c2.add(Calendar.MINUTE, eve.getMinuteDelta());
@@ -200,7 +200,7 @@ public class HorarioController extends Controller implements Serializable {
 
     public void onEventResize(ScheduleEntryResizeEvent eve) {
         this.event = (DefaultScheduleEvent) eve.getScheduleEvent();
-        Calendar c=Calendar.getInstance();
+        Calendar c = Calendar.getInstance();
         c.setTime(event.getEndDate());
         c.add(Calendar.MINUTE, eve.getMinuteDelta());
         event.setStartDate(c.getTime());
@@ -343,6 +343,14 @@ public class HorarioController extends Controller implements Serializable {
         createOrUpdate(CREATE);
     }
 
+    public void desactivar() {
+        if (event.getData() != null) {
+            selected = (Horario) event.getData();
+            selected.setEstado(2);
+            update();
+        }
+    }
+
     public void createOrUpdate(String opcion) {
         try {
             if ("3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())) {
@@ -368,16 +376,6 @@ public class HorarioController extends Controller implements Serializable {
         } else {
             Logger.getLogger(HorarioController.class
                     .getName()).log(Level.INFO, "Parametros nulos");
-        }
-    }
-
-    public void desactivar() {
-        if (primaryKey != null) {
-            selected = getJpaController().findHorario(primaryKey.getIdHorario());
-            if (selected != null) {
-                selected.setEstado(2);
-                update();
-            }
         }
     }
 
@@ -509,7 +507,7 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     public boolean activarCalendario() {
-        if ("3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())) {
+        if ("3".equals(getUsuarioController().getUsuario().getIdPlan().getIdPlan())) {
             selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
         }
         if (selected != null && selected.getPlan() != null && !"".equals(selected.getPlan()) && selected.getCohorte() != 0) {

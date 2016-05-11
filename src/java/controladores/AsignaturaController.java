@@ -16,6 +16,8 @@ import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.AsignaturaJpaController;
+import modelos.exceptions.NonexistentEntityException;
+import modelos.exceptions.PreexistingEntityException;
 
 @ManagedBean
 @SessionScoped
@@ -63,7 +65,7 @@ public class AsignaturaController extends Controller implements Serializable {
 
     public void createOrUpdate(String opcion) {
         try {
-            if (opcion == CREATE) {
+            if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
                 selected.setEstado(1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
@@ -72,7 +74,7 @@ public class AsignaturaController extends Controller implements Serializable {
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
             }
             selected = new Asignatura();
-        } catch (Exception e) {
+        } catch (PreexistingEntityException | NonexistentEntityException e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
     }

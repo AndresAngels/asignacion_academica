@@ -40,7 +40,7 @@ public class Menu implements Serializable {
         // Reportes
         submenu = new DefaultSubMenu("Reportes");
 
-        submenu.addElement(crearItem("Generar reportes", "/secretario/reportes.xhtml"));
+        submenu.addElement(crearItem("Generar Reportes", "/secretario/reportes.xhtml"));
 
         model.addElement(submenu);
     }

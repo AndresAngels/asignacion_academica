@@ -124,11 +124,18 @@
                                         required="true"/>
                         </h:panelGrid>
                         <div align="center" style="padding: 5px;">
-                            <p:commandButton id="addButton" value="Grabar" 
-                                             process=":form" 
-                                             actionListener="#{horarioController.addEvent}" 
-                                             onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
-                                             update=":growl"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton id="addButton" value="Grabar" 
+                                                 process=":form" 
+                                                 actionListener="#{horarioController.addEvent}" 
+                                                 onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
+                                                 update=":growl"/>
+                                <p:commandButton id="delButton" value="Eliminar" 
+                                                 process=":form" 
+                                                 actionListener="#{horarioController.desactivar()}" 
+                                                 onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
+                                                 update=":growl"/>
+                            </h:panelGrid>
                         </div>
                     </p:dialog>
                     <p:remoteCommand name="funcion" process="@this" actionListener="#{horarioController.activarDia()}" update="eventDetails"/>
