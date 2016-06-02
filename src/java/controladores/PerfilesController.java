@@ -1,8 +1,6 @@
 package controladores;
 
-import controladores.util.JsfUtil;
 import entidades.Perfiles;
-import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -10,27 +8,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import modelos.PerfilesJpaController;
 
 @ManagedBean(name = "perfilesController")
 @SessionScoped
-public class PerfilesController extends Controller {
+public class PerfilesController {
 
     private Perfiles selected;
     private PerfilesJpaController jpaController;
-    private List<Perfiles> perfiles;
-
-    public List<Perfiles> getConsultaPerfiles() {
-        try {
-            Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Perfiles p ORDER BY p.descripcionPerfil");
-            perfiles = query.getResultList();
-        } catch (NullPointerException npe) {
-            JsfUtil.addErrorMessage(npe, CONSULTA);
-        }
-        return perfiles;
-    }
 
     private PerfilesJpaController getJpaController() {
         if (jpaController == null) {

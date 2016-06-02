@@ -16,6 +16,24 @@
         <p:messages id="messages" showDetail="true"/>
         <p:panel id="panel">
             <h:panelGrid columns="3" cellpadding="10">  
+                <p:outputLabel for="perfil" value="Perfil"/>
+                <p:selectOneMenu id="perfil"
+                                 value="#{perfilesController.selected}"
+                                 required="true">
+                    <p:ajax event="change" update="panel" process="perfil" />
+                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
+                    <f:selectItems value="#{usuarioController.consultaPerfiles}" var="perfiles" itemLabel="#{perfiles.descripcionPerfil}" itemValue="#{perfiles}"/>
+                </p:selectOneMenu>
+                <p:message for="perfil" />
+                <p:outputLabel for="plan" value="Plan" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
+                <p:selectOneMenu id="plan"
+                                 value="#{planController.selected}"
+                                 required="true"
+                                 rendered="#{perfilesController.selected.codigoPerfil==3}">
+                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
+                    <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
+                </p:selectOneMenu>
+                <p:message for="perfil" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
                 <p:outputLabel for="login" value="Login"/>
                 <p:inputText id="login" 
                              value="#{usuarioController.selected.ULogin}" required="true">
@@ -40,24 +58,6 @@
                     <f:validator validatorId="email"/>
                 </p:inputText>
                 <p:message for="email" />
-                <p:outputLabel for="perfil" value="Perfil"/>
-                <p:selectOneMenu id="perfil"
-                                 value="#{perfilesController.selected}"
-                                 required="true">
-                    <p:ajax event="change" update="panel" process="perfil"/>
-                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
-                    <f:selectItems value="#{perfilesController.consultaPerfiles}" var="perfiles" itemLabel="#{perfiles.descripcionPerfil}" itemValue="#{perfiles}"/>
-                </p:selectOneMenu>
-                <p:message for="perfil" />
-                <p:outputLabel for="plan" value="Plan" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
-                <p:selectOneMenu id="plan"
-                                 value="#{planController.selected}"
-                                 required="true"
-                                 rendered="#{perfilesController.selected.codigoPerfil==3}">
-                    <f:selectItem itemLabel="--Seleccione uno--" itemValue="" />
-                    <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
-                </p:selectOneMenu>
-                <p:message for="perfil" rendered="#{perfilesController.selected.codigoPerfil==3}"/>
             </h:panelGrid>
             <c:choose>
                 <c:when test="#{usuarioController.selected.ULogin==null}">

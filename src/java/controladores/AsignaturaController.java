@@ -5,8 +5,6 @@ import entidades.Asignatura;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -17,14 +15,11 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import modelos.AsignaturaJpaController;
 import modelos.exceptions.NonexistentEntityException;
-import modelos.exceptions.PreexistingEntityException;
 
 @ManagedBean
 @SessionScoped
 public class AsignaturaController extends Controller implements Serializable {
 
-    private static final String BUNDLE = "/Bundle";
-    private static final String CREATE = "CREATE";
     private Asignatura primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private AsignaturaJpaController jpaController = null;
     private List<Asignatura> consultaTabla;
@@ -64,25 +59,28 @@ public class AsignaturaController extends Controller implements Serializable {
     }
 
     public void createOrUpdate(String opcion) {
-        try {
-            if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
+        if (opcion == CREATE) {
+            try {
                 selected.setEstado(1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
-            } else {
+            } catch (Exception e) {
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("AsignaturaError"));
+            }
+        } else {
+            try {
                 getJpaController().edit(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+            } catch (NonexistentEntityException e) {
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             }
-            selected = new Asignatura();
-        } catch (PreexistingEntityException | NonexistentEntityException e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
+        selected = new Asignatura();
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findAsignatura(getPrimaryKey().getCodasignatura());
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.INFO, "Parametros nulos");
         }
     }
 

@@ -55,7 +55,7 @@ public class HorarioController extends Controller implements Serializable {
     public List<Horario> getConsultaHorarioPrograma() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan=:PLAN");
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan=:PLAN");
             query.setParameter("PLAN", selected.getIdPlan());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
@@ -68,9 +68,24 @@ public class HorarioController extends Controller implements Serializable {
     public List<Horario> getConsultaHorarioCohorte() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Horario p WHERE p.idPlan=:PLAN AND p.cohorte=:COHORTE");
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan=:PLAN AND h.cohorte=:COHORTE");
             query.setParameter("PLAN", getPlanController().getSelected());
             query.setParameter("COHORTE", selected.getCohorte());
+            return query.getResultList();
+        } catch (NullPointerException npe) {
+            JsfUtil.addErrorMessage(npe, CONSULTA);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Horario> getConsultaHorarioGrupo() {
+        try {
+            Query query;
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE (h.idPlan!=:PLAN OR h.cohorte!=:COHORTE) AND h.codasignatura=:ASIGNATURA AND h.grupo=:GRUPO");
+            query.setParameter("PLAN", getPlanController().getSelected());
+            query.setParameter("COHORTE", selected.getCohorte());
+            query.setParameter("ASIGNATURA", getAsignaturaController().getSelected());
+            query.setParameter("GRUPO", selected.getGrupo());
             return query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -145,7 +160,7 @@ public class HorarioController extends Controller implements Serializable {
             return;
         }
         if (validarHorarioNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
-                getConsultaAsignaturaDocente(), selected.getDia(), entrada, salida)) {
+                selected.getDia(), entrada, salida)) {
             return;
         }
 
@@ -207,18 +222,19 @@ public class HorarioController extends Controller implements Serializable {
         addEvent();
     }
 
-    private boolean validarHorarioNuevo(String perfil,
-            List<Horario> consultadoHorarios, String dia, String entrada, String salida) {
-        if (validarEntradaSalida(consultadoHorarios, dia, entrada, salida)
-                && validarCarga(perfil, consultadoHorarios, entrada, salida)) {
+    private boolean validarHorarioNuevo(String perfil, String dia, String entrada, String salida) {
+        if (validarEntradaSalida(dia, entrada, salida)
+                && validarCarga(perfil, entrada, salida)
+                && validarEntradaSalidaCohorte(dia, entrada, salida)
+                && validarGrupo()) {
             return false;
         }
         return true;
     }
 
-    private boolean validarEntradaSalida(List<Horario> consultahHorarios,
+    private boolean validarEntradaSalida(
             String dia, String entrada, String salida) {
-        for (Horario h : consultahHorarios) {
+        for (Horario h : getConsultaAsignaturaDocente()) {
             boolean ent = entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0;
             boolean sal = salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0;
             if (dia.equals(h.getDia())
@@ -230,14 +246,14 @@ public class HorarioController extends Controller implements Serializable {
         return true;
     }
 
-    private boolean validarCarga(String perfil, List<Horario> consultahHorarios, String entrada, String salida) {
+    private boolean validarCarga(String perfil, String entrada, String salida) {
         double acumulador;
         String ent = entrada.replace(":", ".");
         ent = ent.replace("30", "5");
         String sal = salida.replace(":", ".");
         sal = sal.replace("30", "5");
         acumulador = Double.parseDouble(sal) - Double.parseDouble(ent);
-        if ("4".equals(perfil) && acumulador > 12) {
+        if ("4".equals(perfil) && acumulador > 20) {
             JsfUtil.addErrorMessage(CARGA);
             return false;
         }
@@ -245,17 +261,38 @@ public class HorarioController extends Controller implements Serializable {
             JsfUtil.addErrorMessage(CARGA);
             return false;
         }
-        for (Horario h : consultahHorarios) {
+        for (Horario h : getConsultaAsignaturaDocente()) {
             String intensidad = h.getIntensidad().replace(":", ".");
             intensidad = intensidad.replace("30", "5");
             acumulador += Double.parseDouble(intensidad);
         }
-        if ("4".equals(perfil) && acumulador > 12) {
+        if ("4".equals(perfil) && acumulador > 20) {
             JsfUtil.addErrorMessage(CARGA);
             return false;
         }
         if ("5".equals(perfil) && acumulador > 8) {
             JsfUtil.addErrorMessage(CARGA);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validarEntradaSalidaCohorte(
+            String dia, String entrada, String salida) {
+        for (Horario h : getConsultaHorarioCohorte()) {
+            if (dia.equals(h.getDia())
+                    && ((entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0)
+                    || (salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0))) {
+                JsfUtil.addErrorMessage("Ya existe una materia en ese horario para este cohorte");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean validarGrupo() {
+        if (!getConsultaHorarioGrupo().isEmpty()) {
+            JsfUtil.addErrorMessage("Otro plan o cohorte ya uso este grupo en la misma asignatura");
             return false;
         }
         return true;
@@ -293,6 +330,7 @@ public class HorarioController extends Controller implements Serializable {
             evt.setData(h);
             evt.setTitle(h.getCodasignatura().getCodasignatura()
                     + " - " + h.getCodasignatura().getNombreAsignatura()
+                    + " - Grupo: " + h.getGrupo()
                     + " - " + h.getULogin().getNombreLogin());
             eventModel.addEvent(evt);
         }
@@ -341,14 +379,6 @@ public class HorarioController extends Controller implements Serializable {
 
     public void create() {
         createOrUpdate(CREATE);
-    }
-
-    public void desactivar() {
-        if (event.getData() != null) {
-            selected = (Horario) event.getData();
-            selected.setEstado(2);
-            update();
-        }
     }
 
     public void createOrUpdate(String opcion) {
@@ -510,11 +540,15 @@ public class HorarioController extends Controller implements Serializable {
         if (getUsuarioController().getUsuario().getIdPlan() != null) {
             selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
         }
-        if (selected != null && selected.getPlan() != null && !"".equals(selected.getPlan()) && selected.getCohorte() != 0) {
+        if (selected != null
+                && ("1".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())
+                || "3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil()))
+                && selected.getPlan() != null
+                && !selected.getPlan().equals("")
+                && selected.getCohorte() != 0) {
             return true;
         }
         return false;
-
     }
 
     @FacesConverter(forClass = Horario.class)

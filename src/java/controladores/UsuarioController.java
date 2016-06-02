@@ -1,6 +1,7 @@
 package controladores;
 
 import controladores.util.JsfUtil;
+import entidades.Perfiles;
 import entidades.Plan;
 import entidades.Usuarios;
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class UsuarioController extends Controller implements Serializable {
     private UsuariosJpaController jpaController = null;
     private List<Usuarios> consultaTabla;
     private List<Usuarios> filtro;
+    private List<Perfiles> perfiles;
     private Usuarios usuario;
     private Usuarios selected;
     private boolean reactivar = false;
@@ -68,6 +70,23 @@ public class UsuarioController extends Controller implements Serializable {
         return new ArrayList<Usuarios>();
     }
 
+    public List<Perfiles> getConsultaPerfiles() {
+        try {
+            Query query;
+            if ("1".equals(usuario.getCodigoPerfil().getCodigoPerfil())) {
+                query = getJpaController().getEntityManager().createQuery("SELECT p FROM Perfiles p ORDER BY p.descripcionPerfil");
+                perfiles = query.getResultList();
+            } else {
+                query = getJpaController().getEntityManager().createQuery("SELECT p FROM Perfiles p WHERE p.codigoPerfil>:PERFIL ORDER BY p.descripcionPerfil");
+                query.setParameter("PERFIL", "3");
+                perfiles = query.getResultList();
+            }
+        } catch (NullPointerException npe) {
+            JsfUtil.addErrorMessage(npe, "Error al generar las consultas");
+        }
+        return perfiles;
+    }
+
     private UsuariosJpaController getJpaController() {
         if (jpaController == null) {
             jpaController = new UsuariosJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
@@ -84,8 +103,8 @@ public class UsuarioController extends Controller implements Serializable {
     }
 
     public void createOrUpdate(String opcion) {
-        try {
-            if (opcion == null ? CREATE == null : opcion.equals(CREATE)) {
+        if (opcion.equals(CREATE)) {
+            try {
                 selected.setUPassword(selected.getULogin());
                 selected.setCodigoPerfil(getPerfilesController().getSelected());
                 if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
@@ -94,20 +113,28 @@ public class UsuarioController extends Controller implements Serializable {
                 selected.setUActivo((short) 1);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
-            } else {
+            } catch (PreexistingEntityException e) {
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("UsuarioError"));
+            }
+        } else {
+            try {
                 getJpaController().edit(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosUpdated"));
+            } catch (NonexistentEntityException e) {
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             }
-            selected = new Usuarios();
-            getPlanController().setSelected(new Plan());
-        } catch (PreexistingEntityException | NonexistentEntityException e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
+        selected = new Usuarios();
+        getPlanController().setSelected(new Plan());
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
             selected = getJpaController().findUsuarios(getPrimaryKey().getULogin());
+            getPerfilesController().setSelected(selected.getCodigoPerfil());
+            if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
+                getPlanController().setSelected(selected.getIdPlan());
+            }
         } else {
             JsfUtil.addErrorMessage("Error al generar las consultas");
         }

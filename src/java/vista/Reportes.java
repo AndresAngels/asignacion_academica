@@ -66,11 +66,11 @@ public class Reportes {
                     reporteUsuarios();
                     break;
                 case 1:
-                    fileName = "Asignaturas Docente";
+                    fileName = "Asignaturas";
                     reporteAsignaturas();
                     break;
                 case 2:
-                    fileName = "Asignaturas por Doncente";
+                    fileName = "Asignaturas por Docente";
                     reporteHorarioAsignaturaDocente();
                     break;
                 case 3:
@@ -153,6 +153,8 @@ public class Reportes {
         try {
             String titulo = "Asignaturas por Docente";
             document = reporteEncabezado(titulo);
+            String docente = getUsuarioController().getSelected().getNombreLogin();
+            document = reporteEncabezado(docente);
             reporteTablaHorario();
             reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
             document.add(tabla);
@@ -166,6 +168,8 @@ public class Reportes {
         try {
             String titulo = "Horarios Programa";
             document = reporteEncabezado(titulo);
+            String programa = getHorarioController().getSelected().getIdPlan().getDescripcion();
+            document = reporteEncabezado(programa);
             reporteTablaHorario();
             reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
             document.add(tabla);
@@ -190,8 +194,12 @@ public class Reportes {
 
     public Document reporteHorarioCohorte() {
         try {
-            String titulo = "Asignaturas por Docente";
+            String titulo = "Horario por Cohorte";
             document = reporteEncabezado(titulo);
+            String programa = getHorarioController().getSelected().getIdPlan().getDescripcion()
+                    + ", Cohorte: "
+                    + getHorarioController().getSelected().getCohorte();
+            document = reporteEncabezado(programa);
             reporteTablaHorario();
             reporteLlenarTabla(getHorarioController().getConsultaHorarioCohorte());
             document.add(tabla);

@@ -68,7 +68,7 @@ public class Sesion implements Serializable {
                 getUsuarioController().setUsuario(usuario);
             }
         } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, "La operacion no se pudo completar");
+            JsfUtil.addErrorMessage(e, "No se pudo conectar a la base de datos");
             getUsuarioController().setUsuario(new Usuarios());
         }
     }

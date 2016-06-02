@@ -28,19 +28,22 @@ public class Menu implements Serializable {
         if ("1".equals(perfil) || "3".equals(perfil)) {
             submenu = new DefaultSubMenu("Registro de Informacion");
 
-            if ("1".equals(perfil)) {
-                submenu.addElement(crearItem("Registrar Usuarios", "/administrador/registrousuarios.xhtml"));
+            submenu.addElement(crearItem("Registrar Usuarios", "/administrador/registrousuarios.xhtml"));
 
-                submenu.addElement(crearItem("Registrar Asignaturas", "/administrador/registroasignaturas.xhtml"));
-            }
+            submenu.addElement(crearItem("Registrar Asignaturas", "/administrador/registroasignaturas.xhtml"));
 
             submenu.addElement(crearItem("Registrar Horarios", "/coordinador/registrohorario.xhtml"));
             model.addElement(submenu);
         }
-        // Reportes
+
+        if ("2".equals(perfil)) {
+            submenu = new DefaultSubMenu("Ver horario");
+            submenu.addElement(crearItem("Ver Horarios", "/coordinador/registrohorario.xhtml"));
+            model.addElement(submenu);
+        }
         submenu = new DefaultSubMenu("Reportes");
 
-        submenu.addElement(crearItem("Generar Reportes", "/secretario/reportes.xhtml"));
+        submenu.addElement(crearItem("Generar reportes", "/secretario/reportes.xhtml"));
 
         model.addElement(submenu);
     }
@@ -51,18 +54,15 @@ public class Menu implements Serializable {
         if (getUsuarioController().getUsuario().getCodigoPerfil() != null) {
             perfil = getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil();
         }
-        if ("/secretario/reportes.xhtml".equals(value)
+        if ("/coordinador/registrohorario.xhtml".equals(value)
+                || "/secretario/reportes.xhtml".equals(value)
                 || "/index.xhtml".equals(value)
                 || "/".equals(value)) {
             return true;
         }
-        if ("/coordinador/registrohorario.xhtml".equals(value)
-                && ("1".equals(perfil) || "3".equals(perfil))) {
-            return true;
-        }
         if (("/administrador/registrousuarios.xhtml".equals(value)
                 || "/administrador/registroasignaturas.xhtml".equals(value))
-                && "1".equals(perfil)) {
+                && ("1".equals(perfil) || "3".equals(perfil))) {
             return true;
         }
         return false;
