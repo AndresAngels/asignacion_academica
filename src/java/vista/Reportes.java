@@ -156,7 +156,7 @@ public class Reportes {
             String docente = getUsuarioController().getSelected().getNombreLogin();
             document = reporteEncabezado(docente);
             reporteTablaHorario();
-            reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
+            reporteLlenarTabla(getHorarioController().getConsultaAsignaturaDocente());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
