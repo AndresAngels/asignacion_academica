@@ -32,22 +32,23 @@
             <c:choose>
                 <c:when test="#{asignaturaController.selected.codasignatura==null}">
                     <p:commandButton value="Grabar Asignatura" 
-                                     actionListener="#{asignaturaController.create()}" process="panel" update=":tabview" onclick="funcion();" onsuccess="tabla.clearFilters();"/>
+                                     actionListener="#{asignaturaController.create()}"
+                                     process="panel" update=":tabview"
+                                     oncomplete="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
                     <p:commandButton value="Actualizar Asignatura" 
-                                     actionListener="#{asignaturaController.update}" 
-                                     process="panel" update=":tabview" onclick="funcion1();" 
+                                     actionListener="#{asignaturaController.update()}" 
+                                     process="panel" update=":tabview" oncomplete="funcion();" 
                                      onsuccess="tabla.clearFilters();"/>
                     <p:commandButton value="Cancelar Actualizacion" 
                                      actionListener="#{indexLoader.limpiarCruds()}" 
-                                     process="@this" update=":tabview" onclick="funcion1();" 
+                                     process="@this" update=":tabview" oncomplete="funcion();" 
                                      onsuccess="tabla.clearFilters();"/>
                 </c:otherwise>
             </c:choose>
             <p:remoteCommand name="funcion" process="@this" 
                              onstart="tabla.clearFilters();"/>
-            <p:remoteCommand name="funcion1" process="@this" onstart="tabla.clearFilters();"/>
         </p:panel>
     </cc:implementation>
 </html>
