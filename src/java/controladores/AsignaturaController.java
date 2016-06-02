@@ -59,7 +59,7 @@ public class AsignaturaController extends Controller implements Serializable {
     }
 
     public void createOrUpdate(String opcion) {
-        if (opcion == CREATE) {
+        if (opcion.equals(CREATE)) {
             try {
                 selected.setEstado(1);
                 getJpaController().create(selected);
