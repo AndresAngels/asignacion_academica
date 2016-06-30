@@ -1,6 +1,6 @@
 package modelos;
 
-import entidades.Usuarios;
+import entidades.Asignaturas;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -15,11 +15,11 @@ import modelos.exceptions.PreexistingEntityException;
  *
  * @author Aaron
  */
-public class UsuariosJpaController implements Serializable {
+public class AsignaturasJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
 
-    public UsuariosJpaController(EntityManagerFactory emf) {
+    public AsignaturasJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -27,16 +27,16 @@ public class UsuariosJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Usuarios usuarios) throws PreexistingEntityException {
+    public void create(Asignaturas asignaturas) throws PreexistingEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(usuarios);
+            em.persist(asignaturas);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findUsuarios(usuarios.getLoginUsuario()) != null) {
-                throw new PreexistingEntityException("Usuarios " + usuarios + " already exists.", ex);
+            if (findAsignaturas(asignaturas.getCodigoAsignatura()) != null) {
+                throw new PreexistingEntityException("Asignaturas " + asignaturas + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -46,19 +46,19 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public void edit(Usuarios usuarios) throws NonexistentEntityException {
+    public void edit(Asignaturas asignaturas) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            usuarios = em.merge(usuarios);
+            asignaturas = em.merge(asignaturas);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = usuarios.getLoginUsuario();
-                if (findUsuarios(id) == null) {
-                    throw new NonexistentEntityException("The usuarios with id " + id + " no longer exists.");
+                String id = asignaturas.getCodigoAsignatura();
+                if (findAsignaturas(id) == null) {
+                    throw new NonexistentEntityException("The asignaturas with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -69,19 +69,19 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public List<Usuarios> findUsuariosEntities() {
-        return findUsuariosEntities(true, -1, -1);
+    public List<Asignaturas> findAsignaturasEntities() {
+        return findAsignaturasEntities(true, -1, -1);
     }
 
-    public List<Usuarios> findUsuariosEntities(int maxResults, int firstResult) {
-        return findUsuariosEntities(false, maxResults, firstResult);
+    public List<Asignaturas> findAsignaturasEntities(int maxResults, int firstResult) {
+        return findAsignaturasEntities(false, maxResults, firstResult);
     }
 
-    private List<Usuarios> findUsuariosEntities(boolean all, int maxResults, int firstResult) {
+    private List<Asignaturas> findAsignaturasEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Usuarios.class));
+            cq.select(cq.from(Asignaturas.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -93,20 +93,20 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public Usuarios findUsuarios(String id) {
+    public Asignaturas findAsignaturas(String id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Usuarios.class, id);
+            return em.find(Asignaturas.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getUsuariosCount() {
+    public int getAsignaturasCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Usuarios> rt = cq.from(Usuarios.class);
+            Root<Asignaturas> rt = cq.from(Asignaturas.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

@@ -51,7 +51,7 @@ public class PerfilesJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.merge(perfiles);
+            perfiles = em.merge(perfiles);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();

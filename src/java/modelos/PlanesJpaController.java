@@ -1,6 +1,6 @@
 package modelos;
 
-import entidades.Asignatura;
+import entidades.Planes;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -15,11 +15,11 @@ import modelos.exceptions.PreexistingEntityException;
  *
  * @author Aaron
  */
-public class AsignaturaJpaController implements Serializable {
+public class PlanesJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
 
-    public AsignaturaJpaController(EntityManagerFactory emf) {
+    public PlanesJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -27,16 +27,16 @@ public class AsignaturaJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Asignatura asignatura) throws PreexistingEntityException {
+    public void create(Planes planes) throws PreexistingEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(asignatura);
+            em.persist(planes);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findAsignatura(asignatura.getCodasignatura()) != null) {
-                throw new PreexistingEntityException("Asignatura " + asignatura + " already exists.", ex);
+            if (findPlanes(planes.getIdPlan()) != null) {
+                throw new PreexistingEntityException("Planes " + planes + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -46,19 +46,19 @@ public class AsignaturaJpaController implements Serializable {
         }
     }
 
-    public void edit(Asignatura asignatura) throws NonexistentEntityException {
+    public void edit(Planes planes) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.merge(asignatura);
+            planes = em.merge(planes);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = asignatura.getCodasignatura();
-                if (findAsignatura(id) == null) {
-                    throw new NonexistentEntityException("The asignatura with id " + id + " no longer exists.");
+                String id = planes.getIdPlan();
+                if (findPlanes(id) == null) {
+                    throw new NonexistentEntityException("The planes with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -69,19 +69,19 @@ public class AsignaturaJpaController implements Serializable {
         }
     }
 
-    public List<Asignatura> findAsignaturaEntities() {
-        return findAsignaturaEntities(true, -1, -1);
+    public List<Planes> findPlanesEntities() {
+        return findPlanesEntities(true, -1, -1);
     }
 
-    public List<Asignatura> findAsignaturaEntities(int maxResults, int firstResult) {
-        return findAsignaturaEntities(false, maxResults, firstResult);
+    public List<Planes> findPlanesEntities(int maxResults, int firstResult) {
+        return findPlanesEntities(false, maxResults, firstResult);
     }
 
-    private List<Asignatura> findAsignaturaEntities(boolean all, int maxResults, int firstResult) {
+    private List<Planes> findPlanesEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Asignatura.class));
+            cq.select(cq.from(Planes.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -93,20 +93,20 @@ public class AsignaturaJpaController implements Serializable {
         }
     }
 
-    public Asignatura findAsignatura(String id) {
+    public Planes findPlanes(String id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Asignatura.class, id);
+            return em.find(Planes.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getAsignaturaCount() {
+    public int getPlanesCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Asignatura> rt = cq.from(Asignatura.class);
+            Root<Planes> rt = cq.from(Planes.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

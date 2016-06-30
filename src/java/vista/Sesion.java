@@ -1,10 +1,11 @@
 package vista;
 
-import controladores.AsignaturaController;
-import controladores.HorarioController;
+import controladores.AsignaturasController;
+import controladores.Controller;
+import controladores.HorariosController;
 import controladores.PerfilesController;
-import controladores.PlanController;
-import controladores.UsuarioController;
+import controladores.PlanesController;
+import controladores.UsuariosController;
 import controladores.util.JsfUtil;
 import entidades.Usuarios;
 import java.io.Serializable;
@@ -24,16 +25,16 @@ import modelos.SesionJpaController;
 @SessionScoped
 public class Sesion implements Serializable {
 
-    @ManagedProperty("#{asignaturaController}")
-    private AsignaturaController asignaturaController;
-    @ManagedProperty("#{horarioController}")
-    private HorarioController horarioController;
+    @ManagedProperty("#{asignaturasController}")
+    private AsignaturasController asignaturasController;
+    @ManagedProperty("#{horariosController}")
+    private HorariosController horariosController;
     @ManagedProperty("#{perfilesController}")
     private PerfilesController perfilesController;
-    @ManagedProperty("#{planController}")
-    private PlanController planController;
-    @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
+    @ManagedProperty("#{planesController}")
+    private PlanesController planesController;
+    @ManagedProperty("#{usuariosController}")
+    private UsuariosController usuariosController;
     private SesionJpaController jpaController;
     private Date fechaInicial;
 
@@ -48,28 +49,29 @@ public class Sesion implements Serializable {
     public void iniciarSesion() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.loginUsuario=:LOGIN AND u.idEstado=:ESTADO");
+            query.setParameter("ESTADO", Controller.ACTIVO);
+            query.setParameter("LOGIN", getUsuariosController().getUsuario().getLoginUsuario());
             Usuarios usuario = null;
             for (Usuarios u : (List<Usuarios>) query.getResultList()) {
                 boolean perfil = "1".equals(u.getCodigoPerfil().getCodigoPerfil())
                         || "2".equals(u.getCodigoPerfil().getCodigoPerfil())
                         || "3".equals(u.getCodigoPerfil().getCodigoPerfil());
-                if (u.getULogin().equals(getUsuarioController().getUsuario().getULogin())
-                        && u.getUPassword().equals(getUsuarioController().getUsuario().getUPassword())
+                if (u.getLoginUsuario().equals(getUsuariosController().getUsuario().getLoginUsuario())
+                        && u.getPasswordUsuario().equals(getUsuariosController().getUsuario().getPasswordUsuario())
                         && perfil) {
                     usuario = u;
                 }
             }
             if (usuario == null) {
-                getUsuarioController().setUsuario(new Usuarios());
+                getUsuariosController().setUsuario(new Usuarios());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "Datos invalidos"));
             } else {
-                getUsuarioController().setUsuario(usuario);
+                getUsuariosController().setUsuario(usuario);
             }
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, "No se pudo conectar a la base de datos");
-            getUsuarioController().setUsuario(new Usuarios());
+            getUsuariosController().setUsuario(new Usuarios());
         }
     }
 
@@ -86,17 +88,17 @@ public class Sesion implements Serializable {
     }
 
     /**
-     * @return the usuarioController
+     * @return the usuariosController
      */
-    public UsuarioController getUsuarioController() {
-        return usuarioController;
+    public UsuariosController getUsuariosController() {
+        return usuariosController;
     }
 
     /**
-     * @param usuarioController the usuarioController to set
+     * @param usuariosController the usuariosController to set
      */
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
+    public void setUsuariosController(UsuariosController usuariosController) {
+        this.usuariosController = usuariosController;
     }
 
     /**
@@ -114,31 +116,31 @@ public class Sesion implements Serializable {
     }
 
     /**
-     * @return the asignaturaController
+     * @return the asignaturasController
      */
-    public AsignaturaController getAsignaturaController() {
-        return asignaturaController;
+    public AsignaturasController getAsignaturasController() {
+        return asignaturasController;
     }
 
     /**
-     * @param asignaturaController the asignaturaController to set
+     * @param asignaturasController the asignaturaController to set
      */
-    public void setAsignaturaController(AsignaturaController asignaturaController) {
-        this.asignaturaController = asignaturaController;
+    public void setAsignaturasController(AsignaturasController asignaturasController) {
+        this.asignaturasController = asignaturasController;
     }
 
     /**
-     * @return the horarioController
+     * @return the horariosController
      */
-    public HorarioController getHorarioController() {
-        return horarioController;
+    public HorariosController getHorariosController() {
+        return horariosController;
     }
 
     /**
-     * @param horarioController the horarioController to set
+     * @param horariosController the horarioController to set
      */
-    public void setHorarioController(HorarioController horarioController) {
-        this.horarioController = horarioController;
+    public void setHorariosController(HorariosController horariosController) {
+        this.horariosController = horariosController;
     }
 
     /**
@@ -149,23 +151,23 @@ public class Sesion implements Serializable {
     }
 
     /**
-     * @param PerfilesController the PerfilesController to set
+     * @param perfilesController the PerfilesController to set
      */
     public void setPerfilesController(PerfilesController perfilesController) {
         this.perfilesController = perfilesController;
     }
 
     /**
-     * @return the planController
+     * @return the planesController
      */
-    public PlanController getPlanController() {
-        return planController;
+    public PlanesController getPlanesController() {
+        return planesController;
     }
 
     /**
-     * @param planController the planController to set
+     * @param planesController the planController to set
      */
-    public void setPlanController(PlanController planController) {
-        this.planController = planController;
+    public void setPlanesController(PlanesController planesController) {
+        this.planesController = planesController;
     }
 }

@@ -12,8 +12,8 @@
     <!-- IMPLEMENTATION -->
     <cc:implementation>
         <h:panelGrid columns="1" style="text-align: center; width: 100%; height: 100%">
-            <h:outputLabel styleClass="sesion" value="#{usuarioController.usuario.nombreLogin}"/>
-            <h:outputLabel styleClass="sesion" value="#{usuarioController.usuario.codigoPerfil.descripcionPerfil}"/>
+            <h:outputLabel styleClass="sesion" value="#{usuariosController.usuario.nombreLogin}"/>
+            <h:outputLabel styleClass="sesion" value="#{usuariosController.usuario.codigoPerfil.descripcionPerfil}"/>
             <p:commandLink styleClass="sesion" value="Cerrar Sesion" global="true" action="#{sesion.cerrarSesion}" process="@this" ajax="false" />
         </h:panelGrid>
     </cc:implementation>

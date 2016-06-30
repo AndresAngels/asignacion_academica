@@ -1,7 +1,7 @@
 package controladores;
 
 import controladores.util.JsfUtil;
-import entidades.Horario;
+import entidades.Horarios;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,7 +19,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import modelos.HorarioJpaController;
+import modelos.HorariosJpaController;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -27,9 +27,9 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
 
-@ManagedBean
+@ManagedBean(name = "horariosController")
 @SessionScoped
-public class HorarioController extends Controller implements Serializable {
+public class HorariosController extends Controller implements Serializable {
 
     private static final String CARGA = "La carga del docente supera el horario";
     private static final String LUNES = "Lunes";
@@ -40,37 +40,39 @@ public class HorarioController extends Controller implements Serializable {
     private static final String SABADO = "Sábado";
     private static final String DOMINGO = "Domingo";
     @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
+    private UsuariosController usuarioController;
     @ManagedProperty("#{planController}")
-    private PlanController planController;
-    @ManagedProperty("#{asignaturaController}")
-    private AsignaturaController asignaturaController;
-    private Horario primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
-    private HorarioJpaController jpaController = null;
-    private Horario selected;
+    private PlanesController planesController;
+    @ManagedProperty("#{asignaturasController}")
+    private AsignaturasController asignaturasController;
+    @ManagedProperty("#{modalidadController}")
+    private ModalidadController modalidadController;
+    private Horarios primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
+    private HorariosJpaController jpaController = null;
+    private Horarios selected;
     private ScheduleModel eventModel = new DefaultScheduleModel();
     private DefaultScheduleEvent event = new DefaultScheduleEvent();
-    private List<Horario> consultaTabla;
+    private List<Horarios> consultaTabla;
 
-    public List<Horario> getConsultaHorarioPrograma() {
+    public List<Horarios> getConsultaHorariosPrograma() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan=:PLAN");
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horarios h WHERE h.idPlan=:PLAN");
             query.setParameter("PLAN", selected.getIdPlan());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
-            consultaTabla = new ArrayList<Horario>();
+            consultaTabla = new ArrayList<Horarios>();
         }
         return consultaTabla;
     }
 
-    public List<Horario> getConsultaHorarioCohorte() {
+    public List<Horarios> getConsultaHorariosCohorte() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.idPlan=:PLAN AND h.cohorte=:COHORTE");
-            query.setParameter("PLAN", getPlanController().getSelected());
-            query.setParameter("COHORTE", selected.getCohorte());
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horarios h WHERE h.idPlan=:PLAN AND h.cohorteHorario=:COHORTE");
+            query.setParameter("PLAN", getPlanesController().getSelected());
+            query.setParameter("COHORTE", selected.getCohorteHorario());
             return query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -78,14 +80,14 @@ public class HorarioController extends Controller implements Serializable {
         return new ArrayList<>();
     }
 
-    public List<Horario> getConsultaHorarioGrupo() {
+    public List<Horarios> getConsultaHorariosGrupo() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE (h.idPlan!=:PLAN OR h.cohorte!=:COHORTE) AND h.codasignatura=:ASIGNATURA AND h.grupo=:GRUPO");
-            query.setParameter("PLAN", getPlanController().getSelected());
-            query.setParameter("COHORTE", selected.getCohorte());
-            query.setParameter("ASIGNATURA", getAsignaturaController().getSelected());
-            query.setParameter("GRUPO", selected.getGrupo());
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horarios h WHERE (h.idPlan!=:PLAN OR h.cohorteHorario!=:COHORTE) AND h.codigoAsignatura=:ASIGNATURA AND h.grupoHorario=:GRUPO");
+            query.setParameter("PLAN", getPlanesController().getSelected());
+            query.setParameter("COHORTE", selected.getCohorteHorario());
+            query.setParameter("ASIGNATURA", getAsignaturasController().getSelected());
+            query.setParameter("GRUPO", selected.getGrupoHorario());
             return query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -93,10 +95,10 @@ public class HorarioController extends Controller implements Serializable {
         return new ArrayList<>();
     }
 
-    public List<Horario> getConsultaAsignaturaDocente() {
+    public List<Horarios> getConsultaAsignaturaDocente() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.uLogin=:DOCENTE");
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horarios h WHERE h.loginUsuario=:DOCENTE");
             query.setParameter("DOCENTE", getUsuarioController().getSelected());
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
@@ -105,11 +107,11 @@ public class HorarioController extends Controller implements Serializable {
         return consultaTabla;
     }
 
-    public List<Horario> getConsultaTabla() {
+    public List<Horarios> getConsultaTabla() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horario h WHERE h.estado=:ESTADO ORDER BY h.uLogin.uLogin");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT h FROM Horarios h WHERE h.idEstado=:ESTADO ORDER BY h.loginUsuario.loginUsuario");
+            query.setParameter("ESTADO", ACTIVO);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -118,14 +120,14 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     public void insertar() {
-        selected.setEstado(1);
+        selected.setIdEstado(ACTIVO);
         create();
     }
 
     public void addEvent() {
         Calendar fechaEntrada = Calendar.getInstance();
         Calendar fechaSalida = Calendar.getInstance();
-        int n = obtenerDia(selected.getDia());
+        int n = obtenerDia(selected.getDiaHorario());
         if (n == 6) {
             JsfUtil.addErrorMessage("No se pueden establecer clases los domingos");
             return;
@@ -151,7 +153,7 @@ public class HorarioController extends Controller implements Serializable {
             JsfUtil.addErrorMessage("Las horas de salida debe ser mayor a la de entrada");
             return;
         }
-        event.setTitle(getAsignaturaController().getSelected().getNombre() + " - "
+        event.setTitle(getAsignaturasController().getSelected().getNombreAsignatura() + " - "
                 + getUsuarioController().getSelected().getNombreLogin());
         String entrada = extraerHora(fechaEntrada);
         String salida = extraerHora(fechaSalida);
@@ -159,8 +161,8 @@ public class HorarioController extends Controller implements Serializable {
             JsfUtil.addErrorMessage("No se puede seleccionar salidas a las 10:30 PM");
             return;
         }
-        if (validarHorarioNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
-                selected.getDia(), entrada, salida)) {
+        if (validarHorariosNuevo(getUsuarioController().getSelected().getCodigoPerfil().getCodigoPerfil(),
+                selected.getDiaHorario(), entrada, salida)) {
             return;
         }
 
@@ -170,13 +172,14 @@ public class HorarioController extends Controller implements Serializable {
         fechaIntencidad.add(Calendar.MINUTE, -fechaEntrada.get(Calendar.MINUTE));
         String intensidad = extraerHora(fechaIntencidad);
 
-        selected.setIntensidad(intensidad);
-        selected.setHEntrada(entrada);
-        selected.setHSalida(salida);
-        selected.setEstado(1);
-        selected.setCodasignatura(getAsignaturaController().getSelected());
-        selected.setIdPlan(getPlanController().getSelected());
-        selected.setULogin(getUsuarioController().getSelected());
+        selected.setIntensidadHorario(intensidad);
+        selected.setHEntradaHorario(entrada);
+        selected.setHSalidaHorario(salida);
+        selected.setIdEstado(ACTIVO);
+        selected.setCodigoAsignatura(getAsignaturasController().getSelected());
+        selected.setIdPlan(getPlanesController().getSelected());
+        selected.setLoginUsuario(getUsuarioController().getSelected());
+        selected.setIdModalidad(getModalidadController().getSelected());
         if (event.getData() == null) {
             create();
         } else {
@@ -186,7 +189,7 @@ public class HorarioController extends Controller implements Serializable {
         event.setData(selected);
         getEventModel().addEvent(event);
         event = new DefaultScheduleEvent();
-        selected = new Horario();
+        selected = new Horarios();
         event = new DefaultScheduleEvent();
     }
 
@@ -222,7 +225,7 @@ public class HorarioController extends Controller implements Serializable {
         addEvent();
     }
 
-    private boolean validarHorarioNuevo(String perfil, String dia, String entrada, String salida) {
+    private boolean validarHorariosNuevo(String perfil, String dia, String entrada, String salida) {
         if (validarEntradaSalida(dia, entrada, salida)
                 && validarCarga(perfil, entrada, salida)
                 && validarEntradaSalidaCohorte(dia, entrada, salida)
@@ -234,10 +237,10 @@ public class HorarioController extends Controller implements Serializable {
 
     private boolean validarEntradaSalida(
             String dia, String entrada, String salida) {
-        for (Horario h : getConsultaAsignaturaDocente()) {
-            boolean ent = entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0;
-            boolean sal = salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0;
-            if (dia.equals(h.getDia())
+        for (Horarios h : getConsultaAsignaturaDocente()) {
+            boolean ent = entrada.compareTo(h.getHEntradaHorario()) >= 0 && entrada.compareTo(h.getHSalidaHorario()) <= 0;
+            boolean sal = salida.compareTo(h.getHEntradaHorario()) >= 0 && salida.compareTo(h.getHSalidaHorario()) <= 0;
+            if (dia.equals(h.getDiaHorario())
                     && (ent || sal)) {
                 JsfUtil.addErrorMessage("El docente ya tiene una asignatura en este horario");
                 return false;
@@ -261,8 +264,8 @@ public class HorarioController extends Controller implements Serializable {
             JsfUtil.addErrorMessage(CARGA);
             return false;
         }
-        for (Horario h : getConsultaAsignaturaDocente()) {
-            String intensidad = h.getIntensidad().replace(":", ".");
+        for (Horarios h : getConsultaAsignaturaDocente()) {
+            String intensidad = h.getIntensidadHorario().replace(":", ".");
             intensidad = intensidad.replace("30", "5");
             acumulador += Double.parseDouble(intensidad);
         }
@@ -279,10 +282,10 @@ public class HorarioController extends Controller implements Serializable {
 
     private boolean validarEntradaSalidaCohorte(
             String dia, String entrada, String salida) {
-        for (Horario h : getConsultaHorarioCohorte()) {
-            if (dia.equals(h.getDia())
-                    && ((entrada.compareTo(h.getHEntrada()) >= 0 && entrada.compareTo(h.getHSalida()) <= 0)
-                    || (salida.compareTo(h.getHEntrada()) >= 0 && salida.compareTo(h.getHSalida()) <= 0))) {
+        for (Horarios h : getConsultaHorariosCohorte()) {
+            if (dia.equals(h.getDiaHorario())
+                    && ((entrada.compareTo(h.getHEntradaHorario()) >= 0 && entrada.compareTo(h.getHSalidaHorario()) <= 0)
+                    || (salida.compareTo(h.getHEntradaHorario()) >= 0 && salida.compareTo(h.getHSalidaHorario()) <= 0))) {
                 JsfUtil.addErrorMessage("Ya existe una materia en ese horario para este cohorte");
                 return false;
             }
@@ -291,7 +294,7 @@ public class HorarioController extends Controller implements Serializable {
     }
 
     private boolean validarGrupo() {
-        if (!getConsultaHorarioGrupo().isEmpty()) {
+        if (!getConsultaHorariosGrupo().isEmpty()) {
             JsfUtil.addErrorMessage("Otro plan o cohorte ya uso este grupo en la misma asignatura");
             return false;
         }
@@ -300,18 +303,18 @@ public class HorarioController extends Controller implements Serializable {
 
     public void cargarEventos() {
         eventModel = new DefaultScheduleModel();
-        List<Horario> consulta = getConsultaHorarioCohorte();
-        for (Horario h : consulta) {
+        List<Horarios> consulta = getConsultaHorariosCohorte();
+        for (Horarios h : consulta) {
             DefaultScheduleEvent evt = new DefaultScheduleEvent();
 
             Calendar start = Calendar.getInstance();
             Calendar end = Calendar.getInstance();
-            int n = obtenerDia(h.getDia());
+            int n = obtenerDia(h.getDiaHorario());
             start.setTime(new Date());
             start.set(Calendar.YEAR, 2016);
             start.set(Calendar.MONTH, Calendar.JANUARY);
             start.set(Calendar.DAY_OF_MONTH, 4 + n);
-            String hEntrada = h.getHEntrada();
+            String hEntrada = h.getHEntradaHorario();
             String[] entrada = hEntrada.split(":");
             start.set(Calendar.HOUR_OF_DAY, Integer.parseInt(entrada[0]));
             start.set(Calendar.MINUTE, Integer.parseInt(entrada[1]));
@@ -321,17 +324,17 @@ public class HorarioController extends Controller implements Serializable {
             end.set(Calendar.YEAR, 2016);
             end.set(Calendar.MONTH, Calendar.JANUARY);
             end.set(Calendar.DAY_OF_MONTH, 4 + n);
-            String hSalida = h.getHSalida();
+            String hSalida = h.getHSalidaHorario();
             String[] salida = hSalida.split(":");
             end.set(Calendar.HOUR_OF_DAY, Integer.parseInt(salida[0]));
             end.set(Calendar.MINUTE, Integer.parseInt(salida[1]));
             evt.setEndDate(end.getTime());
 
             evt.setData(h);
-            evt.setTitle(h.getCodasignatura().getCodasignatura()
-                    + " - " + h.getCodasignatura().getNombreAsignatura()
-                    + " - Grupo: " + h.getGrupo()
-                    + " - " + h.getULogin().getNombreLogin());
+            evt.setTitle(h.getCodigoAsignatura().getCodigoAsignatura()
+                    + " - " + h.getCodigoAsignatura().getNombreAsignatura()
+                    + " - Grupo: " + h.getGrupoHorario()
+                    + " - " + h.getLoginUsuario().getNombreLogin());
             eventModel.addEvent(evt);
         }
     }
@@ -342,33 +345,33 @@ public class HorarioController extends Controller implements Serializable {
             c.setTime(event.getStartDate());
             switch (c.get(Calendar.DAY_OF_MONTH)) {
                 case 4:
-                    selected.setDia(LUNES);
+                    selected.setDiaHorario(LUNES);
                     break;
                 case 5:
-                    selected.setDia(MARTES);
+                    selected.setDiaHorario(MARTES);
                     break;
                 case 6:
-                    selected.setDia(MIERCOLES);
+                    selected.setDiaHorario(MIERCOLES);
                     break;
                 case 7:
-                    selected.setDia(JUEVES);
+                    selected.setDiaHorario(JUEVES);
                     break;
                 case 8:
-                    selected.setDia(VIERNES);
+                    selected.setDiaHorario(VIERNES);
                     break;
                 case 9:
-                    selected.setDia(SABADO);
+                    selected.setDiaHorario(SABADO);
                     break;
                 default:
-                    selected.setDia(DOMINGO);
+                    selected.setDiaHorario(DOMINGO);
                     break;
             }
         }
     }
 
-    private HorarioJpaController getJpaController() {
+    private HorariosJpaController getJpaController() {
         if (jpaController == null) {
-            jpaController = new HorarioJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
+            jpaController = new HorariosJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
         }
         return jpaController;
     }
@@ -388,12 +391,12 @@ public class HorarioController extends Controller implements Serializable {
             }
             if (opcion.equals(CREATE)) {
                 getJpaController().create(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorarioCreated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorariosCreated"));
             } else {
                 getJpaController().edit(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorarioUpdated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("HorariosUpdated"));
             }
-            selected = new Horario();
+            selected = new Horarios();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
         }
@@ -401,10 +404,10 @@ public class HorarioController extends Controller implements Serializable {
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
-            selected = getJpaController().findHorario(getPrimaryKey().getIdHorario());
+            selected = getJpaController().findHorarios(getPrimaryKey().getIdHorario());
 
         } else {
-            Logger.getLogger(HorarioController.class
+            Logger.getLogger(HorariosController.class
                     .getName()).log(Level.INFO, "Parametros nulos");
         }
     }
@@ -441,30 +444,30 @@ public class HorarioController extends Controller implements Serializable {
     /**
      * @return the primaryKey
      */
-    public Horario getPrimaryKey() {
+    public Horarios getPrimaryKey() {
         return primaryKey;
     }
 
     /**
      * @param primaryKey the primaryKey to set
      */
-    public void setPrimaryKey(Horario primaryKey) {
+    public void setPrimaryKey(Horarios primaryKey) {
         this.primaryKey = primaryKey;
     }
 
     /**
      * @param jpaController the jpaController to set
      */
-    public void setJpaController(HorarioJpaController jpaController) {
+    public void setJpaController(HorariosJpaController jpaController) {
         this.jpaController = jpaController;
     }
 
     /**
      * @return the selected
      */
-    public Horario getSelected() {
+    public Horarios getSelected() {
         if (selected == null) {
-            selected = new Horario();
+            selected = new Horarios();
         }
         return selected;
     }
@@ -472,24 +475,24 @@ public class HorarioController extends Controller implements Serializable {
     /**
      * @param selected the selected to set
      */
-    public void setSelected(Horario selected) {
+    public void setSelected(Horarios selected) {
         this.selected = selected;
     }
 
-    public UsuarioController getUsuarioController() {
+    public UsuariosController getUsuarioController() {
         return usuarioController;
     }
 
-    public void setUsuarioController(UsuarioController usuarioController) {
+    public void setUsuarioController(UsuariosController usuarioController) {
         this.usuarioController = usuarioController;
     }
 
-    public PlanController getPlanController() {
-        return planController;
+    public PlanesController getPlanesController() {
+        return planesController;
     }
 
-    public void setPlanController(PlanController planController) {
-        this.planController = planController;
+    public void setPlanesController(PlanesController planesController) {
+        this.planesController = planesController;
     }
 
     /**
@@ -510,15 +513,15 @@ public class HorarioController extends Controller implements Serializable {
     /**
      * @return the asignaturaController
      */
-    public AsignaturaController getAsignaturaController() {
-        return asignaturaController;
+    public AsignaturasController getAsignaturasController() {
+        return asignaturasController;
     }
 
     /**
      * @param asignaturaController the asignaturaController to set
      */
-    public void setAsignaturaController(AsignaturaController asignaturaController) {
-        this.asignaturaController = asignaturaController;
+    public void setAsignaturasController(AsignaturasController asignaturasController) {
+        this.asignaturasController = asignaturasController;
     }
 
     /**
@@ -538,30 +541,44 @@ public class HorarioController extends Controller implements Serializable {
 
     public boolean activarCalendario() {
         if (getUsuarioController().getUsuario().getIdPlan() != null) {
-            selected.setPlan(getUsuarioController().getUsuario().getIdPlan().getIdPlan());
+            selected.setIdPlan(getUsuarioController().getUsuario().getIdPlan());
         }
         if (selected != null
                 && ("1".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil())
                 || "3".equals(getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil()))
-                && selected.getPlan() != null
-                && !selected.getPlan().equals("")
-                && selected.getCohorte() != 0) {
+                && selected.getIdPlan() != null
+                && !selected.getIdPlan().equals("")
+                && selected.getCohorteHorario() != 0) {
             return true;
         }
         return false;
     }
 
-    @FacesConverter(forClass = Horario.class)
-    public static class HorarioControllerConverter implements Converter {
+    /**
+     * @return the modalidadController
+     */
+    public ModalidadController getModalidadController() {
+        return modalidadController;
+    }
+
+    /**
+     * @param modalidadController the modalidadController to set
+     */
+    public void setModalidadController(ModalidadController modalidadController) {
+        this.modalidadController = modalidadController;
+    }
+
+    @FacesConverter(forClass = Horarios.class)
+    public static class HorariosControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            HorarioController controller = (HorarioController) facesContext.getApplication().getELResolver().
+            HorariosController controller = (HorariosController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "horarioController");
-            return controller.getJpaController().findHorario(Integer.parseInt(value));
+            return controller.getJpaController().findHorarios(Integer.parseInt(value));
         }
 
         java.lang.Integer getKey(String value) {
@@ -581,11 +598,11 @@ public class HorarioController extends Controller implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Horario) {
-                Horario o = (Horario) object;
+            if (object instanceof Horarios) {
+                Horarios o = (Horarios) object;
                 return "" + o.getIdHorario();
             } else {
-                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Horario.class.getName());
+                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Horarios.class.getName());
             }
         }
 

@@ -24,19 +24,19 @@
                 <h:form id="form">
                     <p:panel id="panel" header="Control de horarios">
                         <h:panelGrid id="preseleccion" columns="2">
-                            <p:outputLabel for="plan" value="Plan" rendered="#{usuarioController.usuario.codigoPerfil.codigoPerfil!=3}"/>
+                            <p:outputLabel for="plan" value="Plan" rendered="#{usuariosController.usuario.codigoPerfil.codigoPerfil!=3}"/>
                             <p:selectOneMenu id="plan"
-                                             value="#{planController.selected}"
+                                             value="#{planesController.selected}"
                                              required="true"
-                                             rendered="#{usuarioController.usuario.codigoPerfil.codigoPerfil!=3}">
+                                             rendered="#{usuariosController.usuario.codigoPerfil.codigoPerfil!=3}">
                                 <p:ajax event="change" update="panel"/>
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItems value="#{planController.consultaTabla}" var="plan" itemLabel="#{plan.descripcion}" itemValue="#{plan}"/>
+                                <f:selectItems value="#{planesController.consultaTabla}" var="plan" itemLabel="#{plan.descripcionPlan}" itemValue="#{plan}"/>
                             </p:selectOneMenu>
 
                             <p:outputLabel for="cohorte" value="Cohorte"/>
                             <p:selectOneMenu id="cohorte"
-                                             value="#{horarioController.selected.cohorte}"
+                                             value="#{horariosController.selected.cohorteHorario}"
                                              required="true">
                                 <p:ajax event="change" update="panel"/>
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
@@ -55,7 +55,7 @@
 
                             <p:outputLabel for="grupo" value="Grupo"/>
                             <p:selectOneMenu id="grupo"
-                                             value="#{horarioController.selected.grupo}"
+                                             value="#{horariosController.selected.grupoHorario}"
                                              required="true">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
                                 <f:selectItem itemLabel="50" itemValue="50" />
@@ -63,20 +63,28 @@
                                 <f:selectItem itemLabel="52" itemValue="52" />
                                 <f:selectItem itemLabel="53" itemValue="53" />
                             </p:selectOneMenu>
+
+                            <p:outputLabel for="modalidad" value="Modalidad"/>
+                            <p:selectOneMenu id="modalidad"
+                                             value="#{modalidadController.selected}"
+                                             required="true">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="" />
+                                <f:selectItems value="#{modalidadController.consultaTabla}" var="modalidad" itemLabel="#{modalidad.descripcionModalidad}" itemValue="#{modalidad}"/>
+                            </p:selectOneMenu>
                         </h:panelGrid>
 
                         <c:choose>
-                            <c:when test="#{horarioController.activarCalendario()}">
+                            <c:when test="#{horariosController.activarCalendario()}">
                                 <p:schedule id="schedule" widgetVar="myschedule" timeZone="GMT-5" locale="es"
                                             view="agendaWeek" minTime="6:30am" rightHeaderTemplate=""
                                             leftHeaderTemplate="" centerHeaderTemplate="" maxTime="10:30pm"
                                             allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
-                                            value="#{horarioController.eventModel}">
+                                            value="#{horariosController.eventModel}">
 
-                                    <p:ajax event="dateSelect" listener="#{horarioController.onDateSelect}" update="eventDetails, :growl" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
-                                    <p:ajax event="eventSelect" listener="#{horarioController.onEventSelect}" update="eventDetails, :growl" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
-                                    <p:ajax event="eventMove" listener="#{horarioController.onEventMove}" update="eventDetails, :growl" />
-                                    <p:ajax event="eventResize" listener="#{horarioController.onEventResize}" update="eventDetails, :growl" />
+                                    <p:ajax event="dateSelect" listener="#{horariosController.onDateSelect}" update="eventDetails, :growl" onsuccess="funcion();" oncomplete="PF('eventDialog').show();funcion();" />
+                                    <p:ajax event="eventSelect" listener="#{horariosController.onEventSelect}" update="eventDetails, :growl" onsuccess="funcion();" oncomplete="PF('eventDialog').show();" />
+                                    <p:ajax event="eventMove" listener="#{horariosController.onEventMove}" update="eventDetails, :growl" />
+                                    <p:ajax event="eventResize" listener="#{horariosController.onEventResize}" update="eventDetails, :growl" />
 
                                 </p:schedule>
                             </c:when>
@@ -85,7 +93,7 @@
                                             view="agendaWeek" minTime="6:30am" rightHeaderTemplate=""
                                             leftHeaderTemplate="" centerHeaderTemplate="" maxTime="10:30pm"
                                             allDaySlot="false" columnFormat="dddd" initialDate="#{sesion.fechaInicial}"
-                                            value="#{horarioController.eventModel}"/>
+                                            value="#{horariosController.eventModel}"/>
                             </c:otherwise>
                         </c:choose>
                     </p:panel>
@@ -94,30 +102,30 @@
 
                             <p:outputLabel for="Asignatura" value="Asignatura" />
                             <p:selectOneMenu id="Asignatura"
-                                             value="#{asignaturaController.selected}"
+                                             value="#{asignaturasController.selected}"
                                              required="true"
                                              filter="true" filterMatchMode="startsWith">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItems value="#{asignaturaController.consultaTabla}" var="asignatura" itemLabel="#{asignatura.codigoNombre}" itemValue="#{asignatura}"/>
+                                <f:selectItems value="#{asignaturasController.consultaTabla}" var="asignatura" itemLabel="#{asignatura.nombreAsignatura}" itemValue="#{asignatura}"/>
                             </p:selectOneMenu> 
 
                             <p:outputLabel for="Docente" value="Docente" />
                             <p:selectOneMenu id="Docente"
-                                             value="#{usuarioController.selected}"
+                                             value="#{usuariosController.selected}"
                                              required="true" filter="true"
                                              filterMatchMode="startsWith">
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="" />
-                                <f:selectItems value="#{usuarioController.consultaDocentes}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
+                                <f:selectItems value="#{usuariosController.consultaDocentes}" var="usuario" itemLabel="#{usuario.nombreLogin}" itemValue="#{usuario}"/>
                             </p:selectOneMenu>
 
                             <p:outputLabel for="inicio" value="Hora de Entrada:" />
-                            <p:calendar id="inicio" value="#{horarioController.event.startDate}"
+                            <p:calendar id="inicio" value="#{horariosController.event.startDate}"
                                         locale="es" pattern="HH:mm" timeZone="GMT-5" timeOnly="true"
                                         maxHour="22" minHour="7" stepMinute="30"
                                         required="true"/>
 
                             <p:outputLabel for="fin" value="Hora de Salida:" />
-                            <p:calendar id="fin" value="#{horarioController.event.endDate}"
+                            <p:calendar id="fin" value="#{horariosController.event.endDate}"
                                         locale="es" pattern="HH:mm" timeZone="GMT-5" timeOnly="true"
                                         maxHour="22" minHour="7" stepMinute="30"
                                         required="true"/>
@@ -126,18 +134,18 @@
                             <h:panelGrid columns="2">
                                 <p:commandButton id="addButton" value="Grabar" 
                                                  process=":form" 
-                                                 actionListener="#{horarioController.addEvent}" 
+                                                 actionListener="#{horariosController.addEvent}" 
                                                  onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
                                                  update=":growl"/>
                                 <p:commandButton id="delButton" value="Eliminar" 
                                                  process=":form" 
-                                                 actionListener="#{horarioController.desactivar()}" 
+                                                 actionListener="#{horariosController.desactivar()}" 
                                                  onsuccess="PF('myschedule').update();PF('eventDialog').hide();" 
                                                  update=":growl"/>
                             </h:panelGrid>
                         </div>
                     </p:dialog>
-                    <p:remoteCommand name="funcion" process="@this" actionListener="#{horarioController.activarDia()}" update="eventDetails"/>
+                    <p:remoteCommand name="funcion" process="@this" actionListener="#{horariosController.activarDia()}" update="eventDetails"/>
                 </h:form>
             </ui:define>
 

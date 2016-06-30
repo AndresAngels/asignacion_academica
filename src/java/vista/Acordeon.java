@@ -1,8 +1,8 @@
 package vista;
 
-import controladores.AsignaturaController;
-import controladores.HorarioController;
-import controladores.UsuarioController;
+import controladores.AsignaturasController;
+import controladores.HorariosController;
+import controladores.UsuariosController;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -14,11 +14,11 @@ import javax.faces.context.FacesContext;
 public class Acordeon implements Serializable {
 
     @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
+    private UsuariosController usuarioController;
     @ManagedProperty("#{asignaturaController}")
-    private AsignaturaController asignaturaController;
+    private AsignaturasController asignaturaController;
     @ManagedProperty("#{horarioController}")
-    private HorarioController horarioController;
+    private HorariosController horarioController;
     private String tituloTabla = "";
     private String tituloFormulario = "";
 
@@ -26,14 +26,14 @@ public class Acordeon implements Serializable {
         String value = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         if ("/administrador/registrousuarios.xhtml".equals(value)) {
             tituloTabla = "Consultar Usuarios";
-            if (getUsuarioController().getSelected().getULogin() == null) {
+            if (getUsuarioController().getSelected().getLogin() == null) {
                 tituloFormulario = "Grabar Usuario";
             } else {
                 tituloFormulario = "Actualizar Usuario";
             }
         } else if ("/administrador/registroasignaturas.xhtml".equals(value)) {
             tituloTabla = "Consultar Asignaturas";
-            if (getAsignaturaController().getSelected().getCodasignatura() == null) {
+            if (getAsignaturaController().getSelected().getCodigoAsignatura() == null) {
                 tituloFormulario = "Guardar Asignatura";
             } else {
                 tituloFormulario = "Actualizar Asignatura";
@@ -76,42 +76,42 @@ public class Acordeon implements Serializable {
     /**
      * @return the usuarioController
      */
-    public UsuarioController getUsuarioController() {
+    public UsuariosController getUsuarioController() {
         return usuarioController;
     }
 
     /**
      * @param usuarioController the usuarioController to set
      */
-    public void setUsuarioController(UsuarioController usuarioController) {
+    public void setUsuarioController(UsuariosController usuarioController) {
         this.usuarioController = usuarioController;
     }
 
     /**
      * @return the asignaturaController
      */
-    public AsignaturaController getAsignaturaController() {
+    public AsignaturasController getAsignaturaController() {
         return asignaturaController;
     }
 
     /**
      * @param asignaturaController the asignaturaController to set
      */
-    public void setAsignaturaController(AsignaturaController asignaturaController) {
+    public void setAsignaturaController(AsignaturasController asignaturaController) {
         this.asignaturaController = asignaturaController;
     }
 
     /**
      * @return the horarioController
      */
-    public HorarioController getHorarioController() {
+    public HorariosController getHorarioController() {
         return horarioController;
     }
 
     /**
      * @param horarioController the horarioController to set
      */
-    public void setHorarioController(HorarioController horarioController) {
+    public void setHorarioController(HorariosController horarioController) {
         this.horarioController = horarioController;
     }
 }

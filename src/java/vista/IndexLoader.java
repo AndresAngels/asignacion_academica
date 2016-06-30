@@ -4,11 +4,11 @@
  */
 package vista;
 
-import controladores.AsignaturaController;
-import controladores.HorarioController;
-import controladores.UsuarioController;
-import entidades.Asignatura;
-import entidades.Horario;
+import controladores.AsignaturasController;
+import controladores.HorariosController;
+import controladores.UsuariosController;
+import entidades.Asignaturas;
+import entidades.Horarios;
 import entidades.Usuarios;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -25,26 +25,26 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class IndexLoader implements Serializable {
 
-    @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
-    @ManagedProperty("#{asignaturaController}")
-    private AsignaturaController asignaturaController;
-    @ManagedProperty("#{horarioController}")
-    private HorarioController horarioControlller;
+    @ManagedProperty("#{usuariosController}")
+    private UsuariosController usuariosController;
+    @ManagedProperty("#{asignaturasController}")
+    private AsignaturasController asignaturasController;
+    @ManagedProperty("#{horariosController}")
+    private HorariosController horariosControlller;
     @ManagedProperty("#{sesion}")
     private Sesion sesion;
 
     public void indexLoader() {
-        getUsuarioController().setSelected(new Usuarios());
-        getAsignaturaController().setSelected(new Asignatura());
-        getHorarioController().setSelected(new Horario());
-        getUsuarioController().setReactivar(false);
+        getUsuariosController().setSelected(new Usuarios());
+        getAsignaturasController().setSelected(new Asignaturas());
+        getHorariosController().setSelected(new Horarios());
+        getUsuariosController().setReactivar(false);
     }
 
     public void limpiarCruds() {
-        getUsuarioController().setSelected(new Usuarios());
-        getAsignaturaController().setSelected(new Asignatura());
-        getHorarioController().setSelected(new Horario());
+        getUsuariosController().setSelected(new Usuarios());
+        getAsignaturasController().setSelected(new Asignaturas());
+        getHorariosController().setSelected(new Horarios());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Actualizacion cancelada", "La actulizacion del registro a sido cancelada"));
     }
 
@@ -63,44 +63,44 @@ public class IndexLoader implements Serializable {
     }
 
     /**
-     * @return the usuarioController
+     * @return the usuariosController
      */
-    public UsuarioController getUsuarioController() {
-        return usuarioController;
+    public UsuariosController getUsuariosController() {
+        return usuariosController;
     }
 
     /**
-     * @param usuarioController the usuarioController to set
+     * @param usuariosController the usuariosController to set
      */
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
+    public void setUsuariosController(UsuariosController usuariosController) {
+        this.usuariosController = usuariosController;
     }
 
     /**
-     * @return the asignaturaController
+     * @return the asignaturasController
      */
-    public AsignaturaController getAsignaturaController() {
-        return asignaturaController;
+    public AsignaturasController getAsignaturasController() {
+        return asignaturasController;
     }
 
     /**
-     * @param asignaturaController the asignaturaController to set
+     * @param asignaturasController the asignaturasController to set
      */
-    public void setAsignaturaController(AsignaturaController asignaturaController) {
-        this.asignaturaController = asignaturaController;
+    public void setAsignaturasController(AsignaturasController asignaturasController) {
+        this.asignaturasController = asignaturasController;
     }
 
     /**
-     * @return the horarioControlller
+     * @return the horariosControlller
      */
-    public HorarioController getHorarioController() {
-        return horarioControlller;
+    public HorariosController getHorariosController() {
+        return horariosControlller;
     }
 
     /**
-     * @param horarioControlller the horarioControlller to set
+     * @param horariosControlller the horariosControlller to set
      */
-    public void setHorarioControlller(HorarioController horarioControlller) {
-        this.horarioControlller = horarioControlller;
+    public void setHorariosControlller(HorariosController horariosControlller) {
+        this.horariosControlller = horariosControlller;
     }
 }

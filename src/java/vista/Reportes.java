@@ -10,12 +10,12 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import controladores.AsignaturaController;
-import controladores.HorarioController;
-import controladores.UsuarioController;
+import controladores.AsignaturasController;
+import controladores.HorariosController;
+import controladores.UsuariosController;
 import controladores.util.JsfUtil;
-import entidades.Asignatura;
-import entidades.Horario;
+import entidades.Asignaturas;
+import entidades.Horarios;
 import entidades.Usuarios;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
@@ -39,12 +39,12 @@ public class Reportes {
     private static final String ARIAL = "arial";
     @ManagedProperty("#{sesion}")
     private Sesion sesion;
-    @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
-    @ManagedProperty("#{asignaturaController}")
-    private AsignaturaController asignaturaController;
-    @ManagedProperty("#{horarioController}")
-    private HorarioController horarioController;
+    @ManagedProperty("#{usuariosController}")
+    private UsuariosController usuariosController;
+    @ManagedProperty("#{asignaturasController}")
+    private AsignaturasController asignaturasController;
+    @ManagedProperty("#{horariosController}")
+    private HorariosController horariosController;
     private Date inicio = null;
     private Date fin = null;
     private Document document;
@@ -116,7 +116,7 @@ public class Reportes {
             nombres.add("Apellidos");
             nombres.add("Perfiles");
             reporteTablaGeneral(nombres);
-            for (Usuarios m : getUsuarioController().getConsultaTabla()) {
+            for (Usuarios m : getUsuariosController().getConsultaTabla()) {
                 tabla.addCell(new PdfPCell(new Phrase(m.getNombre(), FontFactory.getFont(ARIAL, 10))));
                 tabla.addCell(new PdfPCell(new Phrase(m.getApellido(), FontFactory.getFont(ARIAL, 10))));
                 tabla.addCell(new PdfPCell(new Phrase(m.getCodigoPerfil().getDescripcionPerfil(), FontFactory.getFont(ARIAL, 10))));
@@ -138,8 +138,8 @@ public class Reportes {
             nombres.add("Codigo Asignatura");
             nombres.add("Nombre Asignatura");
             reporteTablaGeneral(nombres);
-            for (Asignatura m : getAsignaturaController().getConsultaTabla()) {
-                tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
+            for (Asignaturas m : getAsignaturasController().getConsultaTabla()) {
+                tabla.addCell(new PdfPCell(new Phrase(m.getCodigoAsignatura(), FontFactory.getFont(ARIAL, 10))));
                 tabla.addCell(new PdfPCell(new Phrase(m.getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
             }
             document.add(tabla);
@@ -153,10 +153,10 @@ public class Reportes {
         try {
             String titulo = "Asignaturas por Docente";
             document = reporteEncabezado(titulo);
-            String docente = getUsuarioController().getSelected().getNombreLogin();
+            String docente = getUsuariosController().getSelected().getNombreLogin();
             document = reporteEncabezado(docente);
             reporteTablaHorario();
-            reporteLlenarTabla(getHorarioController().getConsultaAsignaturaDocente());
+            reporteLlenarTabla(getHorariosController().getConsultaAsignaturaDocente());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -168,10 +168,10 @@ public class Reportes {
         try {
             String titulo = "Horarios Programa";
             document = reporteEncabezado(titulo);
-            String programa = getHorarioController().getSelected().getIdPlan().getDescripcion();
+            String programa = getHorariosController().getSelected().getIdPlan().getDescripcionPlan();
             document = reporteEncabezado(programa);
             reporteTablaHorario();
-            reporteLlenarTabla(getHorarioController().getConsultaHorarioPrograma());
+            reporteLlenarTabla(getHorariosController().getConsultaHorariosPrograma());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -184,7 +184,7 @@ public class Reportes {
             String titulo = "Horario General";
             document = reporteEncabezado(titulo);
             reporteTablaHorario();
-            reporteLlenarTabla(getHorarioController().getConsultaTabla());
+            reporteLlenarTabla(getHorariosController().getConsultaTabla());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -196,12 +196,12 @@ public class Reportes {
         try {
             String titulo = "Horario por Cohorte";
             document = reporteEncabezado(titulo);
-            String programa = getHorarioController().getSelected().getIdPlan().getDescripcion()
+            String programa = getHorariosController().getSelected().getIdPlan().getDescripcionPlan()
                     + ", Cohorte: "
-                    + getHorarioController().getSelected().getCohorte();
+                    + getHorariosController().getSelected().getCohorteHorario();
             document = reporteEncabezado(programa);
             reporteTablaHorario();
-            reporteLlenarTabla(getHorarioController().getConsultaHorarioCohorte());
+            reporteLlenarTabla(getHorariosController().getConsultaHorariosCohorte());
             document.add(tabla);
         } catch (DocumentException ex) {
             JsfUtil.addErrorMessage(ex, ex.toString());
@@ -249,17 +249,17 @@ public class Reportes {
         return tabla;
     }
 
-    public PdfPTable reporteLlenarTabla(List<Horario> consulta) {
-        for (Horario m : consulta) {
+    public PdfPTable reporteLlenarTabla(List<Horarios> consulta) {
+        for (Horarios m : consulta) {
             tabla.addCell(new PdfPCell(new Phrase(m.getIdPlan().getIdPlan(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorte(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getCodasignatura(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getCodasignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getULogin().getNombre(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getIntensidad(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getDia(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getHEntrada(), FontFactory.getFont(ARIAL, 10))));
-            tabla.addCell(new PdfPCell(new Phrase(m.getHSalida(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase("" + m.getCohorteHorario(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getCodigoAsignatura().getCodigoAsignatura(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getCodigoAsignatura().getNombreAsignatura(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getLoginUsuario().getNombre(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getIntensidadHorario(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getDiaHorario(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getHEntradaHorario(), FontFactory.getFont(ARIAL, 10))));
+            tabla.addCell(new PdfPCell(new Phrase(m.getHSalidaHorario(), FontFactory.getFont(ARIAL, 10))));
         }
         return tabla;
     }
@@ -302,41 +302,41 @@ public class Reportes {
     }
 
     /**
-     * @return the usuarioController
+     * @return the usuariosController
      */
-    public UsuarioController getUsuarioController() {
-        return usuarioController;
+    public UsuariosController getUsuariosController() {
+        return usuariosController;
     }
 
     /**
-     * @param usuarioController the usuarioController to set
+     * @param usuariosController the usuariosController to set
      */
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
+    public void setUsuariosController(UsuariosController usuariosController) {
+        this.usuariosController = usuariosController;
     }
 
-    public HorarioController getHorarioController() {
-        return horarioController;
-    }
-
-    /**
-     * @param horarioController the usuarioController to set
-     */
-    public void setHorarioController(HorarioController horarioController) {
-        this.horarioController = horarioController;
+    public HorariosController getHorariosController() {
+        return horariosController;
     }
 
     /**
-     * @return the asignaturaController
+     * @param horariosController the horariosController to set
      */
-    public AsignaturaController getAsignaturaController() {
-        return asignaturaController;
+    public void setHorariosController(HorariosController horariosController) {
+        this.horariosController = horariosController;
     }
 
     /**
-     * @param asignaturaController the asignaturaController to set
+     * @return the asignaturasController
      */
-    public void setAsignaturaController(AsignaturaController asignaturaController) {
-        this.asignaturaController = asignaturaController;
+    public AsignaturasController getAsignaturasController() {
+        return asignaturasController;
+    }
+
+    /**
+     * @param asignaturasController the asignaturasController to set
+     */
+    public void setAsignaturasController(AsignaturasController asignaturasController) {
+        this.asignaturasController = asignaturasController;
     }
 }

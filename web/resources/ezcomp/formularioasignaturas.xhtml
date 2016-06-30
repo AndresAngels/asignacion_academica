@@ -18,27 +18,27 @@
             <h:panelGrid columns="3" cellpadding="10">  
                 <p:outputLabel for="codigo" value="Codigo"/>
                 <p:inputText id="codigo" 
-                             value="#{asignaturaController.selected.codasignatura}" required="true">
+                             value="#{asignaturasController.selected.codigoAsignatura}" required="true">
                     <f:validator validatorId="asignatura"/>
                 </p:inputText>
                 <p:message for="codigo" />
                 <p:outputLabel for="nombre" value="Nombre"/>
                 <p:inputText id="nombre" 
-                             value="#{asignaturaController.selected.nombreAsignatura}" required="true">
+                             value="#{asignaturasController.selected.nombreAsignatura}" required="true">
                     <f:validator validatorId="letrasnumeros"/>
                 </p:inputText>
                 <p:message for="nombre" />
             </h:panelGrid>
             <c:choose>
-                <c:when test="#{asignaturaController.selected.codasignatura==null}">
+                <c:when test="#{asignaturasController.selected.codigoAsignatura==null}">
                     <p:commandButton value="Grabar Asignatura" 
-                                     actionListener="#{asignaturaController.create()}"
+                                     actionListener="#{asignaturasController.create()}"
                                      process="panel" update=":tabview"
                                      oncomplete="funcion();" onsuccess="tabla.clearFilters();"/>
                 </c:when>
                 <c:otherwise>
                     <p:commandButton value="Actualizar Asignatura" 
-                                     actionListener="#{asignaturaController.update()}" 
+                                     actionListener="#{asignaturasController.update()}" 
                                      process="panel" update=":tabview" oncomplete="funcion();" 
                                      onsuccess="tabla.clearFilters();"/>
                     <p:commandButton value="Cancelar Actualizacion" 

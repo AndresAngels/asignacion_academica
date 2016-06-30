@@ -1,7 +1,7 @@
 package controladores;
 
 import controladores.util.JsfUtil;
-import entidades.Asignatura;
+import entidades.Asignaturas;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -13,29 +13,29 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import modelos.AsignaturaJpaController;
+import modelos.AsignaturasJpaController;
 import modelos.exceptions.NonexistentEntityException;
 
-@ManagedBean
+@ManagedBean(name = "asignaturasController")
 @SessionScoped
-public class AsignaturaController extends Controller implements Serializable {
+public class AsignaturasController extends Controller implements Serializable {
 
-    private Asignatura primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
-    private AsignaturaJpaController jpaController = null;
-    private List<Asignatura> consultaTabla;
-    private List<Asignatura> filtro;
-    private Asignatura selected;
+    private Asignaturas primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
+    private AsignaturasJpaController jpaController = null;
+    private List<Asignaturas> consultaTabla;
+    private List<Asignaturas> filtro;
+    private Asignaturas selected;
 
-    public AsignaturaController() {
+    public AsignaturasController() {
         setColumnTemplate("codigo nombre");
         createDynamicColumns();
     }
 
-    public List<Asignatura> getConsultaTabla() {
+    public List<Asignaturas> getConsultaTabla() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT a FROM Asignatura a WHERE a.estado=:ESTADO ORDER BY a.codasignatura");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT a FROM Asignaturas a WHERE a.idEstado=:ESTADO ORDER BY a.codigoAsignatura");
+            query.setParameter("ESTADO", ACTIVO);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -43,9 +43,9 @@ public class AsignaturaController extends Controller implements Serializable {
         return consultaTabla;
     }
 
-    private AsignaturaJpaController getJpaController() {
+    private AsignaturasJpaController getJpaController() {
         if (jpaController == null) {
-            jpaController = new AsignaturaJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
+            jpaController = new AsignaturasJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
         }
         return jpaController;
     }
@@ -61,34 +61,34 @@ public class AsignaturaController extends Controller implements Serializable {
     public void createOrUpdate(String opcion) {
         if (opcion.equals(CREATE)) {
             try {
-                selected.setEstado(1);
+                selected.setIdEstado(ACTIVO);
                 getJpaController().create(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaCreated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturasCreated"));
             } catch (Exception e) {
-                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("AsignaturaError"));
+                JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("AsignaturasError"));
             }
         } else {
             try {
                 getJpaController().edit(selected);
-                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturaUpdated"));
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("AsignaturasUpdated"));
             } catch (NonexistentEntityException e) {
                 JsfUtil.addErrorMessage(e, ResourceBundle.getBundle(BUNDLE).getString("PersistenceErrorOccured"));
             }
         }
-        selected = new Asignatura();
+        selected = new Asignaturas();
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
-            selected = getJpaController().findAsignatura(getPrimaryKey().getCodasignatura());
+            selected = getJpaController().findAsignaturas(getPrimaryKey().getCodigoAsignatura());
         }
     }
 
     public void desactivar() {
         if (primaryKey != null) {
-            selected = getJpaController().findAsignatura(primaryKey.getCodasignatura());
+            selected = getJpaController().findAsignaturas(primaryKey.getCodigoAsignatura());
             if (selected != null) {
-                selected.setEstado(2);
+                selected.setIdEstado(DESACTIVADO);
                 update();
             }
         }
@@ -97,53 +97,53 @@ public class AsignaturaController extends Controller implements Serializable {
     /**
      * @return the primaryKey
      */
-    public Asignatura getPrimaryKey() {
+    public Asignaturas getPrimaryKey() {
         return primaryKey;
     }
 
     /**
      * @param primaryKey the primaryKey to set
      */
-    public void setPrimaryKey(Asignatura primaryKey) {
+    public void setPrimaryKey(Asignaturas primaryKey) {
         this.primaryKey = primaryKey;
     }
 
     /**
      * @param jpaController the jpaController to set
      */
-    public void setJpaController(AsignaturaJpaController jpaController) {
+    public void setJpaController(AsignaturasJpaController jpaController) {
         this.jpaController = jpaController;
     }
 
     /**
      * @return the selected
      */
-    public Asignatura getSelected() {
+    public Asignaturas getSelected() {
         return selected;
     }
 
     /**
      * @param selected the selected to set
      */
-    public void setSelected(Asignatura selected) {
+    public void setSelected(Asignaturas selected) {
         this.selected = selected;
     }
 
     /**
      * @return the filtro
      */
-    public List<Asignatura> getFiltro() {
+    public List<Asignaturas> getFiltro() {
         return filtro;
     }
 
     /**
      * @param filtro the filtro to set
      */
-    public void setFiltro(List<Asignatura> filtro) {
+    public void setFiltro(List<Asignaturas> filtro) {
         this.filtro = filtro;
     }
 
-    @FacesConverter(forClass = Asignatura.class)
+    @FacesConverter(forClass = Asignaturas.class)
     public static class UsuariosControllerConverter implements Converter {
 
         @Override
@@ -151,9 +151,9 @@ public class AsignaturaController extends Controller implements Serializable {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            AsignaturaController controller = (AsignaturaController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "asignaturaController");
-            return controller.getJpaController().findAsignatura(value);
+            AsignaturasController controller = (AsignaturasController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "asignaturasController");
+            return controller.getJpaController().findAsignaturas(value);
         }
 
         @Override
@@ -161,11 +161,11 @@ public class AsignaturaController extends Controller implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Asignatura) {
-                Asignatura o = (Asignatura) object;
-                return o.getCodasignatura();
+            if (object instanceof Asignaturas) {
+                Asignaturas o = (Asignaturas) object;
+                return o.getCodigoAsignatura();
             } else {
-                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Asignatura.class.getName());
+                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Asignaturas.class.getName());
             }
         }
 

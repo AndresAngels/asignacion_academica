@@ -22,43 +22,38 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Usuarios.findAll", query = "SELECT u FROM Usuarios u"),
-    @NamedQuery(name = "Usuarios.findByUId", query = "SELECT u FROM Usuarios u WHERE u.uId = :uId"),
-    @NamedQuery(name = "Usuarios.findByULogin", query = "SELECT u FROM Usuarios u WHERE u.uLogin = :uLogin"),
-    @NamedQuery(name = "Usuarios.findByUPassword", query = "SELECT u FROM Usuarios u WHERE u.uPassword = :uPassword"),
-    @NamedQuery(name = "Usuarios.findByUNombre", query = "SELECT u FROM Usuarios u WHERE u.uNombre = :uNombre"),
-    @NamedQuery(name = "Usuarios.findByUApellido", query = "SELECT u FROM Usuarios u WHERE u.uApellido = :uApellido"),
-    @NamedQuery(name = "Usuarios.findByUEmail", query = "SELECT u FROM Usuarios u WHERE u.uEmail = :uEmail"),
-    @NamedQuery(name = "Usuarios.findByUActivo", query = "SELECT u FROM Usuarios u WHERE u.uActivo = :uActivo")})
+    @NamedQuery(name = "Usuarios.findByLoginUsuario", query = "SELECT u FROM Usuarios u WHERE u.loginUsuario = :loginUsuario"),
+    @NamedQuery(name = "Usuarios.findByPasswordUsuario", query = "SELECT u FROM Usuarios u WHERE u.passwordUsuario = :passwordUsuario"),
+    @NamedQuery(name = "Usuarios.findByNombreUsuario", query = "SELECT u FROM Usuarios u WHERE u.nombreUsuario = :nombreUsuario"),
+    @NamedQuery(name = "Usuarios.findByApellidoUsuario", query = "SELECT u FROM Usuarios u WHERE u.apellidoUsuario = :apellidoUsuario"),
+    @NamedQuery(name = "Usuarios.findByEmailUsuario", query = "SELECT u FROM Usuarios u WHERE u.emailUsuario = :emailUsuario")})
 public class Usuarios implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Basic(optional = false)
-    @Column(name = "u_id")
-    private int uId;
     @Id
     @Basic(optional = false)
-    @Column(name = "u_login")
-    private String uLogin;
+    @Column(name = "login_usuario")
+    private String loginUsuario;
     @Basic(optional = false)
-    @Column(name = "u_password")
-    private String uPassword;
+    @Column(name = "password_usuario")
+    private String passwordUsuario;
     @Basic(optional = false)
-    @Column(name = "u_nombre")
-    private String uNombre;
-    @Column(name = "u_apellido")
-    private String uApellido;
+    @Column(name = "nombre_usuario")
+    private String nombreUsuario;
+    @Column(name = "apellido_usuario")
+    private String apellidoUsuario;
     @Basic(optional = false)
-    @Column(name = "u_email")
-    private String uEmail;
-    @Basic(optional = false)
-    @Column(name = "u_activo")
-    private short uActivo;
-    @JoinColumn(name = "codigo_perfil", referencedColumnName = "codigo_perfil")
+    @Column(name = "email_usuario")
+    private String emailUsuario;
+    @JoinColumn(name = "id_estado", referencedColumnName = "id_estado")
     @ManyToOne(optional = false)
+    private Estados idEstado;
+    @JoinColumn(name = "codigo_perfil", referencedColumnName = "codigo_perfil")
+    @ManyToOne
     private Perfiles codigoPerfil;
     @JoinColumn(name = "id_plan", referencedColumnName = "id_plan")
     @ManyToOne
-    private Plan idPlan;
+    private Planes idPlan;
     @Transient
     private String nombreLogin;
     @Transient
@@ -69,67 +64,65 @@ public class Usuarios implements Serializable {
     private String apellido;
 
     public Usuarios() {
-        //Contructor vacio para limpriar campos
     }
 
-    public Usuarios(String uLogin) {
-        this.uLogin = uLogin;
+    public Usuarios(String loginUsuario) {
+        this.loginUsuario = loginUsuario;
     }
 
-    public int getUId() {
-        return uId;
+    public Usuarios(String loginUsuario, String passwordUsuario, String nombreUsuario, String emailUsuario) {
+        this.loginUsuario = loginUsuario;
+        this.passwordUsuario = passwordUsuario;
+        this.nombreUsuario = nombreUsuario;
+        this.emailUsuario = emailUsuario;
     }
 
-    public void setUId(int uId) {
-        this.uId = uId;
+    public String getLoginUsuario() {
+        return loginUsuario;
     }
 
-    public String getULogin() {
-        return uLogin;
+    public void setLoginUsuario(String loginUsuario) {
+        this.loginUsuario = loginUsuario;
     }
 
-    public void setULogin(String uLogin) {
-        this.uLogin = uLogin;
+    public String getPasswordUsuario() {
+        return passwordUsuario;
     }
 
-    public String getUPassword() {
-        return uPassword;
+    public void setPasswordUsuario(String passwordUsuario) {
+        this.passwordUsuario = passwordUsuario;
     }
 
-    public void setUPassword(String uPassword) {
-        this.uPassword = uPassword;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public String getUNombre() {
-        return uNombre;
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
-    public void setUNombre(String uNombre) {
-        this.uNombre = uNombre;
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
     }
 
-    public String getUApellido() {
-        return uApellido;
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = apellidoUsuario;
     }
 
-    public void setUApellido(String uApellido) {
-        this.uApellido = uApellido;
+    public String getEmailUsuario() {
+        return emailUsuario;
     }
 
-    public String getUEmail() {
-        return uEmail;
+    public void setEmailUsuario(String emailUsuario) {
+        this.emailUsuario = emailUsuario;
     }
 
-    public void setUEmail(String uEmail) {
-        this.uEmail = uEmail;
+    public Estados getIdEstado() {
+        return idEstado;
     }
 
-    public short getUActivo() {
-        return uActivo;
-    }
-
-    public void setUActivo(short uActivo) {
-        this.uActivo = uActivo;
+    public void setIdEstado(Estados idEstado) {
+        this.idEstado = idEstado;
     }
 
     public Perfiles getCodigoPerfil() {
@@ -140,28 +133,29 @@ public class Usuarios implements Serializable {
         this.codigoPerfil = codigoPerfil;
     }
 
-    public Plan getIdPlan() {
+    public Planes getIdPlan() {
         return idPlan;
     }
 
-    public void setIdPlan(Plan idPlan) {
+    public void setIdPlan(Planes idPlan) {
         this.idPlan = idPlan;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (uLogin != null ? uLogin.hashCode() : 0);
+        hash += (loginUsuario != null ? loginUsuario.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Usuarios)) {
             return false;
         }
         Usuarios other = (Usuarios) object;
-        if ((this.uLogin == null && other.uLogin != null) || (this.uLogin != null && !this.uLogin.equals(other.uLogin))) {
+        if ((this.loginUsuario == null && other.loginUsuario != null) || (this.loginUsuario != null && !this.loginUsuario.equals(other.loginUsuario))) {
             return false;
         }
         return true;
@@ -169,14 +163,14 @@ public class Usuarios implements Serializable {
 
     @Override
     public String toString() {
-        return "entidades.Usuarios[ uLogin=" + uLogin + " ]";
+        return "entidades.Usuarios[ loginUsuario=" + loginUsuario + " ]";
     }
 
     /**
      * @return the nombreLogin
      */
     public String getNombreLogin() {
-        nombreLogin = uNombre + " " + uApellido;
+        nombreLogin = nombreUsuario + " " + apellidoUsuario;
         return nombreLogin;
     }
 
@@ -191,7 +185,7 @@ public class Usuarios implements Serializable {
      * @return the login
      */
     public String getLogin() {
-        login = uLogin;
+        login = loginUsuario;
         return login;
     }
 
@@ -206,7 +200,7 @@ public class Usuarios implements Serializable {
      * @return the nombre
      */
     public String getNombre() {
-        nombre = uNombre;
+        nombre = nombreUsuario;
         return nombre;
     }
 
@@ -221,7 +215,7 @@ public class Usuarios implements Serializable {
      * @return the apellido
      */
     public String getApellido() {
-        apellido = uApellido;
+        apellido = apellidoUsuario;
         return apellido;
     }
 

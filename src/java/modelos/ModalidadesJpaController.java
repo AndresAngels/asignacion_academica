@@ -1,6 +1,6 @@
 package modelos;
 
-import entidades.Usuarios;
+import entidades.Modalidades;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -9,17 +9,16 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import modelos.exceptions.NonexistentEntityException;
-import modelos.exceptions.PreexistingEntityException;
 
 /**
  *
  * @author Aaron
  */
-public class UsuariosJpaController implements Serializable {
+public class ModalidadesJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
 
-    public UsuariosJpaController(EntityManagerFactory emf) {
+    public ModalidadesJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -27,18 +26,13 @@ public class UsuariosJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Usuarios usuarios) throws PreexistingEntityException {
+    public void create(Modalidades modalidades) {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(usuarios);
+            em.persist(modalidades);
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findUsuarios(usuarios.getLoginUsuario()) != null) {
-                throw new PreexistingEntityException("Usuarios " + usuarios + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -46,19 +40,19 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public void edit(Usuarios usuarios) throws NonexistentEntityException {
+    public void edit(Modalidades modalidades) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            usuarios = em.merge(usuarios);
+            modalidades = em.merge(modalidades);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = usuarios.getLoginUsuario();
-                if (findUsuarios(id) == null) {
-                    throw new NonexistentEntityException("The usuarios with id " + id + " no longer exists.");
+                Integer id = modalidades.getIdModalidad();
+                if (findModalidades(id) == null) {
+                    throw new NonexistentEntityException("The modalidades with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -69,19 +63,19 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public List<Usuarios> findUsuariosEntities() {
-        return findUsuariosEntities(true, -1, -1);
+    public List<Modalidades> findModalidadesEntities() {
+        return findModalidadesEntities(true, -1, -1);
     }
 
-    public List<Usuarios> findUsuariosEntities(int maxResults, int firstResult) {
-        return findUsuariosEntities(false, maxResults, firstResult);
+    public List<Modalidades> findModalidadesEntities(int maxResults, int firstResult) {
+        return findModalidadesEntities(false, maxResults, firstResult);
     }
 
-    private List<Usuarios> findUsuariosEntities(boolean all, int maxResults, int firstResult) {
+    private List<Modalidades> findModalidadesEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Usuarios.class));
+            cq.select(cq.from(Modalidades.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -93,20 +87,20 @@ public class UsuariosJpaController implements Serializable {
         }
     }
 
-    public Usuarios findUsuarios(String id) {
+    public Modalidades findModalidades(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Usuarios.class, id);
+            return em.find(Modalidades.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getUsuariosCount() {
+    public int getModalidadesCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Usuarios> rt = cq.from(Usuarios.class);
+            Root<Modalidades> rt = cq.from(Modalidades.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

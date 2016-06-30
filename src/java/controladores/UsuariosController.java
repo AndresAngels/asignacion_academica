@@ -2,7 +2,7 @@ package controladores;
 
 import controladores.util.JsfUtil;
 import entidades.Perfiles;
-import entidades.Plan;
+import entidades.Planes;
 import entidades.Usuarios;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,14 +21,14 @@ import modelos.UsuariosJpaController;
 import modelos.exceptions.NonexistentEntityException;
 import modelos.exceptions.PreexistingEntityException;
 
-@ManagedBean(name = "usuarioController", eager = true)
+@ManagedBean(name = "usuariosController", eager = true)
 @SessionScoped
-public class UsuarioController extends Controller implements Serializable {
+public class UsuariosController extends Controller implements Serializable {
 
     @ManagedProperty("#{perfilesController}")
     private PerfilesController perfilesController;
     @ManagedProperty("#{planController}")
-    private PlanController planController;
+    private PlanesController planesController;
     private Usuarios primaryKey;  //usando para el modelo de tabla (con el que se va a buscar)
     private UsuariosJpaController jpaController = null;
     private List<Usuarios> consultaTabla;
@@ -38,7 +38,7 @@ public class UsuarioController extends Controller implements Serializable {
     private Usuarios selected;
     private boolean reactivar = false;
 
-    public UsuarioController() {
+    public UsuariosController() {
         usuario = new Usuarios();
         setColumnTemplate("login nombre apellido");
         createDynamicColumns();
@@ -47,8 +47,8 @@ public class UsuarioController extends Controller implements Serializable {
     public List<Usuarios> getConsultaTabla() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO ORDER BY u.uLogin");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.idEstado=:ESTADO ORDER BY u.loginUsuario");
+            query.setParameter("ESTADO", ACTIVO);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -59,8 +59,8 @@ public class UsuarioController extends Controller implements Serializable {
     public List<Usuarios> getConsultaDocentes() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.uActivo=:ESTADO AND (u.codigoPerfil.codigoPerfil=:DOCENTE OR u.codigoPerfil.codigoPerfil=:DOCENTEM) ORDER BY u.uLogin");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT u FROM Usuarios u WHERE u.idEstado=:ESTADO AND (u.codigoPerfil.codigoPerfil=:DOCENTE OR u.codigoPerfil.codigoPerfil=:DOCENTEM) ORDER BY u.loginUsuario");
+            query.setParameter("ESTADO", ACTIVO);
             query.setParameter("DOCENTE", "4");
             query.setParameter("DOCENTEM", "5");
             return query.getResultList();
@@ -105,12 +105,12 @@ public class UsuarioController extends Controller implements Serializable {
     public void createOrUpdate(String opcion) {
         if (opcion.equals(CREATE)) {
             try {
-                selected.setUPassword(selected.getULogin());
+                selected.setPasswordUsuario(selected.getLoginUsuario());
                 selected.setCodigoPerfil(getPerfilesController().getSelected());
                 if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
-                    selected.setIdPlan(getPlanController().getSelected());
+                    selected.setIdPlan(getPlanesController().getSelected());
                 }
-                selected.setUActivo((short) 1);
+                selected.setIdEstado(ACTIVO);
                 getJpaController().create(selected);
                 JsfUtil.addSuccessMessage(ResourceBundle.getBundle(BUNDLE).getString("UsuariosCreated"));
             } catch (PreexistingEntityException e) {
@@ -125,15 +125,15 @@ public class UsuarioController extends Controller implements Serializable {
             }
         }
         selected = new Usuarios();
-        getPlanController().setSelected(new Plan());
+        getPlanesController().setSelected(new Planes());
     }
 
     public void prepararEdicion() {
         if (getPrimaryKey() != null) {
-            selected = getJpaController().findUsuarios(getPrimaryKey().getULogin());
+            selected = getJpaController().findUsuarios(getPrimaryKey().getLoginUsuario());
             getPerfilesController().setSelected(selected.getCodigoPerfil());
             if ("3".equals(selected.getCodigoPerfil().getCodigoPerfil())) {
-                getPlanController().setSelected(selected.getIdPlan());
+                getPlanesController().setSelected(selected.getIdPlan());
             }
         } else {
             JsfUtil.addErrorMessage("Error al generar las consultas");
@@ -142,9 +142,9 @@ public class UsuarioController extends Controller implements Serializable {
 
     public void desactivar() {
         if (primaryKey != null) {
-            selected = getJpaController().findUsuarios(primaryKey.getULogin());
+            selected = getJpaController().findUsuarios(primaryKey.getLoginUsuario());
             if (selected != null) {
-                selected.setUActivo((short) 2);
+                selected.setIdEstado(DESACTIVADO);
                 update();
             }
         }
@@ -238,17 +238,17 @@ public class UsuarioController extends Controller implements Serializable {
     }
 
     /**
-     * @return the planController
+     * @return the planesController
      */
-    public PlanController getPlanController() {
-        return planController;
+    public PlanesController getPlanesController() {
+        return planesController;
     }
 
     /**
-     * @param planController the planController to set
+     * @param planesController the planController to set
      */
-    public void setPlanController(PlanController planController) {
-        this.planController = planController;
+    public void setPlanesController(PlanesController planesController) {
+        this.planesController = planesController;
     }
 
     @FacesConverter(forClass = Usuarios.class)
@@ -259,7 +259,7 @@ public class UsuarioController extends Controller implements Serializable {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            UsuarioController controller = (UsuarioController) facesContext.getApplication().getELResolver().
+            UsuariosController controller = (UsuariosController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "usuarioController");
             return controller.getJpaController().findUsuarios(value);
         }
@@ -271,7 +271,7 @@ public class UsuarioController extends Controller implements Serializable {
             }
             if (object instanceof Usuarios) {
                 Usuarios o = (Usuarios) object;
-                return o.getULogin();
+                return o.getLoginUsuario();
             } else {
                 throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Usuarios.class.getName());
             }

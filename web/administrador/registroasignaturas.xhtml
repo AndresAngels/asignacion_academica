@@ -19,10 +19,10 @@
             </ui:define>
 
             <ui:define name="tabla">
-                <ezcomp:datatable id="tablaMapa" controller="#{asignaturaController}" 
-                                  datos="#{asignaturaController.consultaTabla}" 
+                <ezcomp:datatable id="tablaMapa" controller="#{asignaturasController}" 
+                                  datos="#{asignaturasController.consultaTabla}" 
                                   campoPrimario="nombre" 
-                                  listaFiltro="#{asignaturaController.filtro}" 
+                                  listaFiltro="#{asignaturasController.filtro}" 
                                   titulo="Asignaturas" exporter="1"/>
             </ui:define>
 

@@ -5,6 +5,7 @@
  */
 package controladores;
 
+import entidades.Estados;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ public class Controller {
     public static final String BUNDLE = "/Bundle";
     public static final String CREATE = "CREATE";
     public static final String UPDATE = "UPDATE";
+    public static final Estados ACTIVO = new Estados(1, "ACTIVO");
+    public static final Estados DESACTIVADO = new Estados(0, "DESACTIVADO");
 
     //Implementando Tabla Dinamica
     public static class ColumnModel implements Serializable {

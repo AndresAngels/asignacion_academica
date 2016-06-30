@@ -6,7 +6,7 @@
 package controladores;
 
 import controladores.util.JsfUtil;
-import entidades.Plan;
+import entidades.Planes;
 import java.io.Serializable;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -17,25 +17,25 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import modelos.PlanJpaController;
+import modelos.PlanesJpaController;
 
 /**
  *
  * @author AndresAngel
  */
-@ManagedBean(name = "planController")
+@ManagedBean(name = "planesController")
 @SessionScoped
-public class PlanController extends Controller implements Serializable {
+public class PlanesController extends Controller implements Serializable {
 
-    private Plan selected;
-    private PlanJpaController jpaController;
-    private List<Plan> consultaTabla;
+    private Planes selected;
+    private PlanesJpaController jpaController;
+    private List<Planes> consultaTabla;
 
-    public List<Plan> getConsultaTabla() {
+    public List<Planes> getConsultaTabla() {
         try {
             Query query;
-            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Plan p WHERE p.estado=:ESTADO ORDER BY p.descripcion");
-            query.setParameter("ESTADO", 1);
+            query = getJpaController().getEntityManager().createQuery("SELECT p FROM Planes p WHERE p.idEstado=:ESTADO ORDER BY p.descripcionPlan");
+            query.setParameter("ESTADO", ACTIVO);
             consultaTabla = query.getResultList();
         } catch (NullPointerException npe) {
             JsfUtil.addErrorMessage(npe, CONSULTA);
@@ -46,9 +46,9 @@ public class PlanController extends Controller implements Serializable {
     /**
      * @return the jpaController
      */
-    public PlanJpaController getJpaController() {
+    public PlanesJpaController getJpaController() {
         if (jpaController == null) {
-            jpaController = new PlanJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
+            jpaController = new PlanesJpaController(Persistence.createEntityManagerFactory("asignacion_academicaPU"));
         }
         return jpaController;
     }
@@ -56,35 +56,35 @@ public class PlanController extends Controller implements Serializable {
     /**
      * @param jpaController the jpaController to set
      */
-    public void setJpaController(PlanJpaController jpaController) {
+    public void setJpaController(PlanesJpaController jpaController) {
         this.jpaController = jpaController;
     }
 
     /**
      * @return the selected
      */
-    public Plan getSelected() {
+    public Planes getSelected() {
         if (selected == null) {
-            selected = new Plan();
+            selected = new Planes();
         }
         return selected;
     }
 
-    public void setSelected(Plan selected) {
+    public void setSelected(Planes selected) {
         this.selected = selected;
     }
 
-    @FacesConverter(forClass = Plan.class)
-    public static class PlanControllerConverter implements Converter {
+    @FacesConverter(forClass = Planes.class)
+    public static class PlanesControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            PlanController controller = (PlanController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "planController");
-            return controller.getJpaController().findPlan(value);
+            PlanesController controller = (PlanesController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "planesController");
+            return controller.getJpaController().findPlanes(value);
         }
 
         @Override
@@ -92,11 +92,11 @@ public class PlanController extends Controller implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Plan) {
-                Plan o = (Plan) object;
+            if (object instanceof Planes) {
+                Planes o = (Planes) object;
                 return o.getIdPlan();
             } else {
-                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Plan.class.getName());
+                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Planes.class.getName());
             }
         }
 

@@ -1,6 +1,6 @@
 package modelos;
 
-import entidades.Plan;
+import entidades.Estados;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -15,11 +15,11 @@ import modelos.exceptions.PreexistingEntityException;
  *
  * @author Aaron
  */
-public class PlanJpaController implements Serializable {
+public class EstadosJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
 
-    public PlanJpaController(EntityManagerFactory emf) {
+    public EstadosJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -27,16 +27,16 @@ public class PlanJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Plan plan) throws PreexistingEntityException {
+    public void create(Estados estados) throws PreexistingEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(plan);
+            em.persist(estados);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findPlan(plan.getIdPlan()) != null) {
-                throw new PreexistingEntityException("Plan " + plan + " already exists.", ex);
+            if (findEstados(estados.getIdEstado()) != null) {
+                throw new PreexistingEntityException("Estados " + estados + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -46,19 +46,19 @@ public class PlanJpaController implements Serializable {
         }
     }
 
-    public void edit(Plan plan) throws NonexistentEntityException {
+    public void edit(Estados estados) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.merge(plan);
+            estados = em.merge(estados);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = plan.getIdPlan();
-                if (findPlan(id) == null) {
-                    throw new NonexistentEntityException("The plan with id " + id + " no longer exists.");
+                Integer id = estados.getIdEstado();
+                if (findEstados(id) == null) {
+                    throw new NonexistentEntityException("The estados with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -69,19 +69,19 @@ public class PlanJpaController implements Serializable {
         }
     }
 
-    public List<Plan> findPlanEntities() {
-        return findPlanEntities(true, -1, -1);
+    public List<Estados> findEstadosEntities() {
+        return findEstadosEntities(true, -1, -1);
     }
 
-    public List<Plan> findPlanEntities(int maxResults, int firstResult) {
-        return findPlanEntities(false, maxResults, firstResult);
+    public List<Estados> findEstadosEntities(int maxResults, int firstResult) {
+        return findEstadosEntities(false, maxResults, firstResult);
     }
 
-    private List<Plan> findPlanEntities(boolean all, int maxResults, int firstResult) {
+    private List<Estados> findEstadosEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Plan.class));
+            cq.select(cq.from(Estados.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -93,20 +93,20 @@ public class PlanJpaController implements Serializable {
         }
     }
 
-    public Plan findPlan(String id) {
+    public Estados findEstados(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Plan.class, id);
+            return em.find(Estados.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getPlanCount() {
+    public int getEstadosCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Plan> rt = cq.from(Plan.class);
+            Root<Estados> rt = cq.from(Estados.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

@@ -5,6 +5,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -30,9 +32,11 @@ public class Perfiles implements Serializable {
     private String codigoPerfil;
     @Column(name = "descripcion_perfil")
     private String descripcionPerfil;
+    @JoinColumn(name = "id_estado", referencedColumnName = "id_estado")
+    @ManyToOne
+    private Estados idEstado;
 
     public Perfiles() {
-        //Contructor vacio para limpriar campos
     }
 
     public Perfiles(String codigoPerfil) {
@@ -55,6 +59,14 @@ public class Perfiles implements Serializable {
         this.descripcionPerfil = descripcionPerfil;
     }
 
+    public Estados getIdEstado() {
+        return idEstado;
+    }
+
+    public void setIdEstado(Estados idEstado) {
+        this.idEstado = idEstado;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -64,6 +76,7 @@ public class Perfiles implements Serializable {
 
     @Override
     public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Perfiles)) {
             return false;
         }

@@ -23,10 +23,10 @@
                         <p:panel id="panel" header="Iniciar Sesion" style="position: fixed; left: 50%; margin-left: -143px;">
                             <h:panelGrid columns="3">
                                 <p:outputLabel for="userLogin" value="Usuario"/>
-                                <p:inputText id="userLogin" value="#{usuarioController.usuario.ULogin}" required="true"/>
+                                <p:inputText id="userLogin" value="#{usuariosController.usuario.loginUsuario}" required="true"/>
                                 <p:message for="userLogin"/>
                                 <p:outputLabel for="passLogin" value="Contraseña"/>
-                                <p:password id="passLogin" value="#{usuarioController.usuario.UPassword}" required="true"/>
+                                <p:password id="passLogin" value="#{usuariosController.usuario.passwordUsuario}" required="true"/>
                                 <p:message for="passLogin"/>
                             </h:panelGrid>
                             <div align="center" style="padding: 5px;">

@@ -1,6 +1,6 @@
 package vista;
 
-import controladores.UsuarioController;
+import controladores.UsuariosController;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -15,8 +15,8 @@ import org.primefaces.model.menu.MenuModel;
 @SessionScoped
 public class Menu implements Serializable {
 
-    @ManagedProperty("#{usuarioController}")
-    private UsuarioController usuarioController;
+    @ManagedProperty("#{usuariosController}")
+    private UsuariosController usuariosController;
     private MenuModel model;
 
     private void llenarMenu() {
@@ -24,7 +24,7 @@ public class Menu implements Serializable {
 
         // Formularios de ingreso
         DefaultSubMenu submenu;
-        String perfil = getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil();
+        String perfil = getUsuariosController().getUsuario().getCodigoPerfil().getCodigoPerfil();
         if ("1".equals(perfil) || "3".equals(perfil)) {
             submenu = new DefaultSubMenu("Registro de Informacion");
 
@@ -51,8 +51,8 @@ public class Menu implements Serializable {
     public boolean esVisible() {
         String value = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         String perfil = "";
-        if (getUsuarioController().getUsuario().getCodigoPerfil() != null) {
-            perfil = getUsuarioController().getUsuario().getCodigoPerfil().getCodigoPerfil();
+        if (getUsuariosController().getUsuario().getCodigoPerfil() != null) {
+            perfil = getUsuariosController().getUsuario().getCodigoPerfil().getCodigoPerfil();
         }
         if ("/coordinador/registrohorario.xhtml".equals(value)
                 || "/secretario/reportes.xhtml".equals(value)
@@ -81,17 +81,17 @@ public class Menu implements Serializable {
     }
 
     /**
-     * @return the usuarioController
+     * @return the usuariosController
      */
-    public UsuarioController getUsuarioController() {
-        return usuarioController;
+    public UsuariosController getUsuariosController() {
+        return usuariosController;
     }
 
     /**
-     * @param usuarioController the usuarioController to set
+     * @param usuariosController the usuariosController to set
      */
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
+    public void setUsuariosController(UsuariosController usuariosController) {
+        this.usuariosController = usuariosController;
     }
 
 }

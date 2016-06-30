@@ -15,7 +15,7 @@
                 <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=/asignacion_academica/index.xhtml"/>
                 <title>
                     <c:choose>
-                        <c:when test="#{usuarioController.usuario.ULogin!=null}">
+                        <c:when test="#{usuariosController.usuario.loginUsuario!=null}">
                             <ui:insert name="title">
                                 Plantilla
                             </ui:insert>
@@ -38,7 +38,7 @@
         </h:head>
         <h:body onload="bodyLoaded();">
             <c:choose>
-                <c:when test="#{usuarioController.usuario.ULogin!=null}">
+                <c:when test="#{usuariosController.usuario.loginUsuario!=null}">
                     <p:growl id="growl" showDetail="true"/>
                     <p:layout fullPage="true">
                         <p:layoutUnit position="north" size="106">
